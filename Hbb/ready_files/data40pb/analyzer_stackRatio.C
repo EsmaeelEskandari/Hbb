@@ -67,25 +67,25 @@ using namespace std;
 
 void analyzer_stackRatio(){
     
-const int nfiles  = 9;
+const int nfiles  = 10;
 const int nhistos = 40;
-TString leg_names[nfiles] = {"Data, 13 TeV, bx = 50 ns",/*"powheg, m(H) = 130 GeV","amc@NLO, m(H) = 125 GeV",*/"powheg, m(H) = 125 GeV","QCD, H_{T}=100-200 GeV","QCD, H_{T}=200-300 GeV","QCD, H_{T}=300-500 GeV","QCD, H_{T}=500-700 GeV","QCD, H_{T}=700-1000 GeV","QCD, H_{T}=1500-2000 GeV","QCD, H_{T}=2000-Inf GeV"};
-TString file_names[nfiles] = { "Data40pb_DoubleBtag",/*"Spring15_powheg_M130","Spring15_amcatnlo_M125",*/"Spring15_powheg_M125","Spring15_QCD_HT100to200","Spring15_QCD_HT200to300","Spring15_QCD_HT300to500","Spring15_QCD_HT500to700","Spring15_QCD_HT700to1000","Spring15_QCD_HT1500to2000","Spring15_QCD_HT2000toInf"}; 		
+TString leg_names[nfiles] = {"Data, 13 TeV, bx = 50 ns",/*"powheg, m(H) = 130 GeV","amc@NLO, m(H) = 125 GeV",*/"powheg, m(H) = 125 GeV","QCD, H_{T}=100-200 GeV","QCD, H_{T}=200-300 GeV","QCD, H_{T}=300-500 GeV","QCD, H_{T}=500-700 GeV","QCD, H_{T}=700-1000 GeV","QCD, H_{T}=1000-1500 GeV","QCD, H_{T}=1500-2000 GeV","QCD, H_{T}=2000-Inf GeV"};
+TString file_names[nfiles] = { "Data40pb_DoubleBtag",/*"Spring15_powheg_M130","Spring15_amcatnlo_M125",*/"Spring15_powheg_M125","Spring15_QCD_HT100to200","Spring15_QCD_HT200to300","Spring15_QCD_HT300to500","Spring15_QCD_HT500to700","Spring15_QCD_HT700to1000","Spring15_QCD_HT1000to1500","Spring15_QCD_HT1500to2000","Spring15_QCD_HT2000toInf"}; 		
 for (int i=0;i<nfiles;i++){
-	if (i!=0)file_names[i].Prepend("SingleBtag_");
-	if (i==0) file_names[i] = "Data40pb_SingleBtag";
+//	if (i!=0)file_names[i].Prepend("SingleBtag_");
+//	if (i==0) file_names[i] = "Data40pb_SingleBtag";
 	file_names[i].Prepend("tree");
 	file_names[i].Append(".root");
 }
-//TString trigger = "RatioDoubleBtag_";
-TString trigger = "RatioSingleBtag_";
+TString trigger = "RatioDoubleBtag_";
+//TString trigger = "RatioSingleBtag_";
 //TString dir_name= "plots_powheg_130/";
 TString dir_name= "plots_powheg_125/";
 //TString dir_name = "plots_amc/";
 Float_t lumi = 37.86;
 
 	
-Double_t xsec[nfiles] = { 1.,  /*1.96, 2.16,*/2.16, 2.75E07,  6.52E03,  3.67E05, 2.94E04, 2.54E01,  1.74E06, 121.5 };
+Double_t xsec[nfiles] = { 1.,  /*1.96, 2.16,*/2.16, 2.75E07,  6.52E03,  3.67E05, 2.94E04, 2.54E01, 1.064E03, 1.74E06, 121.5 };
 
 
 TLegend *leg = new TLegend(0.54,0.5,0.75,0.88);
@@ -162,6 +162,7 @@ do{
 		if (files==6) {histos[hist]->SetFillColor(kAzure+10);histos[hist]->SetLineColor(kAzure+10); }
 		if (files==7) {histos[hist]->SetFillColor(kGreen+2);histos[hist]->SetLineColor(kGreen+2); }
 		if (files==8) {histos[hist]->SetFillColor(kPink+9);histos[hist]->SetLineColor(kPink+9); }
+		if (files==9) {histos[hist]->SetFillColor(kViolet+1);histos[hist]->SetLineColor(kViolet+1); }
 		if (files==1) {
 			histos[hist]->SetFillStyle(3324);
 			histos[hist]->SetFillColor(1);
@@ -231,8 +232,8 @@ out_discrimination.close();
       tex2->SetTextFont(52);
       tex2->SetTextSize(0.04);
     	tex2->SetLineWidth(2);
-//		TLatex* tex_file = new TLatex(0.28,0.92,"Spring15, DoubleBtag");
-		TLatex* tex_file = new TLatex(0.28,0.92,"Spring15, SingleBtag");
+		TLatex* tex_file = new TLatex(0.28,0.92,"Spring15, DoubleBtag");
+//		TLatex* tex_file = new TLatex(0.28,0.92,"Spring15, SingleBtag");
       tex_file->SetNDC();
 		tex_file->SetTextAlign(35);
       tex_file->SetTextFont(42);
