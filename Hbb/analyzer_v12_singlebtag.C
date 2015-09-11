@@ -53,7 +53,7 @@ using namespace std;
 
 void analyzer_v12_singlebtag(int files, int files_max){
     
-const int nfiles  = 10;
+const int nfiles  = 11;
 
 TString file_names[nfiles] = {
 "MC_new/VBFHToBB_M-130_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
@@ -65,11 +65,12 @@ TString file_names[nfiles] = {
 "MC_new/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 "MC_new/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 "MC_new/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
-"MC_new/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1"
+"MC_new/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+"MC_new/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2"
 };      
-TString type[nfiles] = {"Spring15_powheg_M130","Spring15_amcatnlo_M125","Spring15_powheg_M125","Spring15_QCD_HT100to200","Spring15_QCD_HT700to1000","Spring15_QCD_HT300to500","Spring15_QCD_HT500to700","Spring15_QCD_HT2000toInf","Spring15_QCD_HT200to300","Spring15_QCD_HT1500to2000"}; 		
+TString type[nfiles] = {"Spring15_powheg_M130","Spring15_amcatnlo_M125","Spring15_powheg_M125","Spring15_QCD_HT100to200","Spring15_QCD_HT700to1000","Spring15_QCD_HT300to500","Spring15_QCD_HT500to700","Spring15_QCD_HT2000toInf","Spring15_QCD_HT200to300","Spring15_QCD_HT1500to2000", "Spring15_QCD_HT1000to1500"}; 		
 
-Double_t xsec[nfiles] = {   1.96,2.16 ,2.16, 2.75E07,  6.52E03,  3.67E05, 2.94E04, 2.54E01,  1.74E06, 121.5 };
+Double_t xsec[nfiles] = {   1.96,2.16 ,2.16, 2.75E07,  6.52E03,  3.67E05, 2.94E04, 2.54E01,  1.74E06, 121.5, 1.064E03 };
 
 do {
 	
@@ -253,6 +254,7 @@ do {
 
 		int loopJet_min = 4;
 		if (nJets<4) loopJet_min=nJets;
+		if (nJets<4) continue;
 
 
 		Double_t btag_max = 0.7;

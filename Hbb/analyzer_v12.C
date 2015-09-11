@@ -53,7 +53,7 @@ using namespace std;
 
 void analyzer_v12(int files, int files_max){
     
-const int nfiles  = 10;
+const int nfiles  = 11;
 
 TString file_names[nfiles] = {
 "MC_new/VBFHToBB_M-130_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
@@ -65,11 +65,12 @@ TString file_names[nfiles] = {
 "MC_new/QCD_HT500to700_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 "MC_new/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 "MC_new/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
-"MC_new/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1"
+"MC_new/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
+"MC_new/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2"
 };      
-TString type[nfiles] = {"Spring15_powheg_M130","Spring15_amcatnlo_M125","Spring15_powheg_M125","Spring15_QCD_HT100to200","Spring15_QCD_HT700to1000","Spring15_QCD_HT300to500","Spring15_QCD_HT500to700","Spring15_QCD_HT2000toInf","Spring15_QCD_HT200to300","Spring15_QCD_HT1500to2000"}; 		
+TString type[nfiles] = {"Spring15_powheg_M130","Spring15_amcatnlo_M125","Spring15_powheg_M125","Spring15_QCD_HT100to200","Spring15_QCD_HT700to1000","Spring15_QCD_HT300to500","Spring15_QCD_HT500to700","Spring15_QCD_HT2000toInf","Spring15_QCD_HT200to300","Spring15_QCD_HT1500to2000", "Spring15_QCD_HT1000to1500"}; 		
 
-Double_t xsec[nfiles] = {   1.96,2.16 ,2.16, 2.75E07,  6.52E03,  3.67E05, 2.94E04, 2.54E01,  1.74E06, 121.5 };
+Double_t xsec[nfiles] = {   1.96,2.16 ,2.16, 2.75E07,  6.52E03,  3.67E05, 2.94E04, 2.54E01,  1.74E06, 121.5, 1.064E03 };
 
 do {
 	
@@ -250,14 +251,19 @@ do {
 		Float_t btag_max = 0.4;
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
-		for (int i=0;i<6;i++){
+		int loopJet_min = 6;
+		if (nJets<6) loopJet_min=nJets;
+		for (int i=0;i<loopJet_min;i++){
+			if (Jet.btag[i]>1) Jet.btag[i]=1.;
+		}
+		for (int i=0;i<loopJet_min;i++){
 			if ((Jet.btag[i]>btag_max)&&(Jet.id[i]>0)){
 				btag_max=Jet.btag[i];
 				btag_max1_number=i;
 			}
 		}
 		btag_max = 0.4;
-		for (int i=0;i<6;i++){
+		for (int i=0;i<loopJet_min;i++){
 			if ((Jet.btag[i]>btag_max)&&(i!=btag_max1_number)&&(Jet.id[i]>0)) {
 				btag_max=Jet.btag[i];
 				btag_max2_number=i;
@@ -274,14 +280,14 @@ do {
 		Float_t pt_max = 20.;
 		int pt_max1_number = -1;
 		int pt_max2_number = -1;
-		for (int i=0;i<6;i++){
+		for (int i=0;i<loopJet_min;i++){
 			if ((Jet.pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(Jet.id[i]>0)) {
 				pt_max=Jet.pt[i];
 				pt_max1_number=i;	
 			}
 		}
 		pt_max = 20.;
-		for (int i=0;i<6;i++){
+		for (int i=0;i<loopJet_min;i++){
 			if ((Jet.pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(i!=pt_max1_number)&&(Jet.id[i]>0)) {
 				pt_max=Jet.pt[i];
 				pt_max2_number=i;	
@@ -460,7 +466,7 @@ do {
    		} 
     		file.Write();
     		file.Close();
-	ofstream out("output_txt/Spring15_"+type[files]+".txt");
+	 ofstream out("output_txt/Spring15_"+type[files]+".txt");
 	out<< "preselection only = "<< presel<<" , all evetns in the begining = "<<events_generated<<", % = "<< (float)presel/events_generated<< "N evets 1 fb-1 = "<<(float)presel/events_generated*xsec[files]*1000.<<endl;
 	out.close();
 	files++;
