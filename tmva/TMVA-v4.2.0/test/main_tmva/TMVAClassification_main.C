@@ -229,7 +229,7 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    if (Use["BDTG"]) //
       factory->BookMethod( TMVA::Types::kBDT, "BDTG",
-		   "!H:!V:NTrees=100:MinNodeSize=2.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=4:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+		   "!H:!V:NTrees=120:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=3:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
    // For an example of the category classifier usage, see: TMVAClassificationCategory
 
