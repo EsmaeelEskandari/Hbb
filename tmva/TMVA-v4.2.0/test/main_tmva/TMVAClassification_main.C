@@ -109,7 +109,7 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
  //  TString outfileName( "TMVA_bjet_new_powheg.root" );
-   TString outfileName( "TMVA_bjet_6var_qq5_125_08_qlike_single.root" );
+   TString outfileName( "TMVA_main_all_qcd_300to500.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -135,18 +135,14 @@ void TMVAClassification_main( TString myMethodList = "" )
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
   // factory->AddVariable( "myvar1 := var1+var2", 'F' );
   // factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
-   factory->AddVariable( "Jet_pt", "Jet p_{T}", "GeV", 'F' );
-   factory->AddVariable( "Jet_eta", "Jet #eta", "", 'F' );
-   factory->AddVariable( "Jet_btagCSV", "Jet btag", "", 'F' );
-   factory->AddVariable( "Jet_pt_idx", "Jet Pt index", "", 'I' );
-   factory->AddVariable( "Jet_eta_idx", "Jet #eta index", "", 'I' );
-   factory->AddVariable( "Jet_btagCSV_idx", "Jet btag index", "", 'I' );
- //  factory->AddVariable( "Jet_chMult", "Jet charge multiplcity", "", 'I' );
-//	  factory->AddVariable( "Jet_ptd", "Jet ptd", "", 'F' );
- //  factory->AddVariable( "Jet_axis2", "Jet axis 2", "", 'F' );
-   //factory->AddVariable( "Jet_leadTrPt", "Jet leading track p_{T}", "GeV", 'F' );
-  // factory->AddVariable( "Jet_btag_idx", "Jet btag index", "", 'I' );
-  		factory->AddVariable("Jet_deltaEtaBQ","#Delta #eta_{bq}",'F');
+   factory->AddVariable( "CSV1", "CSV_{1}", "", 'F' );
+   factory->AddVariable( "CSV2", "CSV_{2}", "", 'F' );
+   factory->AddVariable( "Mqq", "M_{qq}", "", 'F' );
+   factory->AddVariable( "DeltaQQ", "#Delta#Eta_{qq}", "", 'F' );
+   factory->AddVariable( "SoftN5", "Soft multiplicity with p_{T} > 5 GeV", "", 'I' );
+   factory->AddVariable( "HTsoft", "H_{T}^{soft}", "GeV", 'F' );
+   factory->AddVariable( "DeltaEtaQB1", "#Delta#Eta_{qb}^{forward}", "", 'F' );
+   factory->AddVariable( "DeltaEtaQB2", "#Delta#Eta_{qb}^{backward}", "", 'F' );
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
@@ -156,39 +152,48 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
-//	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_vbf_b_likelihood_04_caterina_b.root"; 
-	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_vbf_powheg_new_qlike_125_single_08_singlebtag.root"; 
+	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBF_powheg_125.root";
+	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_300_500.root";
+
+
+
 //	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_M125_powheg_VBF_b_likelihood.root";	
 
-   if (gSystem->AccessPathName( fname )) { // file does not exist in local directory
-		cout<<"input file "<< fname<<" doesn't exist!"<<endl;
+   if (gSystem->AccessPathName( fname_signal )) { // file does not exist in local directory
+		cout<<"input file "<< fname_signal<<" doesn't exist!"<<endl;
+		//break;
+	}
+   if (gSystem->AccessPathName( fname_bg)) { // file does not exist in local directory
+		cout<<"input file "<< fname_bg<<" doesn't exist!"<<endl;
 		//break;
 	}
     //  gSystem->Exec("wget http://root.cern.ch/files/tmva_class_example.root");
    
-   TFile *input = TFile::Open( fname );
+   TFile *input_signal = TFile::Open( fname_signal );
+   TFile *input_bg = TFile::Open( fname_bg );
    
-   std::cout << "--- TMVAClassification       : Using input file: " << input->GetName() << std::endl;
+   std::cout << "--- TMVAClassification       : Using input signal file: " << input_signal->GetName() << std::endl;
+   std::cout << "--- TMVAClassification       : Using input bg file: " << input_bg->GetName() << std::endl;
    
    // --- Register the training and test trees
 
-   TTree *bjet     = (TTree*)input->Get("Jet_tree_b");
-   TTree *qjet = (TTree*)input->Get("Jet_tree_b");
+   TTree *signal     = (TTree*)input_signal->Get("TMVA");
+   TTree *bg = (TTree*)input_bg->Get("TMVA");
    
    // global event weights per tree (see below for setting event-wise weights)
-   Double_t bjetWeight     = 1.0;
-   Double_t qjetWeight = 1.0;
+   Double_t signalWeight     = 1.0;
+   Double_t bgWeight = 1.0;
    
    // You can add an arbitrary number of signal or background trees
  //  factory->AddSignalTree    ( bjet,     bjetWeight  );
 //   factory->AddBackgroundTree( qjet, qjetWeight );
-   factory->AddSignalTree    ( qjet,     bjetWeight  );
-   factory->AddBackgroundTree( bjet, qjetWeight );
+   factory->AddSignalTree    ( signal,     signalWeight  );
+   factory->AddBackgroundTree( bg, bgWeight );
    // Apply additional cuts on the signal and background samples (can be different)
  //  TCut mycuts = "Jet_b_matched==1 && Jet_q_matched==0"; 
 //   TCut mycutb = "Jet_b_matched==0"; // for example: TCut mycutb = "abs(var1)<0.5";
-   TCut mycuts = "Jet_q_matched==1"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
-   TCut mycutb = "Jet_q_matched==0"; // for example: TCut mycutb = "abs(var1)<0.5";
+   TCut mycuts = ""; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+   TCut mycutb = ""; // for example: TCut mycutb = "abs(var1)<0.5";
    
 
 
