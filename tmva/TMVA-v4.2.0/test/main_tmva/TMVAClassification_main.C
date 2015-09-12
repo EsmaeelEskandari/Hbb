@@ -109,7 +109,7 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
  //  TString outfileName( "TMVA_bjet_new_powheg.root" );
-   TString outfileName( "TMVA_main_all_qcd_300to500.root" );
+   TString outfileName( "TMVA_main_all_qcd_300to500_double.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -137,12 +137,14 @@ void TMVAClassification_main( TString myMethodList = "" )
   // factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
    factory->AddVariable( "CSV1", "CSV_{1}", "", 'F' );
    factory->AddVariable( "CSV2", "CSV_{2}", "", 'F' );
-   factory->AddVariable( "Mqq", "M_{qq}", "", 'F' );
-   factory->AddVariable( "DeltaQQ", "#Delta#Eta_{qq}", "", 'F' );
+   factory->AddVariable( "Mqq", "M_{qq}", "GeV", 'F' );
+   factory->AddVariable( "DeltaEtaQQ", "#Delta#eta_{qq}", "", 'F' );
+   factory->AddVariable( "DeltaPhiBB", "#Delta#phi_{bb}", "", 'F' );
    factory->AddVariable( "SoftN5", "Soft multiplicity with p_{T} > 5 GeV", "", 'I' );
    factory->AddVariable( "HTsoft", "H_{T}^{soft}", "GeV", 'F' );
-   factory->AddVariable( "DeltaEtaQB1", "#Delta#Eta_{qb}^{forward}", "", 'F' );
-   factory->AddVariable( "DeltaEtaQB2", "#Delta#Eta_{qb}^{backward}", "", 'F' );
+   factory->AddVariable( "DeltaEtaQB1", "#Delta#eta_{qb}^{forward}", "", 'F' );
+   factory->AddVariable( "DeltaEtaQB2", "#Delta#eta_{qb}^{backward}", "", 'F' );
+   factory->AddVariable( "cosOqqbb", "cos#theta_{qqbb}", "", 'F' );
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
@@ -152,8 +154,8 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
-	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBF_powheg_125.root";
-	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_300_500.root";
+	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBF_powheg_125_double.root";
+	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_300_500_double.root";
 
 
 
