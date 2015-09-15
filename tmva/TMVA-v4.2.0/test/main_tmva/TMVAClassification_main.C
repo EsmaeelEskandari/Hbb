@@ -109,7 +109,7 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
  //  TString outfileName( "TMVA_bjet_new_powheg.root" );
-   TString outfileName( "TMVA_main_all_qcd_300to500_double.root" );
+   TString outfileName( "output/TMVA_main_all_qcd_300to500_double.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -135,16 +135,30 @@ void TMVAClassification_main( TString myMethodList = "" )
    // [all types of expressions that can also be parsed by TTree::Draw( "expression" )]
   // factory->AddVariable( "myvar1 := var1+var2", 'F' );
   // factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
-   factory->AddVariable( "CSV1", "CSV_{1}", "", 'F' );
-   factory->AddVariable( "CSV2", "CSV_{2}", "", 'F' );
+
+
+////////////first group////////////
    factory->AddVariable( "Mqq", "M_{qq}", "GeV", 'F' );
    factory->AddVariable( "DeltaEtaQQ", "#Delta#eta_{qq}", "", 'F' );
-   factory->AddVariable( "DeltaPhiBB", "#Delta#phi_{bb}", "", 'F' );
+
+////////////second group//////////////
    factory->AddVariable( "SoftN5", "Soft multiplicity with p_{T} > 5 GeV", "", 'I' );
    factory->AddVariable( "HTsoft", "H_{T}^{soft}", "GeV", 'F' );
+
+////////////third group///////////////
+   factory->AddVariable( "CSV1", "CSV_{1}", "", 'F' );
+   factory->AddVariable( "CSV2", "CSV_{2}", "", 'F' );
+
+////////////forth group//////////////
+   factory->AddVariable( "cosOqqbb", "cos#theta_{qqbb}", "", 'F' );
    factory->AddVariable( "DeltaEtaQB1", "#Delta#eta_{qb}^{forward}", "", 'F' );
    factory->AddVariable( "DeltaEtaQB2", "#Delta#eta_{qb}^{backward}", "", 'F' );
-   factory->AddVariable( "cosOqqbb", "cos#theta_{qqbb}", "", 'F' );
+   factory->AddVariable( "DeltaPhiBB", "#Delta#phi_{bb}", "", 'F' );
+
+////////////fifth group//////////
+
+
+
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
