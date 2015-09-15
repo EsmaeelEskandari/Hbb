@@ -109,7 +109,7 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
  //  TString outfileName( "TMVA_bjet_new_powheg.root" );
-   TString outfileName( "output/TMVA_main_6_step_qcd_300to500_double.root" );
+   TString outfileName( "output/TMVA_main_1_step_qcd_300to500_single.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -140,7 +140,7 @@ void TMVAClassification_main( TString myMethodList = "" )
 ////////////first group////////////
    factory->AddVariable( "Mqq", "M_{qq}", "GeV", 'F' );
    factory->AddVariable( "DeltaEtaQQ", "#Delta#eta_{qq}", "", 'F' );
-
+/*
 ////////////second group//////////////
    factory->AddVariable( "SoftN5", "Soft multiplicity with p_{T} > 5 GeV", "", 'I' );
    factory->AddVariable( "HTsoft", "H_{T}^{soft}", "GeV", 'F' );
@@ -161,7 +161,7 @@ void TMVAClassification_main( TString myMethodList = "" )
    factory->AddVariable( "DeltaEtaQB1", "#Delta#eta_{qb}^{forward}", "", 'F' );
    factory->AddVariable( "DeltaEtaQB2", "#Delta#eta_{qb}^{backward}", "", 'F' );
 
-
+*/
 
 
 
@@ -173,8 +173,8 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
-	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBF_powheg_125_double.root";
-	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_300_500_double.root";
+	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBF_powheg_125_single.root";
+	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_300_500_single.root";
 
 
 

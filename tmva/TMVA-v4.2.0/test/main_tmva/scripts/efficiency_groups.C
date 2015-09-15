@@ -16,7 +16,8 @@ void efficiency_groups(){
 	Double_t hist_integrals[n_groups];
 	for (int i=0;i<n_groups;i++){
 		file_names[i].Prepend("../output/TMVA_main_");
-		file_names[i].Append("_step_qcd_300to500_double.root");
+		//file_names[i].Append("_step_qcd_300to500_double.root");
+		file_names[i].Append("_step_qcd_300to500_single.root");
 	}
 TLegend *leg = new TLegend(0.12,0.17,0.45,0.4);
 leg->SetBorderSize(0);
@@ -41,8 +42,8 @@ leg->SetTextSize(0.04);
       tex2->SetTextFont(52);
       tex2->SetTextSize(0.04);
       tex2->SetLineWidth(2);
-		TLatex* tex_file = new TLatex(0.35,0.92,"Spring15, DoubleBtag");
-	//	TLatex* tex_file = new TLatex(0.35,0.92,"Spring15, SingleBtag");
+	//	TLatex* tex_file = new TLatex(0.35,0.92,"Spring15, DoubleBtag");
+		TLatex* tex_file = new TLatex(0.35,0.92,"Spring15, SingleBtag");
       tex_file->SetNDC();
 		tex_file->SetTextAlign(35);
       tex_file->SetTextFont(42);
@@ -105,35 +106,7 @@ leg->SetTextSize(0.04);
 		//file->Close();
 	}
 	leg->Draw("same");
-	c1->Print("plots/efficiency_groups_roc.png");
+	c1->Print("plots/efficiency_groups_roc_single.png");
 
-////////////////////////////////
-
-
-		TCanvas *c2 = new TCanvas();
-		c2->SetBottomMargin(.12);
-		c2->cd();
-		TH1F *frame2 = new TH1F("frame2","",n_groups,0.,6.);
-		frame2->SetMinimum(0.6);
-      frame2->SetMaximum(1.0);
-      frame2->GetYaxis()->SetTitleOffset(0.9);
-      frame2->GetXaxis()->SetTitleOffset(0.91);
-      frame2->SetStats(0);
-      frame2->SetTitleFont(42,"x");
-		frame2->SetTitleFont(42,"y");
-      frame2->SetTitleSize(0.05, "XYZ");
-		frame2->SetYTitle("ROC Area");
-		frame2->SetXTitle("");	
-		frame2->GetXaxis()->SetLabelSize(0.05);
-		for (int i=0;i<n_groups;i++){
-			frame2->GetXaxis()->SetBinLabel(i+1,legend_names[i]);
-		}
-		frame2->Draw();
-		TGraph *gr = new TGraph(n_groups,frame2_axisx,hist_integrals);
-		gr->SetMarkerStyle(20);
-		gr->SetLineWidth(2);
-		gr->Draw("PLsame");
-		c2->Print("plots/efficiency_groups.png");
-	
 
 }
