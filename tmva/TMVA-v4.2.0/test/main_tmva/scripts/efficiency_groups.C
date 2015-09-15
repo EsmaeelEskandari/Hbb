@@ -9,16 +9,16 @@
 #include "TFile.h"
 
 void efficiency_groups(){
-	const int n_groups = 5;
-	TString file_names[n_groups] = {"1","2","3","4","all"};
-	TString legend_names[n_groups] = {"qq system", "soft activity", "btag", "angular dynamics","all"};
-	Double_t frame2_axisx[n_groups] = {.5,1.5,2.5,3.5,4.5};
+	const int n_groups = 6;
+	TString file_names[n_groups] = {"1","2","3","4","5","6"};
+	TString legend_names[n_groups] = {"qq system", "soft activity", "btag", "angular dynamics","bb system", "qb system"};
+	Double_t frame2_axisx[n_groups] = {.5,1.5,2.5,3.5,4.5,5.5};
 	Double_t hist_integrals[n_groups];
 	for (int i=0;i<n_groups;i++){
 		file_names[i].Prepend("../output/TMVA_main_");
-		file_names[i].Append("_qcd_300to500_double.root");
+		file_names[i].Append("_step_qcd_300to500_double.root");
 	}
-TLegend *leg = new TLegend(0.15,0.17,0.3,0.35);
+TLegend *leg = new TLegend(0.12,0.17,0.45,0.4);
 leg->SetBorderSize(0);
 leg->SetTextSize(0.04);
 
@@ -63,7 +63,7 @@ leg->SetTextSize(0.04);
 		frame->SetYTitle("Background rejection");
 		frame->SetXTitle("Signal efficiency");
 		frame->Draw();
-	for (int current_file=0;current_file<n_groups;current_file++){
+	for (int current_file=n_groups-1;current_file>=0;current_file--){
 		TFile *file = new TFile(file_names[current_file]);
 		file->cd("Method_BDT/BDTG");
 		file->ls();
@@ -72,8 +72,30 @@ leg->SetTextSize(0.04);
 		hist->SetDirectory(0);
 		hist->SetTitle("");
 		hist->SetLineWidth(3);
-		hist->SetLineColor(current_file+1);
-		hist->SetLineStyle(current_file+1);
+		if (current_file==4) {
+			hist->SetLineColor(kGreen);
+			hist->SetLineStyle(2);
+		}
+		if (current_file==0) {
+			hist->SetLineColor(kCyan);
+			hist->SetLineStyle(5);
+		}
+		if (current_file==1) {
+			hist->SetLineColor(kBlue);
+			hist->SetLineStyle(7);
+		}
+		if (current_file==2) {
+			hist->SetLineColor(1);
+			hist->SetLineStyle(9);
+		}
+		if (current_file==3) {
+			hist->SetLineColor(kOrange+1);
+			hist->SetLineStyle(10);
+		}
+		if (current_file==5) {
+			hist->SetLineColor(kRed);
+			hist->SetLineStyle(1);
+		}
 		hist->Draw("Lsame");
 		leg->AddEntry(hist, legend_names[current_file]);
 		tex->Draw();
@@ -83,7 +105,7 @@ leg->SetTextSize(0.04);
 		//file->Close();
 	}
 	leg->Draw("same");
-	c1->Print("efficiency_groups_roc_separately.png");
+	c1->Print("plots/efficiency_groups_roc.png");
 
 ////////////////////////////////
 
@@ -91,9 +113,9 @@ leg->SetTextSize(0.04);
 		TCanvas *c2 = new TCanvas();
 		c2->SetBottomMargin(.12);
 		c2->cd();
-		TH1F *frame2 = new TH1F("frame2","",n_groups,0.,5.);
-		frame2->SetMinimum(0.);
-      frame2->SetMaximum(1.05);
+		TH1F *frame2 = new TH1F("frame2","",n_groups,0.,6.);
+		frame2->SetMinimum(0.6);
+      frame2->SetMaximum(1.0);
       frame2->GetYaxis()->SetTitleOffset(0.9);
       frame2->GetXaxis()->SetTitleOffset(0.91);
       frame2->SetStats(0);
@@ -111,7 +133,7 @@ leg->SetTextSize(0.04);
 		gr->SetMarkerStyle(20);
 		gr->SetLineWidth(2);
 		gr->Draw("PLsame");
-		c2->Print("efficiency_groups_separately.png");
+		c2->Print("plots/efficiency_groups.png");
 	
 
 }

@@ -109,7 +109,7 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
  //  TString outfileName( "TMVA_bjet_new_powheg.root" );
-   TString outfileName( "output/TMVA_main_all_qcd_300to500_double.root" );
+   TString outfileName( "output/TMVA_main_6_step_qcd_300to500_double.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -151,11 +151,16 @@ void TMVAClassification_main( TString myMethodList = "" )
 
 ////////////forth group//////////////
    factory->AddVariable( "cosOqqbb", "cos#theta_{qqbb}", "", 'F' );
-   factory->AddVariable( "DeltaEtaQB1", "#Delta#eta_{qb}^{forward}", "", 'F' );
-   factory->AddVariable( "DeltaEtaQB2", "#Delta#eta_{qb}^{backward}", "", 'F' );
-   factory->AddVariable( "DeltaPhiBB", "#Delta#phi_{bb}", "", 'F' );
+
 
 ////////////fifth group//////////
+   factory->AddVariable( "DeltaPhiBB", "#Delta#phi_{bb}", "", 'F' );
+
+
+////////////sixth group//////////
+   factory->AddVariable( "DeltaEtaQB1", "#Delta#eta_{qb}^{forward}", "", 'F' );
+   factory->AddVariable( "DeltaEtaQB2", "#Delta#eta_{qb}^{backward}", "", 'F' );
+
 
 
 
