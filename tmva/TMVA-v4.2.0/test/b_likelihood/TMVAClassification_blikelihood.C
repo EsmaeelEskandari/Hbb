@@ -109,7 +109,7 @@ void TMVAClassification_blikelihood( TString myMethodList = "" )
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
  //  TString outfileName( "TMVA_bjet_new_powheg.root" );
-   TString outfileName( "TMVA_bjet_6var_qq5_125_08_qlike_single.root" );
+   TString outfileName( "TMVA_blike_singlebtag_final.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -146,7 +146,7 @@ void TMVAClassification_blikelihood( TString myMethodList = "" )
  //  factory->AddVariable( "Jet_axis2", "Jet axis 2", "", 'F' );
    //factory->AddVariable( "Jet_leadTrPt", "Jet leading track p_{T}", "GeV", 'F' );
   // factory->AddVariable( "Jet_btag_idx", "Jet btag index", "", 'I' );
-  		factory->AddVariable("Jet_deltaEtaBQ","#Delta #eta_{bq}",'F');
+  	//	factory->AddVariable("Jet_deltaEtaBQ","#Delta #eta_{bq}",'F');
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
    // but will appear in the final "TestTree" produced by TMVA. This TestTree will contain the
@@ -156,9 +156,7 @@ void TMVAClassification_blikelihood( TString myMethodList = "" )
 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
-//	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_vbf_b_likelihood_04_caterina_b.root"; 
-	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_vbf_powheg_new_qlike_125_single_08_singlebtag.root"; 
-//	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_M125_powheg_VBF_b_likelihood.root";	
+	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_vbf_powheg_new_blike_125_singlebtag_final.root"; 
 
    if (gSystem->AccessPathName( fname )) { // file does not exist in local directory
 		cout<<"input file "<< fname<<" doesn't exist!"<<endl;
@@ -185,10 +183,10 @@ void TMVAClassification_blikelihood( TString myMethodList = "" )
    factory->AddSignalTree    ( qjet,     bjetWeight  );
    factory->AddBackgroundTree( bjet, qjetWeight );
    // Apply additional cuts on the signal and background samples (can be different)
- //  TCut mycuts = "Jet_b_matched==1 && Jet_q_matched==0"; 
-//   TCut mycutb = "Jet_b_matched==0"; // for example: TCut mycutb = "abs(var1)<0.5";
-   TCut mycuts = "Jet_q_matched==1"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
-   TCut mycutb = "Jet_q_matched==0"; // for example: TCut mycutb = "abs(var1)<0.5";
+   TCut mycuts = "Jet_b_matched==1 && Jet_q_matched==0"; 
+   TCut mycutb = "Jet_b_matched==0"; // for example: TCut mycutb = "abs(var1)<0.5";
+//   TCut mycuts = "Jet_q_matched==1"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
+//   TCut mycutb = "Jet_q_matched==0"; // for example: TCut mycutb = "abs(var1)<0.5";
    
 
 
@@ -224,7 +222,7 @@ void TMVAClassification_blikelihood( TString myMethodList = "" )
 
    if (Use["BDTG"]) //
       factory->BookMethod( TMVA::Types::kBDT, "BDTG",
-		   "!H:!V:NTrees=100:MinNodeSize=2.5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=4:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+		   "!H:!V:NTrees=100:MinNodeSize=6%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=3:NegWeightTreatment=IgnoreNegWeightsInTraining" );
 
    // For an example of the category classifier usage, see: TMVAClassificationCategory
 
