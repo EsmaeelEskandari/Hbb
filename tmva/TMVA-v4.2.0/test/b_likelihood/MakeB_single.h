@@ -1716,9 +1716,9 @@ MakeB_single::MakeB_single(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../../../Hbb/MC_new/VBFHToBB_M-125_13TeV_powheg_pythia8/tree.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/afs/cern.ch/work/n/nchernya/Hbb/MC_new/VBFHToBB_M-125_13TeV_powheg_pythia8/tree.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("../../../Hbb/MC_new/VBFHToBB_M-125_13TeV_powheg_pythia8/tree.root");
+         f = new TFile("/afs/cern.ch/work/n/nchernya/Hbb/MC_new/VBFHToBB_M-125_13TeV_powheg_pythia8/tree.root");
       }
       f->GetObject("tree",tree);
 

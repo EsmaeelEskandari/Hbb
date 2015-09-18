@@ -78,15 +78,15 @@ void MakeB_single::Loop()
 	Int_t presel=0;
 	TreeJets TreeJet;
 	Int_t loopJet_max;
-	TFile *output = new TFile("b_likelihood_powheg_6var_bbqq_125_08_single.root","recreate");
+	TFile *output = new TFile("blikelihood_vbf_singlebtag.root","recreate");
 	TTree *tree = fChain->CloneTree(0);
 	TBranch *blike_b = tree->Branch("Jet_blikelihood_b",TreeJet.blike_b,"Jet_blikelihood_b[nJet]/F");
-	TBranch *blike_q = tree->Branch("Jet_blikelihood_q",TreeJet.blike_q,"Jet_blikelihood_q[nJet]/F");
+//	TBranch *blike_q = tree->Branch("Jet_blikelihood_q",TreeJet.blike_q,"Jet_blikelihood_q[nJet]/F");
 	TBranch *b_matched = tree->Branch("Jet_b_matched",TreeJet.b_matched,"Jet_b_matched[nJet]/I");
-	TBranch *q_matched = tree->Branch("Jet_q_matched",TreeJet.q_matched,"Jet_q_matched[nJet]/I");
-	TBranch *bb_chosen = tree->Branch("Jet_bb_chosen",&TreeJet.bb_chosen,"Jet_bb_chosen/I");
-	TString weightfile_b = "weights/TMVAClassification_BDTG_6var_bb_125_08_single.weights.xml";
-	TString weightfile_q = "weights/TMVAClassification_BDTG_6var_qq_125_08_single.weights.xml";
+//	TBranch *q_matched = tree->Branch("Jet_q_matched",TreeJet.q_matched,"Jet_q_matched[nJet]/I");
+//	TBranch *bb_chosen = tree->Branch("Jet_bb_chosen",&TreeJet.bb_chosen,"Jet_bb_chosen/I");
+	TString weightfile_b = "weights/TMVAClassification_BDTG.weights.xml";
+//	TString weightfile_q = "weights/TMVAClassification_BDTG_6var_qq_125_08_single.weights.xml";
    TMVA::Reader *reader_b = new TMVA::Reader("Silent");
 	float var1,var2,var3,var4,var5,var6,var7,var8,var9,var10, var11;
 	reader_b->AddVariable("Jet_pt",&var1);
@@ -101,7 +101,7 @@ void MakeB_single::Loop()
  //  reader_b->AddVariable( "Jet_leadTrPt", &var10 );
   // 	reader_b->AddVariable("Jet_btag_idx",&var11);
 	reader_b->BookMVA("BDTG", weightfile_b);
-	
+/*	
    TMVA::Reader *reader_q = new TMVA::Reader("Silent");
 	reader_q->AddVariable("Jet_pt",&var1);
 	reader_q->AddVariable("Jet_eta",&var2);
@@ -109,7 +109,7 @@ void MakeB_single::Loop()
 	reader_q->AddVariable("Jet_pt_idx",&var4);
 	reader_q->AddVariable("Jet_eta_idx",&var5);
 	reader_q->AddVariable("Jet_btagCSV_idx",&var6);
-	reader_q->BookMVA("BDTG", weightfile_q);	
+	reader_q->BookMVA("BDTG", weightfile_q);	*/
 
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
@@ -125,13 +125,14 @@ void MakeB_single::Loop()
 			TreeJet.q_matched[i] = 0.;	
 			TreeJet.bb_chosen = 0.;	
 		}
-
+		
+		if (genWeight<0) continue;
 
 		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
 
 		int loopJet_min = 4;
 		if (nJet<4) loopJet_min=nJet;
-
+		if (nJet<4) continue;
 
 		Double_t btag_max = 0.7;
 		int btag_max1_number = -1;
@@ -267,7 +268,7 @@ void MakeB_single::Loop()
 		   for(int j =0; j<2; j++){
 				TLorentzVector hQ;
 				hQ.SetPtEtaPhiM(GenHiggsSisters_pt[j],GenHiggsSisters_eta[j],GenHiggsSisters_phi[j],GenHiggsSisters_mass[j]);
-				if(hQ.DeltaR(hJ0)<0.8) {TreeJet.q_matched[i] = 1.;}
+			//	if(hQ.DeltaR(hJ0)<0.8) {TreeJet.q_matched[i] = 1.;}
 		   }
 
 		}
@@ -294,10 +295,10 @@ void MakeB_single::Loop()
 	//		var4 = TreeJet.pt_idx[i];
 	//		var5 = TreeJet.eta_idx[i];
 	//		var6 = TreeJet.btagCSV_idx[i];
-			TreeJet.blike_q[i] = reader_q->EvaluateMVA("BDTG");
+		//	TreeJet.blike_q[i] = reader_q->EvaluateMVA("BDTG");
 	}
 
-	
+/*	
         for(int i=0; i<loopJet_max; i++){
                    if(Jet_pt[i]<20 || Jet_id[i] <0) continue;
                    jetList_bl[TreeJet.blike_b[i]]=i;
@@ -321,13 +322,13 @@ void MakeB_single::Loop()
 			if((hQ.DeltaR(hJ1)<0.8 || hQ.DeltaR(hJ0)<0.8)) jet_isMatched++; 
 		}
 	}
-	if (jet_isMatched==2) 	TreeJet.bb_chosen=1;
-
+	//if (jet_isMatched==2) 	TreeJet.bb_chosen=1;
+*/
 	tree->Fill();
 	}
 	cout<<presel<<endl;
 	delete reader_b;
-	delete reader_q;
+//	delete reader_q;
 	output->cd();
 	tree->AutoSave();
 	output->Close();
