@@ -105,8 +105,8 @@ void CreateTree_qlike::Loop()
 		Float_t jet_isMatched2 = 0;
 		Float_t jet_isMatchedQ = 0;
 	   
-
-
+		
+		if (genWeight<0) continue;
 
 
 		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;

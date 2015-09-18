@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <iomanip>
-#include <string.h>
+#include <string>
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
@@ -28,7 +28,9 @@
 #define SWAP(A, B) { Float_t t = A; A = B; B = t; }
 #define SWAP2(A, B) { B.swap(A); }
 
-void bubblesort(Float_t *a, string *str, int n)
+using namespace std;
+
+void bubblesort(Float_t *a, std::string *str, int n)
 {
   int i, j;
   for (i = n - 1; i >= 0; i--)
@@ -66,6 +68,8 @@ Float_t Discr(TH1F *h1, TH1F *h2){
 using namespace std;
 
 void analyzer_stack(){
+
+//int main(){
     
 const int nfiles  = 8;
 const int nhistos = 46;
@@ -92,7 +96,7 @@ leg->SetBorderSize(0);
 leg->SetTextSize(0.04);
 
 TString hist_names[nhistos]={"hJet1_pt","hJet2_pt","hJet3_pt","hJet4_pt","hJet1_eta","hJet2_eta","hJet3_eta","hJet4_eta","hJet1_phi","hJet2_phi","hJet3_phi","hJet4_phi","hMqq", "hEtaQQ", "hPhiBB", "hEtaSoftJets", "hPtSoftJets","hMassSoftJets","hHTsoft","hSoft_n2","hSoft_n5","hSoft_n10","hMbb","hqgl","hbtag","hqgl2","hbtag2","hPtSoftJets2","hPtSoftJets3","hcosOqqbb","hEtaQB1", "hEtaQB2", "hPhiQB1", "hPhiQB2","hx1","hx2","hVB1_mass","hVB2_mass","hEtot","hPxtot","hPytot","hPztot","hJet5_pt","hPtqqbb","hEtaqqbb","hPhiqqbb"};
-string hist_names_sort[nhistos];
+std::string hist_names_sort[nhistos];
 for (int i=0;i<nhistos;i++){
 	hist_names_sort[i] = hist_names[i];
 }

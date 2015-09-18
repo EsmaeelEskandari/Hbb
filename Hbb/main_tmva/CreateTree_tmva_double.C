@@ -40,7 +40,10 @@ typedef struct {
 	Float_t HTsoft;
 	Float_t DeltaEtaQB1;
 	Float_t DeltaEtaQB2;
-	Float_t DeltaPhiBB;
+	Float_t DeltaPhiQQ;
+	Float_t cosOqqbb;
+	Float_t qgl1;
+	Float_t qgl2;
 }TMVAstruct;
 
 
@@ -65,16 +68,18 @@ void CreateTree_tmva_double::Loop(int sample_type)
 	Int_t events_generated = countPos->GetEntries()-countNeg->GetEntries();
 	genWeight/=events_generated/xsec[sample_type];
  
-	TFile file("main_tmva_tree_"+sample_type_name[sample_type]+".root","recreate");
+	TFile file("main_tmva_tree_"+sample_type_name[sample_type]+"_double.root","recreate");
 	TTree *tree0 = new TTree("TMVA","TMVA");
 	tree0->Branch("CSV1",&TMVA.CSV1,"CSV1/F");
 	tree0->Branch("CSV2",&TMVA.CSV2,"CSV2/F");
 	tree0->Branch("Mqq",&TMVA.Mqq,"Mqq/F");
-	tree0->Branch("DeltaQQ",&TMVA.DeltaEtaQQ,"DeltaQQ/F");
+	tree0->Branch("DeltaEtaQQ",&TMVA.DeltaEtaQQ,"DeltaEtaQQ/F");
+	tree0->Branch("DeltaPhiBB",&TMVA.DeltaPhiBB,"DeltPhiBB/F");
 	tree0->Branch("SoftN5",&TMVA.SoftN5,"SoftN5/I");
 	tree0->Branch("HTsoft",&TMVA.HTsoft,"HTsoft/F");
 	tree0->Branch("DeltaEtaQB1",&TMVA.DeltaEtaQB1,"DeltaEtaQB1/F");
 	tree0->Branch("DeltaEtaQB2",&TMVA.DeltaEtaQB2,"DeltaEtaQB2/F");
+	tree0->Branch("cosOqqbb",&TMVA.cosOqqbb,"cosOqqbb/F");
 	
 
 
@@ -197,6 +202,9 @@ void CreateTree_tmva_double::Loop(int sample_type)
 			}
 		
 
+		TLorentzVector bbqq;
+		bbqq = Bjet1 + Bjet2 + Qjet1 + Qjet2;
+		Float_t cosOqqbb =TMath::Cos( ( ( Bjet1.Vect() ).Cross(Bjet2.Vect()) ).Angle( ( Qjet1.Vect() ).Cross(Qjet2.Vect()) ) );	
 
 		TMVA.Mqq = Mqq;
 		TMVA.CSV1 = Jet_btagCSV[btag_max1_number];	
@@ -207,6 +215,7 @@ void CreateTree_tmva_double::Loop(int sample_type)
 		TMVA.HTsoft = softActivity_HT;
 		TMVA.DeltaEtaQB1 = EtaBQ1;
 		TMVA.DeltaEtaQB2 = EtaBQ2;
+		TMVA.cosOqqbb = cosOqqbb;
 
 		tree0->SetWeight(genWeight);
 		tree0->Fill();		

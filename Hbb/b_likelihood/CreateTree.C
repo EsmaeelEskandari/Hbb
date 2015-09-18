@@ -104,6 +104,7 @@ void CreateTree::Loop()
 		Float_t jet_isMatchedQ = 0;
 	   
 
+		if (genWeight<0) continue;
 
 
 

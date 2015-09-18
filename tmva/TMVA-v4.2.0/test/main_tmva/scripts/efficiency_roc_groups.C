@@ -69,7 +69,6 @@ leg->SetTextSize(0.04);
 		gr_single->SetMarkerColor(kBlue);
 		gr_single->SetLineWidth(2);
 		gr_single->Draw("PLsame");
-		c2->Print("plots/efficiency_groups.png");
 
 		TLegend *leg = new TLegend(0.6,0.15,0.9,0.4);
 		leg->SetBorderSize(0);
@@ -78,5 +77,6 @@ leg->SetTextSize(0.04);
 		leg->AddEntry(gr_single,"SingleBtag","PL");
 		leg->Draw("same");
 	
+		c2->Print("plots/efficiency_groups.png");
 
 }
