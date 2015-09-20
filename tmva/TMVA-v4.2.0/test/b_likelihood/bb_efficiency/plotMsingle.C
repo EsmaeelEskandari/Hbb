@@ -42,6 +42,7 @@ Float_t bb_efficiency_find = 0;
          float jet_isMatched2=0, jet_isMatched=0;
          float jet_isMatched2Q=0, jet_isMatchedQ=0;
 		
+	//	if (genWeight<0) continue;	
 
 		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
 
@@ -126,7 +127,7 @@ Float_t bb_efficiency_find = 0;
 	  
  
         for(int i=0; i<loopJet_max; i++){
-                   if(Jet_pt[i]<20 || Jet_id[i] <0) continue;
+                   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
                    jetList_CSV[Jet_btagCSV[i]]=i;
                    jetList_bl[Jet_blikelihood_b[i]]=i;
                  //  jetList_ql[Jet_blikelihood_q[i]]=i;
@@ -136,7 +137,7 @@ Float_t bb_efficiency_find = 0;
 		int found_idx=0;
 		Float_t bb_found = 0;
         for(int i=0; i<loopJet_max; i++){
-                   if(Jet_pt[i]<20 || Jet_id[i] <0) continue;
+                   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
 							TLorentzVector hJall;
 							hJall.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]);
 						for(int j =0; j<2; j++){

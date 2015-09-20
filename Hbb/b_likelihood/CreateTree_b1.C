@@ -16,8 +16,8 @@ typedef std::map<Float_t, Int_t> JetList;
 #define SWAP(A, B) { Float_t t = A; A = B; B = t; }
 void bubblesort(Float_t *a, int n){
   int i, j;
-  for (i = n - 1; i >= 0; i--){
-    for (j = 0; j < i; j++){
+  for (i = 0; i<n-1; i++){
+    for (j = 0; j < n-1-i; j++){
       if (a[j] > a[j + 1]){
         SWAP( a[j], a[j + 1] );
 		}
@@ -26,8 +26,10 @@ void bubblesort(Float_t *a, int n){
 }
 void bubblesort2(Float_t *a, int n){
   int i, j;
-  for (i = n - 1; i >= 0; i--){
-    for (j = 0; j < i; j++){
+  //for (i = n - 1; i >= 0; i--){
+    //for (j = 0; j < i; j++){
+  for (i = 0; i<n-1; i++){
+    for (j = 0; j < n-1-i; j++){
       if (a[j] < a[j + 1]){
         SWAP( a[j], a[j + 1] );
 		}
@@ -36,7 +38,7 @@ void bubblesort2(Float_t *a, int n){
 }
 
 int find(Float_t *a, Float_t value, int n){
-	int num=-1;
+	int num=0;
 	for (int i =0;i<n;i++){
 		if (a[i]==value) {
 			num = i;
@@ -71,7 +73,7 @@ void CreateTree_b1::Loop()
 
    Long64_t nbytes = 0, nb = 0;
 
-	TFile file("spring15_vbf_powheg_new_blike_125_single_08_singlebtag.root","recreate");
+	TFile file("spring15_vbf_powheg_new_blike_125_singlebtag_final.root","recreate");
 	TTree *tree0 = new TTree("Jet_tree_b","Jet_tree_b");
 	TreeJets TreeJet;
 	tree0->Branch("Jet_pt",&TreeJet.pt,"Jet_pt/F");
@@ -185,7 +187,7 @@ void CreateTree_b1::Loop()
 		if (nJet<7) loopJet_max = nJet; 
 
 		for(int i=0; i<loopJet_max; i++){
-		   if(Jet_pt[i]<20 || Jet_id[i] <0) continue;
+		   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
 			if (Jet_btagCSV[i]==-10) Jet_btagCSV[i]=0; 
 			if (Jet_btagCSV[i]>1) Jet_btagCSV[i]=1.;
 		   jetList_CSV[Jet_btagCSV[i]]=i;
@@ -198,26 +200,28 @@ void CreateTree_b1::Loop()
 	Float_t qq_found = 0.;
 
 
+		int actual_jets=0;
 		Float_t eta_sort[30];
 		Float_t btag_sort[30];
 		for (int i=0;i<loopJet_max;i++){
 			if ((Jet_pt[i]>20)&&(Jet_id[i]>0)) {
 				TreeJet.eta = TMath::Abs(Jet_eta[i]);
 				eta_sort[i] = TMath::Abs(Jet_eta[i]);
+				actual_jets++;
 		   	TreeJet.btagCSV=Jet_btagCSV[i];
 				btag_sort[i] = Jet_btagCSV[i];
 			}
 		}
 
-		bubblesort(eta_sort,loopJet_max);
-		bubblesort2(btag_sort,loopJet_max);
+		bubblesort(eta_sort,actual_jets);
+		bubblesort2(btag_sort,actual_jets);
 /*
 		for (int i=0;i<loopJet_max;i++){
 			cout<<btag_sort[i]<<"  "<<i<<endl;
 		}*/
 		int btag_0_num = 0;
 	   for(int i=0; i<loopJet_max; i++){
-		   if(Jet_pt[i]<20 || Jet_id[i] <0) continue;
+		   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
 			TreeJet.b_matched=0;
 			TreeJet.q_matched=0;
 			TreeJet.n_matched=0;
@@ -230,6 +234,7 @@ void CreateTree_b1::Loop()
 			TreeJet.axis2=Jet_axis2[i];
 			TreeJet.leadTrPt=Jet_leadTrackPt[i];
 			TreeJet.pt_idx = i;
+		//	cout <<"   "<<eta_sort[i]<<"   "<<i<<"  "<<TreeJet.eta<<endl;
 			TreeJet.eta_idx = find(eta_sort,TreeJet.eta,loopJet_max);
 			TreeJet.btagCSV_idx = find(btag_sort,TreeJet.btagCSV,loopJet_max);
 			if ((TreeJet.btagCSV==0)&&(btag_0_num==0)) {
@@ -304,7 +309,7 @@ void CreateTree_b1::Loop()
 		presel+=TMath::Sign(1.,genWeight);
 	}  
 
-	ofstream out("spring15_powheg_125_08_singlebtag.txt"); 
+	ofstream out("spring15_powheg_125_singlebtag_final.txt"); 
 	out<<"bb efficiency to find b-jets = "<<bb_efficiency_find/presel<<endl;
 	out<<"bb efficiency to match b-jets = "<<bb_efficiency/presel<<endl;
 	out<<"qq efficiency to find q-jets = "<<qq_efficiency_find/presel<<endl;

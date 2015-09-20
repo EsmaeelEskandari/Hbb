@@ -16,8 +16,8 @@ typedef std::map<double, int> JetList;
 #define SWAP(A, B) { Float_t t = A; A = B; B = t; }
 void bubblesort(Float_t *a, int n){
   int i, j;
-  for (i = n - 1; i >= 0; i--){
-    for (j = 0; j < i; j++){
+  for (i = 0; i<n-1; i++){
+    for (j = 0; j < n-1-i; j++){
       if (a[j] > a[j + 1]){
         SWAP( a[j], a[j + 1] );
 		}
@@ -26,8 +26,8 @@ void bubblesort(Float_t *a, int n){
 }
 void bubblesort2(Float_t *a, int n){
   int i, j;
-  for (i = n - 1; i >= 0; i--){
-    for (j = 0; j < i; j++){
+  for (i = 0; i<n-1; i++){
+    for (j = 0; j < n-1-i; j++){
       if (a[j] < a[j + 1]){
         SWAP( a[j], a[j + 1] );
 		}
@@ -82,7 +82,7 @@ void MakeB_single::Loop()
 	TTree *tree = fChain->CloneTree(0);
 	TBranch *blike_b = tree->Branch("Jet_blikelihood_b",TreeJet.blike_b,"Jet_blikelihood_b[nJet]/F");
 //	TBranch *blike_q = tree->Branch("Jet_blikelihood_q",TreeJet.blike_q,"Jet_blikelihood_q[nJet]/F");
-	TBranch *b_matched = tree->Branch("Jet_b_matched",TreeJet.b_matched,"Jet_b_matched[nJet]/I");
+//	TBranch *b_matched = tree->Branch("Jet_b_matched",TreeJet.b_matched,"Jet_b_matched[nJet]/I");
 //	TBranch *q_matched = tree->Branch("Jet_q_matched",TreeJet.q_matched,"Jet_q_matched[nJet]/I");
 //	TBranch *bb_chosen = tree->Branch("Jet_bb_chosen",&TreeJet.bb_chosen,"Jet_bb_chosen/I");
 	TString weightfile_b = "weights/TMVAClassification_BDTG.weights.xml";
@@ -125,14 +125,16 @@ void MakeB_single::Loop()
 			TreeJet.q_matched[i] = 0.;	
 			TreeJet.bb_chosen = 0.;	
 		}
-		
-		if (genWeight<0) continue;
+	/////	
+		if (genWeight>0) {
 
-		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
+//////////
+		if (((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) {
 
 		int loopJet_min = 4;
 		if (nJet<4) loopJet_min=nJet;
-		if (nJet<4) continue;
+////////
+		if (nJet>=4) {
 
 		Double_t btag_max = 0.7;
 		int btag_max1_number = -1;
@@ -143,7 +145,8 @@ void MakeB_single::Loop()
 				btag_max1_number=i;
 			}
 		}
-		if (!((btag_max1_number>=0))) continue;
+////////
+		if (((btag_max1_number>=0))) {
 		TLorentzVector Bjet1;
 		Bjet1.SetPtEtaPhiM(Jet_pt[btag_max1_number],Jet_eta[btag_max1_number],Jet_phi[btag_max1_number],Jet_mass[btag_max1_number]);
 
@@ -175,7 +178,8 @@ void MakeB_single::Loop()
 		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
 		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
 
-		if (!((pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
+/////////////
+		if (((pt_max1_number>=0)&&(pt_max2_number>=0))) {
 	
 		TLorentzVector Qjet1;
 		Qjet1.SetPtEtaPhiM(Jet_pt[pt_max1_number] ,Jet_eta[pt_max1_number],Jet_phi[pt_max1_number],Jet_mass[pt_max1_number]);
@@ -186,8 +190,8 @@ void MakeB_single::Loop()
 		for (int i=0;i<4;i++){
 			if ( (i!=btag_max1_number)&&(i!=pt_max1_number)&&(i!=pt_max2_number)&&(Jet_id[i]>0)) btag_max2_number=i;
 		}
-
-		if (!((btag_max2_number>=0))) continue;
+/////////////
+		if (((btag_max2_number>=0))) {
 
 
 		TLorentzVector Bjet2;
@@ -198,9 +202,12 @@ void MakeB_single::Loop()
 		Double_t Mqq = qq.M();
 		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) continue;
 
-		if (HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v!=1) continue;
+///////
+		if (((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) {
+
+//////
+		if (HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v==1) {
 
 		
 
@@ -211,7 +218,7 @@ void MakeB_single::Loop()
 		if (nJet<7) loopJet_max = nJet; 
 
 		for(int i=0; i<loopJet_max; i++){
-		   if(Jet_pt[i]<20 || Jet_id[i] <0) continue;
+		   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
 			if (Jet_btagCSV[i]==-10) Jet_btagCSV[i]=0; 
 			if (Jet_btagCSV[i]>1.) Jet_btagCSV[i]=1.; 
 		   jetList_CSV[Jet_btagCSV[i]]=i;
@@ -219,24 +226,25 @@ void MakeB_single::Loop()
          jetList_eta[TMath::Abs(Jet_eta[i])]=i;
 	   }
 
-
+		int actual_jets=0;
 		Float_t eta_sort[30];
 		Float_t btag_sort[30];
 		for (int i=0;i<loopJet_max;i++){
 			if ((Jet_pt[i]>20)&&(Jet_id[i]>0)) {
 				TreeJet.eta[i] = TMath::Abs(Jet_eta[i]);
 				eta_sort[i] = TMath::Abs(Jet_eta[i]);
+				actual_jets++;
 		   	TreeJet.btagCSV[i]=Jet_btagCSV[i];
 				btag_sort[i] = Jet_btagCSV[i];
 			}
 		}
 
-		bubblesort(eta_sort,loopJet_max);
-		bubblesort2(btag_sort,loopJet_max);
+		bubblesort(eta_sort,actual_jets);
+		bubblesort2(btag_sort,actual_jets);
 		int btag_0_num = 0;
 
 	   for(int i=0; i<loopJet_max; i++){
-		   if(Jet_pt[i]<20 || Jet_id[i] <0) continue;
+		   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
 		   TreeJet.pt[i]=Jet_pt[i];
 		   TreeJet.eta[i]=TMath::Abs(Jet_eta[i]); 
 		   TreeJet.btagCSV[i]=Jet_btagCSV[i];
@@ -275,28 +283,28 @@ void MakeB_single::Loop()
 
 
 
+
 	for (int i=0;i<loopJet_max;i++){
-		   if(Jet_pt[i]<20 || Jet_id[i] <0) continue; 
+		   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue; 
 			var1 = TreeJet.pt[i];
 			var2 = TreeJet.eta[i];
 			var3 = TreeJet.btagCSV[i];
 			var4 = TreeJet.pt_idx[i];
 			var5 = TreeJet.eta_idx[i];
 			var6 = TreeJet.btagCSV_idx[i];
-		//	var7 = TreeJet.ch_mult[i];
-		//	var8 = TreeJet.ptd[i];
-	//		var11 = TreeJet.btag_idx[i];
 			TreeJet.blike_b[i] = reader_b->EvaluateMVA("BDTG");
-			//cout<<var3<<"   "<<TreeJet.blike_b[i]<<  endl;
 
-		//	var1 = TreeJet.pt[i];
-		//	var2 = TreeJet.eta[i];
-		//	var3 = TreeJet.btagCSV[i];
-	//		var4 = TreeJet.pt_idx[i];
-	//		var5 = TreeJet.eta_idx[i];
-	//		var6 = TreeJet.btagCSV_idx[i];
-		//	TreeJet.blike_q[i] = reader_q->EvaluateMVA("BDTG");
 	}
+
+	}
+	}
+	}	
+	}
+	}
+	}
+	}
+	}	
+
 
 /*	
         for(int i=0; i<loopJet_max; i++){
