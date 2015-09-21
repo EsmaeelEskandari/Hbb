@@ -126,7 +126,7 @@ void MakeB_single::Loop()
 			TreeJet.bb_chosen = 0.;	
 		}
 	/////	
-		if (genWeight>0) {
+	//	if (genWeight>0) {
 
 //////////
 		if (((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) {
@@ -303,7 +303,7 @@ void MakeB_single::Loop()
 	}
 	}
 	}
-	}	
+//	}	
 
 
 /*	
