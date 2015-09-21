@@ -1,5 +1,5 @@
-#define CreateTree_tmva_double_cxx
-#include "CreateTree_tmva_double.h"
+#define CreateTree_tmva_single_cxx
+#include "CreateTree_tmva_single.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -40,16 +40,14 @@ typedef struct {
 	Float_t HTsoft;
 	Float_t DeltaEtaQB1;
 	Float_t DeltaEtaQB2;
-	Float_t DeltaPhiQQ;
+	Float_t DeltaPhiBB;
 	Float_t cosOqqbb;
-	Float_t qgl1;
-	Float_t qgl2;
 }TMVAstruct;
 
 
 
 
-void CreateTree_tmva_double::Loop(int sample_type)
+void CreateTree_tmva_single::Loop(int sample_type)
 {
    if (fChain == 0) return;
 
@@ -68,7 +66,7 @@ void CreateTree_tmva_double::Loop(int sample_type)
 	Int_t events_generated = countPos->GetEntries()-countNeg->GetEntries();
 	genWeight/=events_generated/xsec[sample_type];
  
-	TFile file("main_tmva_tree_"+sample_type_name[sample_type]+"_double.root","recreate");
+	TFile file("main_tmva_tree_"+sample_type_name[sample_type]+"_single.root","recreate");
 	TTree *tree0 = new TTree("TMVA","TMVA");
 	tree0->Branch("CSV1",&TMVA.CSV1,"CSV1/F");
 	tree0->Branch("CSV2",&TMVA.CSV2,"CSV2/F");
@@ -88,19 +86,16 @@ void CreateTree_tmva_double::Loop(int sample_type)
 	   Long64_t ientry = LoadTree(jentry);
 	   if (ientry < 0) break;
 	   nb = fChain->GetEntry(jentry);   nbytes += nb;
-		   
-		if (genWeight <0) continue;
-
+	  
+		if (genWeight<0) continue;
+ 
 		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
 
-		int loopJet_min = 6;
-		if (nJet<6) loopJet_min=nJet;
+		int loopJet_min = 4;
+		if (nJet<4) loopJet_min=nJet;
+		if (nJet<4) continue;
 
-		for (int i=0;i<loopJet_min;i++){
-			if (Jet_btagCSV[i]>1) Jet_btagCSV[i]=1.;
-		}
-
-		Double_t btag_max = 0.4;
+		Double_t btag_max = 0.7;
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
 		for (int i=0;i<loopJet_min;i++){
@@ -109,55 +104,66 @@ void CreateTree_tmva_double::Loop(int sample_type)
 				btag_max1_number=i;
 			}
 		}
-		btag_max = 0.4;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet_btagCSV[i]>btag_max)&&(i!=btag_max1_number)&&(Jet_id[i]>0)) {
-				btag_max=Jet_btagCSV[i];
-				btag_max2_number=i;
-			} 
-		}
-		if (!((btag_max1_number>=0)&&(btag_max2_number>=0))) continue;
+		if (!((btag_max1_number>=0))) continue;
 		TLorentzVector Bjet1;
 		Bjet1.SetPtEtaPhiM(Jet_pt[btag_max1_number],Jet_eta[btag_max1_number],Jet_phi[btag_max1_number],Jet_mass[btag_max1_number]);
-		
-		TLorentzVector Bjet2;
-		Bjet2.SetPtEtaPhiM(Jet_pt[btag_max2_number],Jet_eta[btag_max2_number],Jet_phi[btag_max2_number],Jet_mass[btag_max2_number]);
 
 
-		Double_t pt_max = 20.;
 		int pt_max1_number = -1;
 		int pt_max2_number = -1;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet_pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(Jet_id[i]>0)) {
-				pt_max=Jet_pt[i];
-				pt_max1_number=i;	
+
+		TLorentzVector js[3];
+		int jcount = 0;
+		int j_num[3] = {};
+		for (int i=0;i<4;i++){
+			if ((i!=btag_max1_number)&&(Jet_id[i]>0)) {
+				js[jcount].SetPtEtaPhiM(Jet_pt[jcount], Jet_eta[jcount], Jet_phi[jcount], Jet_mass[jcount]);
+				j_num[jcount] = i;
+				jcount++;
 			}
-		}
-		pt_max = 20.;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet_pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(i!=pt_max1_number)&&(Jet_id[i]>0)) {
-				pt_max=Jet_pt[i];
-				pt_max2_number=i;	
+		}	
+		Float_t deltaEtaJets[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
+		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
+		Float_t max_deltaEta = 0.;
+		int max_deltaEta_num = -1;
+		for (int i=0;i<3;i++){
+			if (deltaEtaJets[i]>max_deltaEta) {
+				max_deltaEta = deltaEtaJets[i];
+				max_deltaEta_num = i;
 			}
 		}
 		
+		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
+		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
+
 		if (!((pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
-			
+	
 		TLorentzVector Qjet1;
-		Qjet1.SetPtEtaPhiM(Jet_pt[pt_max1_number],Jet_eta[pt_max1_number],Jet_phi[pt_max1_number],Jet_mass[pt_max1_number]);
+		Qjet1.SetPtEtaPhiM(Jet_pt[pt_max1_number] ,Jet_eta[pt_max1_number],Jet_phi[pt_max1_number],Jet_mass[pt_max1_number]);
 	
 		TLorentzVector Qjet2;
 		Qjet2.SetPtEtaPhiM(Jet_pt[pt_max2_number],Jet_eta[pt_max2_number],Jet_phi[pt_max2_number],Jet_mass[pt_max2_number]);
 
+		for (int i=0;i<4;i++){
+			if ( (i!=btag_max1_number)&&(i!=pt_max1_number)&&(i!=pt_max2_number)&&(Jet_id[i]>0)) btag_max2_number=i;
+		}
+
+		if (!((btag_max2_number>=0))) continue;
+
+
+		TLorentzVector Bjet2;
+		Bjet2.SetPtEtaPhiM(Jet_pt[btag_max2_number],Jet_eta[btag_max2_number],Jet_phi[btag_max2_number],Jet_mass[btag_max2_number]);
 
 		TLorentzVector qq;
 		qq = Qjet1+Qjet2;
 		Double_t Mqq = qq.M();
 		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>200)&&(qqDeltaEta>1.2)&&(bbDeltaPhi<2.4))) continue;
+		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) continue;
 
-		if (HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v!=1) continue;
+		if (HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v!=1) continue;
+
+
 
 
 		Float_t EtaBQ1;
