@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <cstdlib>
 #include "TFile.h"
 #include "TH1.h"
 #include "TH1F.h"
@@ -51,10 +52,13 @@ typedef struct {
 
 using namespace std;
 
-void analyzer_v12(int files, int files_max){
-    
-const int nfiles  = 11;
+int main(int argc, char* argv[]){
 
+int files=atoi(argv[1]);
+int files_max=atoi(argv[2]);
+//void analyzer_v12(int files, int files_max){
+    
+/*
 TString file_names[nfiles] = {
 "MC_new/VBFHToBB_M-130_13TeV_powheg_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
 "MC_new/VBFHToBB_M125_13TeV_amcatnlo_pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
@@ -67,10 +71,18 @@ TString file_names[nfiles] = {
 "MC_new/QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2",
 "MC_new/QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1",
 "MC_new/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2"
-};      
-TString type[nfiles] = {"Spring15_powheg_M130","Spring15_amcatnlo_M125","Spring15_powheg_M125","Spring15_QCD_HT100to200","Spring15_QCD_HT700to1000","Spring15_QCD_HT300to500","Spring15_QCD_HT500to700","Spring15_QCD_HT2000toInf","Spring15_QCD_HT200to300","Spring15_QCD_HT1500to2000", "Spring15_QCD_HT1000to1500"}; 		
+}; */
 
-Double_t xsec[nfiles] = {   1.96,2.16 ,2.16, 2.75E07,  6.52E03,  3.67E05, 2.94E04, 2.54E01,  1.74E06, 121.5, 1.064E03 };
+const int nfiles  = 11;
+
+TString file_names[nfiles] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "VBFHToBB_M125_13TeV_amcatnlo"};
+     
+TString type[nfiles]; 		
+for (int i=0;i<nfiles;i++){
+	type[i] = file_names[i];
+}
+
+Double_t xsec[nfiles] = { 2.75E07,  1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,2.16 ,1.96,2.16};
 
 do {
 	
@@ -79,7 +91,7 @@ do {
 	Float_t genweight0;
 	Int_t global_counter = 0;
 	Float_t HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200;
-	TFile *file_initial = new TFile(file_names[files]+"/tree.root");
+	TFile *file_initial = new TFile("skim_trees/"+file_names[files]+"/"+file_names[files]+"_skimmed_tree.root");
    TTree *tree_initial = (TTree*)file_initial->Get("tree");
 	TH1F *countPos = (TH1F*)file_initial->Get("CountPosWeight");
 	TH1F *countNeg = (TH1F*)file_initial->Get("CountNegWeight");
@@ -456,7 +468,7 @@ do {
 			global_counter++;
 			if (global_counter%10000==0)cout<<"Number of events processed = "<< entry<<endl;	
         }
-		TFile file("output_hist/tree"+type[files]+".root","recreate");
+		TFile file("output_hist/skimmed_tree"+type[files]+".root","recreate");
     
 		for (int i=0;i<numArray;++i){
     	    	histArray[i]->SetLineWidth(2);
@@ -470,11 +482,13 @@ do {
    		} 
     		file.Write();
     		file.Close();
-	 ofstream out("output_txt/Spring15_"+type[files]+".txt");
+	 ofstream out("output_txt/skimmed_Spring15_"+type[files]+".txt");
 	out<< "preselection only = "<< presel<<" , all evetns in the begining = "<<events_generated<<", % = "<< (float)presel/events_generated<< "N evets 1 fb-1 = "<<(float)presel/events_generated*xsec[files]*1000.<<endl;
 	out.close();
 	files++;
 } while (files<files_max); 
 
+
+return 0;
     
 }
