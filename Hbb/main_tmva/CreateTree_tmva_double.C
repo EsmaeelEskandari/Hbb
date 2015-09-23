@@ -95,6 +95,8 @@ void CreateTree_tmva_double::Loop(int sample_type)
 	   nb = fChain->GetEntry(jentry);   nbytes += nb;
 		   
 		if (genWeight <0) continue;
+		
+		if (nJet<4) continue;
 
 		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
 
