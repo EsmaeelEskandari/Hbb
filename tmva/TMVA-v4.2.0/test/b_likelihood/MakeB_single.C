@@ -129,13 +129,14 @@ void MakeB_single::Loop()
 	//	if (genWeight>0) {
 
 //////////
-		if (((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) {
 
-		int loopJet_min = 4;
-		if (nJet<4) loopJet_min=nJet;
 ////////
 		if (nJet>=4) {
 
+		if (((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) {
+		
+		int loopJet_min = 4;
+		
 		Double_t btag_max = 0.7;
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;

@@ -42,13 +42,12 @@ Float_t bb_efficiency_find = 0;
          float jet_isMatched2=0, jet_isMatched=0;
          float jet_isMatched2Q=0, jet_isMatchedQ=0;
 		
-		//if (genWeight<0) continue;	
 
+		if (nJet<4) continue;
+		
 		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
 
 		int loopJet_min = 4;
-		if (nJet<4) loopJet_min=nJet;
-		if (nJet<4) continue;
 
 
 		Double_t btag_max = 0.7;

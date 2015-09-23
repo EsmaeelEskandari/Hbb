@@ -2,8 +2,8 @@
 #include "TString.h"
 #include "TSystem.h"
 #include "TTree.h"
-#include "skim_trees_double.h"
-#include "skim_trees_double.C"
+#include "skim_trees_single.h"
+#include "skim_trees_single.C"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -20,8 +20,8 @@ int main(int argc, char* argv[]){
 	
 		TFile *f = TFile::Open(file_name);
 		if (f!=0){	
-			skim_trees_double *c = new skim_trees_double(0,file_name);
-			c->Loop(output_dir+"/skimmed_tree_"+tree_number+".root", file_name);
+			skim_trees_single *c = new skim_trees_single(0,file_name);
+			c->Loop(output_dir+"_single"+"/skimmed_tree_"+tree_number+".root", file_name);
 		}
 	return 0;
 }

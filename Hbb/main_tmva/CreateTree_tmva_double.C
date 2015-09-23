@@ -80,7 +80,12 @@ void CreateTree_tmva_double::Loop(int sample_type)
 	tree0->Branch("DeltaEtaQB1",&TMVA.DeltaEtaQB1,"DeltaEtaQB1/F");
 	tree0->Branch("DeltaEtaQB2",&TMVA.DeltaEtaQB2,"DeltaEtaQB2/F");
 	tree0->Branch("cosOqqbb",&TMVA.cosOqqbb,"cosOqqbb/F");
-	
+	tree0->Branch("qgl1",TMVA.qgl1,"qgl1/F");
+	tree0->Branch("qgl2",TMVA.qgl2,"qgl2/F");
+	tree0->Branch("Etot",TMVA.Etot,"Etot/F");
+	tree0->Branch("Jet5_pt",TMVA.Jet5_pt,"Jet5_pt/F");
+	tree0->Branch("x1",TMVA.x1,"x1/F");
+	tree0->Branch("x2",TMVA.x2,"x2/F");
 
 
 

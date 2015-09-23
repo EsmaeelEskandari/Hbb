@@ -33,7 +33,9 @@ void skim_trees_double::Loop(TString filename, TString input_filename)
 	   Long64_t ientry = LoadTree(jentry);
 	   if (ientry < 0) break;
 	   nb = fChain->GetEntry(jentry);   nbytes += nb;
-	   
+	 
+		if (nJet<4) continue; 
+ 
 		if (!((Jet_pt[0]>92.*looser_cuts_coef)&&(Jet_pt[1]>76.*looser_cuts_coef)&&(Jet_pt[2]>64.*looser_cuts_coef)&&(Jet_pt[3]>30.*looser_cuts_coef))) continue;
 
 		int loopJet_min = 6;

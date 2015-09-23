@@ -109,10 +109,11 @@ void CreateTree_b1::Loop()
 		if (genWeight<0) continue;
 
 
+		if (nJet<4) continue;
+		
 		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
 
 		int loopJet_min = 4;
-		if (nJet<4) loopJet_min=nJet;
 
 
 		Double_t btag_max = 0.7;

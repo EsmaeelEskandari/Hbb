@@ -248,13 +248,12 @@ do {
 	genweight0 = TMath::Sign(1.,genweight);
 	genweight/=events_generated/xsec[files]; 
 	
-		
+	
+		if (nJets<4) continue;	
 
 		if (!((Jet.pt[0]>92.)&&(Jet.pt[1]>76.)&&(Jet.pt[2]>64.)&&(Jet.pt[3]>30.))) continue;
 
 		int loopJet_min = 4;
-		if (nJets<4) loopJet_min=nJets;
-		if (nJets<4) continue;
 
 
 		Double_t btag_max = 0.7;
