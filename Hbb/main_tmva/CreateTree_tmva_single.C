@@ -42,6 +42,14 @@ typedef struct {
 	Float_t DeltaEtaQB2;
 	Float_t DeltaPhiBB;
 	Float_t cosOqqbb;
+	Float_t qgl1;
+	Float_t qgl2;
+	Float_t x1;
+	Float_t x2;
+	Float_t VB1;
+	Float_t VB2;
+	Flaot_t Jet5_pt;
+	Float_t Etot;
 }TMVAstruct;
 
 
@@ -78,6 +86,14 @@ void CreateTree_tmva_single::Loop(int sample_type)
 	tree0->Branch("DeltaEtaQB1",&TMVA.DeltaEtaQB1,"DeltaEtaQB1/F");
 	tree0->Branch("DeltaEtaQB2",&TMVA.DeltaEtaQB2,"DeltaEtaQB2/F");
 	tree0->Branch("cosOqqbb",&TMVA.cosOqqbb,"cosOqqbb/F");
+	tree0->Branch("qgl1",TMVA.qgl1,"qgl1/F");
+	tree0->Branch("qgl2",TMVA.qgl2,"qgl2/F");
+	tree0->Branch("Etot",TMVA.Etot,"Etot/F");
+	tree0->Branch("Jet5_pt",TMVA.Jet5_pt,"Jet5_pt/F");
+	tree0->Branch("x1",TMVA.x1,"x1/F");
+	tree0->Branch("x2",TMVA.x2,"x2/F");
+	tree0->Branch("VB1",TMVA.VB1,"VB1/F");
+	tree0->Branch("VB2",TMVA.VB2,"VB2/F");
 	
 
 
@@ -215,6 +231,33 @@ void CreateTree_tmva_single::Loop(int sample_type)
 		TLorentzVector bbqq;
 		bbqq = Bjet1 + Bjet2 + Qjet1 + Qjet2;
 		Float_t cosOqqbb =TMath::Cos( ( ( Bjet1.Vect() ).Cross(Bjet2.Vect()) ).Angle( ( Qjet1.Vect() ).Cross(Qjet2.Vect()) ) );	
+		
+		Float_t Etot = Bjet1.E()+Bjet2.E()+Qjet1.E()+Qjet2.E();
+		Float_t PzTot = Bjet1.Pz()+Bjet2.Pz()+Qjet1.Pz()+Qjet2.Pz();
+		Float_t PxTot = Bjet1.Px()+Bjet2.Px()+Qjet1.Px()+Qjet2.Px();
+		Float_t PyTot = Bjet1.Py()+Bjet2.Py()+Qjet1.Py()+Qjet2.Py();
+	
+		Float_t x1 = 0.;
+		Float_t x2 = 0.;
+		x1 = (Etot + PzTot)/2./13000.;
+		x2 = (Etot - PzTot)/2./13000.;
+
+		TLorentzVector q1,q2,q1_after,q2_after, VB1, VB2;
+		q1.SetPxPyPzE(0.,0.,13000./2.*x1,13000./2.*x1);
+		q2.SetPxPyPzE(0.,0.,-13000./2.*x2,13000./2.*x2);
+		q1_after.SetPxPyPzE(Qjet1.Px()/Qjet1.Beta(),Qjet1.Py()/Qjet1.Beta(),Qjet1.Pz()/Qjet1.Beta(),Qjet1.E());
+		q2_after.SetPxPyPzE(Qjet2.Px()/Qjet2.Beta(),Qjet2.Py()/Qjet2.Beta(),Qjet2.Pz()/Qjet2.Beta(),Qjet2.E());
+		if (q1_after.Eta()>=0.) {
+			VB1 = -q1_after+q1;
+			VB2 = -q2_after+q2;
+		} else {
+			VB1 = -q2_after+q1;
+			VB2 = -q1_after+q2;
+		} 
+		Float_t VB1_mass, VB2_mass;
+		VB1_mass = TMath::Abs(VB1.M());
+		VB2_mass = TMath::Abs(VB2.M());
+
 
 		TMVA.Mqq = Mqq;
 		TMVA.CSV1 = Jet_btagCSV[btag_max1_number];	
@@ -226,6 +269,14 @@ void CreateTree_tmva_single::Loop(int sample_type)
 		TMVA.DeltaEtaQB1 = EtaBQ1;
 		TMVA.DeltaEtaQB2 = EtaBQ2;
 		TMVA.cosOqqbb = cosOqqbb;
+		TMVA.qgl1 = Jet_qgl[pt_max1_number];
+		TMVA.qgl2 = Jet_qgl[pt_max2_number];
+		TMVA.Jet5_pt = Jet_pt[4];
+		TMVA.Etot = Etot;
+		TMVA.x1 = x1;
+		TMVA.x2 = x2;
+		TMVA.VB1 = VB1_mass;
+		TMVA.VB2 = VB2_mass;
 
 		tree0->SetWeight(genWeight);
 		tree0->Fill();		
