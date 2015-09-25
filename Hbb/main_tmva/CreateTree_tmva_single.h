@@ -5,8 +5,8 @@
 // found on file: /afs/cern.ch/user/n/nchernya/Hbb/CMSSW_7_4_5/src/VHbbAnalysis/Heppy/test/Spring15_vhbb_sisters_powheg/tree.root
 //////////////////////////////////////////////////////////
 
-#ifndef CreateTree_tmva_double_h
-#define CreateTree_tmva_double_h
+#ifndef CreateTree_tmva_single_h
+#define CreateTree_tmva_single_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -17,7 +17,7 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
-class CreateTree_tmva_double {
+class CreateTree_tmva_single {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -1423,8 +1423,8 @@ public :
    TBranch        *b_GenBQuarkFromTop_charge;   //!
    TBranch        *b_GenBQuarkFromTop_status;   //!
 
-   CreateTree_tmva_double(TTree *tree=0, TString filename="");
-   virtual ~CreateTree_tmva_double();
+   CreateTree_tmva_single(TTree *tree=0,TString filename="");
+   virtual ~CreateTree_tmva_single();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -1436,8 +1436,8 @@ public :
 
 #endif
 
-#ifdef CreateTree_tmva_double_cxx
-CreateTree_tmva_double::CreateTree_tmva_double(TTree *tree, TString filename) : fChain(0) 
+#ifdef CreateTree_tmva_single_cxx
+CreateTree_tmva_single::CreateTree_tmva_single(TTree *tree,  TString filename) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -1445,23 +1445,23 @@ CreateTree_tmva_double::CreateTree_tmva_double(TTree *tree, TString filename) : 
 			file_name = filename;
       	TFile *f = TFile::Open(file_name);
       	f->GetObject("tree",tree);
-    }
+   }
    Init(tree);
 }
 
-CreateTree_tmva_double::~CreateTree_tmva_double()
+CreateTree_tmva_single::~CreateTree_tmva_single()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t CreateTree_tmva_double::GetEntry(Long64_t entry)
+Int_t CreateTree_tmva_single::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t CreateTree_tmva_double::LoadTree(Long64_t entry)
+Long64_t CreateTree_tmva_single::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -1474,7 +1474,7 @@ Long64_t CreateTree_tmva_double::LoadTree(Long64_t entry)
    return centry;
 }
 
-void CreateTree_tmva_double::Init(TTree *tree)
+void CreateTree_tmva_single::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -2190,7 +2190,7 @@ void CreateTree_tmva_double::Init(TTree *tree)
    Notify();
 }
 
-Bool_t CreateTree_tmva_double::Notify()
+Bool_t CreateTree_tmva_single::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -2201,18 +2201,18 @@ Bool_t CreateTree_tmva_double::Notify()
    return kTRUE;
 }
 
-void CreateTree_tmva_double::Show(Long64_t entry)
+void CreateTree_tmva_single::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t CreateTree_tmva_double::Cut(Long64_t entry)
+Int_t CreateTree_tmva_single::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef CreateTree_tmva_double_cxx
+#endif // #ifdef CreateTree_tmva_single_cxx
