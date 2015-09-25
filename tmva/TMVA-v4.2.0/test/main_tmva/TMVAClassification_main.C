@@ -50,8 +50,9 @@
 
 using namespace std;
 
-void TMVAClassification_main( TString myMethodList = "" )
+void TMVAClassification_main(TString variable_name, TString type)
 {
+	TString myMethodList = ""; 
    // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
    // if you use your private .rootrc, or run from a different directory, please copy the
    // corresponding lines from .rootrc
@@ -97,7 +98,7 @@ void TMVAClassification_main( TString myMethodList = "" )
             std::cout << "Method \"" << regMethod << "\" not known in TMVA under this name. Choose among the following:" << std::endl;
             for (std::map<std::string,int>::iterator it = Use.begin(); it != Use.end(); it++) std::cout << it->first << " ";
             std::cout << std::endl;
-            return;
+            return 1;
          }
          Use[regMethod] = 1;
       }
@@ -109,7 +110,10 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
  //  TString outfileName( "TMVA_bjet_new_powheg.root" );
-   TString outfileName( "output/TMVA_main_6_step_qcd_300to500_double.root" );
+ 
+
+	
+   TString outfileName( "output/TMVA_main_QCD300to700_Nm1_"+variable_name+type+".root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -123,7 +127,7 @@ void TMVAClassification_main( TString myMethodList = "" )
    // All TMVA output can be suppressed by removing the "!" (not) in
    // front of the "Silent" argument in the option string
    TMVA::Factory *factory = new TMVA::Factory( "TMVAClassification", outputFile,
-                                               "!V:!Silent:Color:DrawProgressBar:Transformations=I;D;P;G,D:AnalysisType=Classification" );
+                                               "!V:!Silent:Color:DrawProgressBar:Transformations=I;P;G,D:AnalysisType=Classification" );
 
    // If you wish to modify default settings
    // (please check "src/Config.h" to see all available global options)
@@ -136,32 +140,15 @@ void TMVAClassification_main( TString myMethodList = "" )
   // factory->AddVariable( "myvar1 := var1+var2", 'F' );
   // factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
 
-
-////////////first group////////////
-   factory->AddVariable( "Mqq", "M_{qq}", "GeV", 'F' );
-   factory->AddVariable( "DeltaEtaQQ", "#Delta#eta_{qq}", "", 'F' );
-
-////////////second group//////////////
-   factory->AddVariable( "SoftN5", "Soft multiplicity with p_{T} > 5 GeV", "", 'I' );
-   factory->AddVariable( "HTsoft", "H_{T}^{soft}", "GeV", 'F' );
-
-////////////third group///////////////
-   factory->AddVariable( "CSV1", "CSV_{1}", "", 'F' );
-   factory->AddVariable( "CSV2", "CSV_{2}", "", 'F' );
-
-////////////forth group//////////////
-   factory->AddVariable( "cosOqqbb", "cos#theta_{qqbb}", "", 'F' );
-
-
-////////////fifth group//////////
-   factory->AddVariable( "DeltaPhiBB", "#Delta#phi_{bb}", "", 'F' );
-
-
-////////////sixth group//////////
-   factory->AddVariable( "DeltaEtaQB1", "#Delta#eta_{qb}^{forward}", "", 'F' );
-   factory->AddVariable( "DeltaEtaQB2", "#Delta#eta_{qb}^{backward}", "", 'F' );
-
-
+	const int max_variables_number=17;
+	TString variables_names[max_variables_number]={"Mqq", "DeltaEtaQQ"/*, "DeltaPhiQQ"*/, "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "Etot", "Jet5_pt", "x1", "x2", "VB1", "VB2"};  
+ 
+	for (int i=0;i<max_variables_number;i++){
+		if (variables_names[i].CompareTo(variable_name)!=0) {
+			cout<< variables_names[i].CompareTo(variable_name)<<endl;
+			factory->AddVariable(variables_names[i], "", "", 'F' );
+		}
+	}
 
 
 
@@ -173,8 +160,8 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
-	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBF_powheg_125_double.root";
-	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_300_500_double.root";
+	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBFHToBB_M-125_13TeV_powheg"+type+".root";///single
+	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_BG"+type+".root"; ///single
 
 
 
@@ -287,5 +274,6 @@ void TMVAClassification_main( TString myMethodList = "" )
 
    // Launch the GUI for the root macros
    if (!gROOT->IsBatch()) TMVAGui( outfileName );
+
 }
 
