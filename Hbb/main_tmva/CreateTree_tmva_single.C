@@ -36,11 +36,11 @@ typedef struct {
 	Float_t CSV2;
 	Float_t Mqq;
 	Float_t DeltaEtaQQ;
+	Float_t DeltaPhiQQ;
 	Int_t SoftN5;
 	Float_t HTsoft;
 	Float_t DeltaEtaQB1;
 	Float_t DeltaEtaQB2;
-	Float_t DeltaPhiBB;
 	Float_t cosOqqbb;
 	Float_t qgl1;
 	Float_t qgl2;
@@ -48,14 +48,14 @@ typedef struct {
 	Float_t x2;
 	Float_t VB1;
 	Float_t VB2;
-	Flaot_t Jet5_pt;
+	Float_t Jet5_pt;
 	Float_t Etot;
 }TMVAstruct;
 
 
 
 
-void CreateTree_tmva_single::Loop(int sample_type)
+void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  int sample_type)
 {
    if (fChain == 0) return;
 
@@ -64,36 +64,35 @@ void CreateTree_tmva_single::Loop(int sample_type)
    Long64_t nbytes = 0, nb = 0;
 	TMVAstruct TMVA;
 
-	TString sample_path[2] = {"/afs/cern.ch/work/n/nchernya/Hbb/MC_new/VBFHToBB_M-125_13TeV_powheg_pythia8/tree.root","/afs/cern.ch/work/n/nchernya/Hbb/MC_new/QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2/tree.root"};	
-	TString sample_type_name[2] = {"VBF_powheg_125","QCD_300_500"};
-	Float_t xsec[2] = {2.16,3.67E05};
 
-	TFile *file_initial = new TFile(sample_path[sample_type]);
+	int events_saved=0;
+	
+	TFile *file_initial = new TFile(input_filename);
 	TH1F *countPos = (TH1F*)file_initial->Get("CountPosWeight");
 	TH1F *countNeg = (TH1F*)file_initial->Get("CountNegWeight");
 	Int_t events_generated = countPos->GetEntries()-countNeg->GetEntries();
-	genWeight/=events_generated/xsec[sample_type];
+//	genWeight/=events_generated/xsec[sample_type];
  
-	TFile file("main_tmva_tree_"+sample_type_name[sample_type]+"_single.root","recreate");
+	TFile file("main_tmva_tree_"+output_dir+"_single.root","recreate");
 	TTree *tree0 = new TTree("TMVA","TMVA");
 	tree0->Branch("CSV1",&TMVA.CSV1,"CSV1/F");
 	tree0->Branch("CSV2",&TMVA.CSV2,"CSV2/F");
 	tree0->Branch("Mqq",&TMVA.Mqq,"Mqq/F");
 	tree0->Branch("DeltaEtaQQ",&TMVA.DeltaEtaQQ,"DeltaEtaQQ/F");
-	tree0->Branch("DeltaPhiBB",&TMVA.DeltaPhiBB,"DeltPhiBB/F");
+	tree0->Branch("DeltaPhiQQ",&TMVA.DeltaPhiQQ,"DeltaPhiQQ/F");
 	tree0->Branch("SoftN5",&TMVA.SoftN5,"SoftN5/I");
 	tree0->Branch("HTsoft",&TMVA.HTsoft,"HTsoft/F");
 	tree0->Branch("DeltaEtaQB1",&TMVA.DeltaEtaQB1,"DeltaEtaQB1/F");
 	tree0->Branch("DeltaEtaQB2",&TMVA.DeltaEtaQB2,"DeltaEtaQB2/F");
 	tree0->Branch("cosOqqbb",&TMVA.cosOqqbb,"cosOqqbb/F");
-	tree0->Branch("qgl1",TMVA.qgl1,"qgl1/F");
-	tree0->Branch("qgl2",TMVA.qgl2,"qgl2/F");
-	tree0->Branch("Etot",TMVA.Etot,"Etot/F");
-	tree0->Branch("Jet5_pt",TMVA.Jet5_pt,"Jet5_pt/F");
-	tree0->Branch("x1",TMVA.x1,"x1/F");
-	tree0->Branch("x2",TMVA.x2,"x2/F");
-	tree0->Branch("VB1",TMVA.VB1,"VB1/F");
-	tree0->Branch("VB2",TMVA.VB2,"VB2/F");
+	tree0->Branch("qgl1",&TMVA.qgl1,"qgl1/F");
+	tree0->Branch("qgl2",&TMVA.qgl2,"qgl2/F");
+	tree0->Branch("Etot",&TMVA.Etot,"Etot/F");
+	tree0->Branch("Jet5_pt",&TMVA.Jet5_pt,"Jet5_pt/F");
+	tree0->Branch("x1",&TMVA.x1,"x1/F");
+	tree0->Branch("x2",&TMVA.x2,"x2/F");
+	tree0->Branch("VB1",&TMVA.VB1,"VB1/F");
+	tree0->Branch("VB2",&TMVA.VB2,"VB2/F");
 	
 
 
@@ -176,6 +175,7 @@ void CreateTree_tmva_single::Loop(int sample_type)
 		qq = Qjet1+Qjet2;
 		Double_t Mqq = qq.M();
 		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
+		Double_t qqDeltaPhi = TMath::Abs(Qjet1.DeltaPhi(Qjet2));
 		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
 		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) continue;
 
@@ -263,7 +263,7 @@ void CreateTree_tmva_single::Loop(int sample_type)
 		TMVA.CSV1 = Jet_btagCSV[btag_max1_number];	
 		TMVA.CSV2 = Jet_btagCSV[btag_max2_number];	
 		TMVA.DeltaEtaQQ = qqDeltaEta;
-		TMVA.DeltaPhiBB = bbDeltaPhi;
+		TMVA.DeltaPhiQQ = qqDeltaPhi;
 		TMVA.SoftN5 = softActivity_njets5;
 		TMVA.HTsoft = softActivity_HT;
 		TMVA.DeltaEtaQB1 = EtaBQ1;
@@ -278,8 +278,13 @@ void CreateTree_tmva_single::Loop(int sample_type)
 		TMVA.VB1 = VB1_mass;
 		TMVA.VB2 = VB2_mass;
 
-		tree0->SetWeight(genWeight);
+//		tree0->SetWeight(genWeight);
 		tree0->Fill();		
+		
+		events_saved++;		
+
+		if (sample_type==2) 
+			if (events_saved>=6422) break;
 
 	}  
 

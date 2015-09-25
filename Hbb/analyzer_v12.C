@@ -100,6 +100,9 @@ do {
     Float_t v_type;
     Float_t wrong_type=0.;
     Int_t nJets;
+		
+	int pos_weight_presel=0;
+
 
     tree_initial->SetBranchAddress("Vtype",&v_type);
     tree_initial->SetBranchAddress("nJet",&nJets);
@@ -130,7 +133,7 @@ do {
     hJet4_pt_bin->GetXaxis()->SetTitle("4th Jet p_{T} (GeV)");
 	TH1F *hMqq_bin = new TH1F("hMqq_bin","",50.,200.,250.);
 	hMqq_bin->GetXaxis()->SetTitle("m_{qq} (GeV)");
-    
+   
     TH1F *hJet1_pt = new TH1F("hJet1_pt", "", 30, 0., 600.);
     hJet1_pt->GetXaxis()->SetTitle("1st Jet p_{T} (GeV)");
     TH1F *hJet2_pt = new TH1F("hJet2_pt", "", 30, 0., 600.);
@@ -464,7 +467,9 @@ do {
             hJet3_pt_bin->Fill(Jet.pt[2],genweight);
             hJet4_pt_bin->Fill(Jet.pt[3],genweight);
 				hMqq_bin->Fill(Mqq,genweight);
-			
+		
+			if (genweight>0) pos_weight_presel++;
+				
 			global_counter++;
 			if (global_counter%10000==0)cout<<"Number of events processed = "<< entry<<endl;	
         }
@@ -484,6 +489,7 @@ do {
     		file.Close();
 	 ofstream out("output_txt/skimmed_Spring15_"+type[files]+".txt");
 	out<< "preselection only = "<< presel<<" , all evetns in the begining = "<<events_generated<<", % = "<< (float)presel/events_generated<< "N evets 1 fb-1 = "<<(float)presel/events_generated*xsec[files]*1000.<<endl;
+	out<<"positive weight in so many events : "<<  pos_weight_presel<<endl;
 	out.close();
 	files++;
 } while (files<files_max); 
