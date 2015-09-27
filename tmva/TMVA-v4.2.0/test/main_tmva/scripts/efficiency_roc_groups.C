@@ -77,6 +77,6 @@ leg->SetTextSize(0.04);
 		leg->AddEntry(gr_single,"SingleBtag","PL");
 		leg->Draw("same");
 	
-		c2->Print("plots/efficiency_groups.png");
+		c2->Print("plots/efficiency_groups_Nm1.png");
 
 }

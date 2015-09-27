@@ -12,8 +12,9 @@
 //int main(){
 void efficiency_roc_Nm1(){
 	gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
-	const int n_variables = 19;
-	TString variables_names[n_variables]={"Mqq", "DeltaEtaQQ", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "Etot", "Jet5_pt", "x1", "x2", "VB1", "VB2", "all"};  
+	const int n_variables = 13; //19
+//	TString variables_names[n_variables]={"Mqq", "DeltaEtaQQ", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "Etot", "Jet5_pt", "x1", "x2", "VB1", "VB2", "all"};  
+	TString variables_names[n_variables]={"Mqq", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" , "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2",  "Jet5_pt", "VB2", "all"};  
 	TString file_names[n_variables];
 	TString file_names_single[n_variables];
 	Double_t frame2_axisx[n_variables];
@@ -80,7 +81,7 @@ leg->SetTextSize(0.04);
 		line2->SetLineColor(2);
 		line2->SetLineWidth(2);
 		line2->Draw("Lsame`");
-		c2->Print("plots/efficiency_groups_Nm1_double.png");
+		c2->Print("plots/efficiency_groups_Nm1_double_2.png");
 
 		TCanvas *c3 = new TCanvas();
 		c3->SetBottomMargin(.12);
@@ -106,7 +107,7 @@ leg->SetTextSize(0.04);
 		line3->SetLineWidth(2);
 		line3->Draw("Lsame`");
 	
-		c3->Print("plots/efficiency_groups_Nm1_single.png");
+		c3->Print("plots/efficiency_groups_Nm1_single_2.png");
 
 	//	return 0;
 

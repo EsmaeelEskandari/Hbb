@@ -41,7 +41,6 @@ typedef struct {
 	Float_t HTsoft;
 	Float_t DeltaEtaQB1;
 	Float_t DeltaEtaQB2;
-	Float_t DeltaPhiQQ;
 	Float_t cosOqqbb;
 	Float_t qgl1;
 	Float_t qgl2;
