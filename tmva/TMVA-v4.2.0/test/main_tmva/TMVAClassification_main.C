@@ -113,7 +113,7 @@ void TMVAClassification_main(TString variable_name, TString type)
  
 
 	
-   TString outfileName( "output/TMVA_main_QCD300to700_Nm1_"+variable_name+type+".root" );
+   TString outfileName( "output/Nm1/TMVA_main_QCD300to700_Nm1_"+variable_name+type+".root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -140,13 +140,17 @@ void TMVAClassification_main(TString variable_name, TString type)
   // factory->AddVariable( "myvar1 := var1+var2", 'F' );
   // factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
 
-	const int max_variables_number=17;
-	TString variables_names[max_variables_number]={"Mqq", "DeltaEtaQQ"/*, "DeltaPhiQQ"*/, "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "Etot", "Jet5_pt", "x1", "x2", "VB1", "VB2"};  
+	const int max_variables_number=18;
+	TString variables_names[max_variables_number]={"Mqq", "DeltaEtaQQ", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "Etot", "Jet5_pt", "x1", "x2", "VB1", "VB2"};  
  
 	for (int i=0;i<max_variables_number;i++){
-		if (variables_names[i].CompareTo(variable_name)!=0) {
-			cout<< variables_names[i].CompareTo(variable_name)<<endl;
+		if (variable_name.CompareTo("all")==0){
 			factory->AddVariable(variables_names[i], "", "", 'F' );
+		}
+		else {	 
+			if (variables_names[i].CompareTo(variable_name)!=0) {
+				factory->AddVariable(variables_names[i], "", "", 'F' );
+			}
 		}
 	}
 
