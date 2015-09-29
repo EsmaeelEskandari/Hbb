@@ -15,7 +15,7 @@
 
 using namespace std;
 
-int cat(int type_int, int signal_sample_num){
+int cat5(int type_int, int signal_sample_num){
 	gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
 	Double_t precision=0.01;
 	TString binning;
@@ -70,6 +70,7 @@ int cat(int type_int, int signal_sample_num){
 	TH1F *hist_B = (TH1F*)hist_Bs[0]->Clone(); 
 	
 	double END = hist_B->GetBinCenter(hist_B->FindLastBinAbove(0.)); //right end of BDT distibution
+
 
 	TCanvas *c1 = new TCanvas();
 	c1->SetBottomMargin(.12);
@@ -177,7 +178,7 @@ int cat(int type_int, int signal_sample_num){
 					bin=(double) hist_S->GetBinCenter(m+1+1);
 					m++;
 				} while (bin < start3);
-				if (b3!=0)max3=pow(s3,2)/b3;
+				if (b3!=0)	max3=pow(s3,2)/b3;
 				start4=start3+precision;
 				do {
 					k=m;
@@ -191,41 +192,24 @@ int cat(int type_int, int signal_sample_num){
 						k++;
 					} while (bin < start4);
 					if (b4!=0 )max4=pow(s4,2)/b4;
-					start5=start4+precision;
-						do{
-							l=k;
-							max5=0;
-							s5=0;
-							b5=0.;
-							do  {
-								s5+=hist_S->GetBinContent(l+1);
-								b5+=hist_B->GetBinContent(l+1);
-								bin=(double) hist_S->GetBinCenter(l+1+1);
-								l++;
-							} while (bin < start5);
-							if (b5!=0)max5=pow(s5,2)/b5;
-							p=l;
-							max6=0;
-							s6=0;
-							b6=0;
-							do{
-								s6+=hist_S->GetBinContent(p+1);
-								b6+=hist_B->GetBinContent(p+1);
-								bin=(double) hist_S->GetBinCenter(p+1+1);
-								p++;
-							}while (bin<END);
-								
-							if (b6!=0) max6=pow(s6,2)/b6;
-							if ((max1+max2+max3+max4+max5+max6)>=max) {
-								max = max1+max2+max3+max4+max5+max6;
-								border1=start1;
-								border2=start2;
-								border3=start3;
-								border4=start4;
-								border5=start5;
-							}
-						start5+=precision;
-					} while (start5<=(END-(NCAT-5)*precision));
+					l=k;
+					max5=0;
+					s5=0;
+					b5=0.;
+					do  {
+						s5+=hist_S->GetBinContent(l+1);
+						b5+=hist_B->GetBinContent(l+1);
+						bin=(double) hist_S->GetBinCenter(l+1+1);
+						l++;
+					} while (bin < END);
+					if (b5!=0 )max5=pow(s5,2)/b5;
+					if ((max1+max2+max3+max4+max5)>=max) {
+						max = max1+max2+max3+max4+max5;
+						border1=start1;
+						border2=start2;
+						border3=start3;
+						border4=start4;
+					}
 					start4+=precision;
 				} while (start4<=(END-(NCAT-4)*precision));
 				start3+=precision;
@@ -236,12 +220,12 @@ int cat(int type_int, int signal_sample_num){
 	} while (start1<=(END-(NCAT-1)*precision));
 
 	ofstream out;
-	out.open("output_txt/6categories_"+s_names[signal_sample_num]+type+binning+".txt");
-	out<<"borders of categories : "<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< border5<< "  , END = "<< END <<endl;
-	out<<"S**2/B in each category : "<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<"  "<< max6<<"  , max = "<<max<<endl;
+	out.open("output_txt/5categories_"+s_names[signal_sample_num]+type+binning+".txt");
+	out<<"borders of categories : "<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< "  , END = "<< END <<endl;
+	out<<"S**2/B in each category : "<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<"  , max = "<<max<<endl;
 	out.close();
-	cout<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< border5<< "  , END = "<< END <<endl;
-	cout<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<" "<<max6<<"  , max = "<<max<<endl;
+	cout<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< "  , END = "<< END <<endl;
+	cout<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<"  , max = "<<max<<endl;
 
 return 0;
 
