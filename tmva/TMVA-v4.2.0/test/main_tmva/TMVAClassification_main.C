@@ -141,7 +141,7 @@ void TMVAClassification_main(TString variable_name, TString type)
   // factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
 
 	const int max_variables_number=12; //18
-	TString variables_names[max_variables_number]={"Mqq",/* "DeltaEtaQQ",*/ "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,/*"cosOqqbb",*/ "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", /*"Etot", */"Jet5_pt", /*"x1", "x2", "VB1",*/ "VB2"};  
+	TString variables_names[max_variables_number]={"Mqq", "DeltaEtaQQ", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2" /*,"Etot", "Jet5_pt","x1", "x2", "VB1", "VB2"*/};  
  
 	for (int i=0;i<max_variables_number;i++){
 		if (variable_name.CompareTo("all")==0){
