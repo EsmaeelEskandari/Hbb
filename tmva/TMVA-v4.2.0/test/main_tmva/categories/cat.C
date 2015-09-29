@@ -1,4 +1,4 @@
-#include <iostream>
+/*#include <iostream>
 #include <TH1F.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -8,29 +8,35 @@
 #include <string.h>
 #include <stdlib.h>
 #include "TFile.h"
-#include "TROOT.h"
+#include "TROOT.h"*/
 
 using namespace std;
 
-int cat(int type_int){
+int cat(int type_int, int signal_sample_num){
 	gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
-	double precision=0.05;
-	double NCAT=5;
-	double max1=0; double max2=0; double max3=0; double max4=0; double max5=0;
-	double s1=0; double s2=0;double s3=0;  double s4=0; double s5=0;
-	double b1=0; double b2=0;double b3=0;  double b4=0; double b5=0;
+	Double_t precision=0.02;
+	TString binning;
+	binning.Form("%f",precision);
+	double NCAT=6;
+	double max1=0; double max2=0; double max3=0; double max4=0; double max5=0; double max6=0;
+	double s1=0; double s2=0;double s3=0;  double s4=0; double s5=0; double s6=0;
+	double b1=0; double b2=0;double b3=0;  double b4=0; double b5=0; double b6=0;
 	double max = -10;
 	double border1=0;
 	double border2=0;
 	double border3=0;
 	double border4=0;
+	double border5=0;
 	double start1=-1+precision;
 	double start2=-1+2*precision;
 	double start3=-1+3*precision;
 	double start4=-1+4*precision;
+	double start5=-1+5*precision;
 
-	double END = .9; //right end of BDT distibution
 	
+	const int num_bgs=8;  //8; //BGs
+	const int num_ss=3;   //3;		//Ss
+
 //	int type_int; //double  =0; single=1
 	
 	TString type;
@@ -40,15 +46,28 @@ int cat(int type_int){
 	if (type_int==0) text_type = "Spring 15, DoubleBtag";
 	if (type_int==1) text_type = "Spring 15, SingleBtag";
 	
-	
 
-	TFile *file_s =  new TFile("BDT_hist_VBFHToBB_M-125_13TeV_powheg"+type+".root");
-	TFile *file_b1 =  new TFile("BDT_hist_QCD_HT300to500"+type+".root");
-	TFile *file_b2 =  new TFile("BDT_hist_QCD_HT500to700"+type+".root");
+	TString bg_names[num_bgs] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf"};
+	TString s_names[num_ss] = {"VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "VBFHToBB_M125_13TeV_amcatnlo"};
+	TString tex_s_names[num_ss] = {"VBF powheg, m(H) = 125 GeV","VBF powheg, m(H) = 130 GeV", "VBF amc@NLO, m(H) = 125 GeV"};
+
+	TFile *file_s =  new TFile("BDT_hist_"+s_names[signal_sample_num]+type+".root");
 	TH1F *hist_S = (TH1F*)file_s->Get("BDT_output");
-	TH1F *hist_B = (TH1F*)file_b1->Get("BDT_output");
-	TH1F *hist_B2 = (TH1F*)file_b2->Get("BDT_output");
-	hist_B->Add(hist_B2);
+
+	TFile *file_b[num_bgs];
+	TH1F *hist_Bs[num_bgs];
+
+	file_b[0] = new TFile("BDT_hist_"+bg_names[0]+type+".root");
+	hist_Bs[0] = (TH1F*)file_b[0]->Get("BDT_output");
+	for (int i=1;i<num_bgs;i++){
+		file_b[i] = new TFile("BDT_hist_"+bg_names[i]+type+".root");
+		hist_Bs[i] = (TH1F*)file_b[i]->Get("BDT_output");
+		hist_Bs[0]->Add(hist_Bs[i]);
+	}
+	TH1F *hist_B = (TH1F*)hist_Bs[0]->Clone(); 
+	
+	double END = (double)hist_S->FindLastBinAbove(0.)/hist_S->GetNbinsX(); //right end of BDT distibution
+
 
 	TCanvas *c1 = new TCanvas();
 	c1->SetBottomMargin(.12);
@@ -67,53 +86,53 @@ int cat(int type_int){
 	frame2->SetXTitle("BDT output");	
 	frame2->GetXaxis()->SetLabelSize(0.05);
 	frame2->Draw();
-		TLatex* tex = new TLatex(0.95,0.95,"13 TeV, PU = 20, bx = 25 ns, 10 fb^{-1}");
-      tex->SetNDC();
-		tex->SetTextAlign(35);
-      tex->SetTextFont(42);
-      tex->SetTextSize(0.04);
-      tex->SetLineWidth(2);
-      TLatex *tex1 = new TLatex(0.2,0.83,"CMS");
-      tex1->SetNDC();
-      tex1->SetTextAlign(20);
-      tex1->SetTextFont(61);
-      tex1->SetTextSize(0.06);
-      tex1->SetLineWidth(2);
-      TLatex* tex2 = new TLatex(0.27,0.77,"Work in progress");
-      tex2->SetNDC();
-      tex2->SetTextAlign(20);
-      tex2->SetTextFont(52);
-      tex2->SetTextSize(0.04);
-    	tex2->SetLineWidth(2);
-		TLatex* tex_file = new TLatex(0.42,0.95,text_type);
-      tex_file->SetNDC();
-		tex_file->SetTextAlign(35);
-      tex_file->SetTextFont(42);
-      tex_file->SetTextSize(0.04);
-      tex_file->SetLineWidth(2);	
-		tex->Draw();
-		tex1->Draw();
-		tex2->Draw();
-		tex_file->Draw();
+	TLatex* tex = new TLatex(0.95,0.95,"13 TeV, PU = 20, bx = 25 ns, 10 fb^{-1}");
+   tex->SetNDC();
+	tex->SetTextAlign(35);
+   tex->SetTextFont(42);
+   tex->SetTextSize(0.04);
+   tex->SetLineWidth(2);
+   TLatex *tex1 = new TLatex(0.2,0.83,"CMS");
+   tex1->SetNDC();
+   tex1->SetTextAlign(20);
+   tex1->SetTextFont(61);
+   tex1->SetTextSize(0.06);
+   tex1->SetLineWidth(2);
+   TLatex* tex2 = new TLatex(0.27,0.77,"Work in progress");
+   tex2->SetNDC();
+   tex2->SetTextAlign(20);
+   tex2->SetTextFont(52);
+   tex2->SetTextSize(0.04);
+  	tex2->SetLineWidth(2);	
+	TLatex* tex_file = new TLatex(0.42,0.95,text_type);
+   tex_file->SetNDC();
+	tex_file->SetTextAlign(35);
+   tex_file->SetTextFont(42);
+   tex_file->SetTextSize(0.04);
+   tex_file->SetLineWidth(2);	
+	tex->Draw();
+	tex1->Draw();
+	tex2->Draw();
+	tex_file->Draw();
 	hist_S->SetLineColor(2);
 	hist_S->SetLineWidth(2);
 	hist_B->SetLineColor(4);
 	hist_B->SetLineWidth(2);
 	hist_S->Draw("same");
 	hist_B->Draw("same");
-	TLegend *leg = new TLegend(0.45,0.7,0.92,0.93);
+	TLegend *leg = new TLegend(0.42,0.7,0.92,0.93);
 	leg->SetBorderSize(0);
 	leg->SetTextSize(0.04);
-	leg->AddEntry(hist_S,"VBF powheg, m(H) = 125 GeV","L");
-	leg->AddEntry(hist_B,"QCD, H_{T} = 300-700 GeV","L");
+	leg->AddEntry(hist_S,tex_s_names[signal_sample_num],"L");
+	leg->AddEntry(hist_B,"QCD, H_{T} = 100 - #infty GeV","L");
 	leg->Draw("same");
-	c1->Print("plots/BDT_output_signal_bg"+type+".png");
+	c1->Print("plots/BDT_output_signal_bg_"+s_names[signal_sample_num]+type+".png");
 		
 
 
 	int num_of_bins = hist_S->GetNbinsX();
 
-	int i=0; int j=0; int k=0; int l=0; int m=0;
+	int i=0; int j=0; int k=0; int l=0; int m=0; int p=0;
 	double bin=0.;
 
 
@@ -175,28 +194,42 @@ int cat(int type_int){
 						//cout<<" k   "<< k<<endl;
 					} while (bin < start4);
 					max4=pow(s4,2)/b4;
-					l=k;
-					max5=0;
-					s5=0;
-					b5=1.;
-					do  {
-						s5+=hist_S->GetBinContent(l+1);
-						b5+=hist_B->GetBinContent(l+1);
-						bin=(double) hist_S->GetBinCenter(l+1+1);
-						l++;
-				//	cout<<s5<< "    "<<b5<< "   "<<max5<<"  "<<l<<"  "<<k<<"   "<<bin <<endl;
-					//	cout<<" l   "<< l<< "   "<< s5<<"  "<< b5<<endl;
-					} while (bin < END);
-					max5=pow(s5,2)/b5;
-			//		cout<<max5<<"  "<<max<<"   "<< s5<< "   "<<b5  <<endl;
-					if ((max1+max2+max3+max4+max5)>=max) {
-						max = max1+max2+max3+max4+max5;
-						border1=start1;
-						border2=start2;
-						border3=start3;
-						border4=start4;
-					}
-				//	cout<<"after  "<<max5<<"  "<<max<<endl;
+					start5=start4+precision;
+						do{
+							l=k;
+							max5=0;
+							s5=0;
+							b5=0.;
+							do  {
+								s5+=hist_S->GetBinContent(l+1);
+								b5+=hist_B->GetBinContent(l+1);
+								bin=(double) hist_S->GetBinCenter(l+1+1);
+								l++;
+							} while (bin < start5);
+							max5=pow(s5,2)/b5;
+							p=l;
+							max6=0;
+							s6=0;
+							b6=0;
+							do{
+								s6+=hist_S->GetBinContent(p+1);
+								b6+=hist_B->GetBinContent(p+1);
+								bin=(double) hist_S->GetBinCenter(p+1+1);
+								p++;
+							}while (bin<END)	
+								cout<<s6<<"   "<<b6<<endl;
+							max6=pow(s6,2)/b6;
+						//	cout<<"   MAX  "<<max6<<endl;
+							if ((max1+max2+max3+max4+max5+max6)>=max) {
+								max = max1+max2+max3+max4+max5+max6;
+								border1=start1;
+								border2=start2;
+								border3=start3;
+								border4=start4;
+								border5=start5;
+							}
+						start5+=precision;
+					} while (start5<=(END-(NCAT-5)*precision));
 					start4+=precision;
 				} while (start4<=(END-(NCAT-4)*precision));
 				start3+=precision;
@@ -207,12 +240,12 @@ int cat(int type_int){
 	} while (start1<=(END-(NCAT-1)*precision));
 
 	ofstream out;
-	out.open("output_txt/categories"+type+".txt");
-	out<<"borders of categories : "<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4 <<endl;
-	out<<"S**2/B in each category : "<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<"  , max = "<<max<<endl;
+	out.open("output_txt/6categories_"+s_names[signal_sample_num]+type+binning+".txt");
+	out<<"borders of categories : "<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< border5<< "  , END = "<< END <<endl;
+	out<<"S**2/B in each category : "<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<"  "<< max6<<"  , max = "<<max<<endl;
 	out.close();
-	cout<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4 <<endl;
-	cout<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<"  , max = "<<max<<endl;
+	cout<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< border5<< "  , END = "<< END <<endl;
+	cout<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<" "<<max6<<"  , max = "<<max<<endl;
 
 return 0;
 
