@@ -264,6 +264,7 @@ do {
     for (int entry=0; entry<nentries;++entry){
         tree_initial->GetEntry(entry);
 	genweight0 = TMath::Sign(1.,genweight);
+	genweight = TMath::Sign(1.,genweight);
 	genweight/=events_generated/xsec[files]; 
 	
 	
