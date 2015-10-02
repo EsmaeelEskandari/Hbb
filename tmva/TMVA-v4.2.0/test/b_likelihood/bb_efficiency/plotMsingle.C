@@ -130,8 +130,8 @@ Float_t bb_efficiency_find = 0;
 		presel+=TMath::Sign(1.,genWeight);
 
 		int loopJet_max;
-		if (nJet<6) loopJet_max = nJet; 
-		else loopJet_max = 6; 
+		if (nJet<7) loopJet_max = nJet; 
+		else loopJet_max = 7; 
 	  
  
         for(int i=0; i<loopJet_max; i++){
