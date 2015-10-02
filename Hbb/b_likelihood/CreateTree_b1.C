@@ -73,7 +73,7 @@ void CreateTree_b1::Loop()
 
    Long64_t nbytes = 0, nb = 0;
 
-	TFile file("spring15_vbf_powheg_new_blike_125_singlebtag_final.root","recreate");
+	TFile file("spring15_vbf_powheg_new_blike_125_singlebtag_final_fixed.root","recreate");
 	TTree *tree0 = new TTree("Jet_tree_b","Jet_tree_b");
 	TreeJets TreeJet;
 	tree0->Branch("Jet_pt",&TreeJet.pt,"Jet_pt/F");
@@ -138,7 +138,7 @@ void CreateTree_b1::Loop()
 		int j_num[3] = {};
 		for (int i=0;i<4;i++){
 			if ((i!=btag_max1_number)&&(Jet_id[i]>0)) {
-				js[jcount].SetPtEtaPhiM(Jet_pt[jcount], Jet_eta[jcount], Jet_phi[jcount], Jet_mass[jcount]);
+				js[jcount].SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
 				j_num[jcount] = i;
 				jcount++;
 			}
