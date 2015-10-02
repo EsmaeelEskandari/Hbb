@@ -270,7 +270,6 @@ void CreateTree_tmva_double::Loop(TString input_filename,TString output_dir,  in
 		TMVA.VB1 = VB1_mass;
 		TMVA.VB2 = VB2_mass;
 
-	//	tree0->SetWeight(genWeight);
 		tree0->Fill();	
 		events_saved++;		
 

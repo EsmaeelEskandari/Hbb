@@ -15,13 +15,21 @@
 
 using namespace std;
 
-int cat5(int type_int, int signal_sample_num){
+int main(int argc, char* argv[]){
+//int cat5(int type_int, int signal_sample_num){
+
+	int type_int=atoi(argv[1]);
+	int signal_sample_num=atoi(argv[2]);
+
+	TString narrow = "";
+
 	gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
 	Double_t precision=0.01;
 	TString binning;
 	binning.Form("%f",precision);
 	double NCAT=6;
 	double max1=0; double max2=0; double max3=0; double max4=0; double max5=0; double max6=0;
+	double max1_final=0; double max2_final=0; double max3_final=0; double max4_final=0; double max5_final=0; double max6_final=0;
 	double s1=0; double s2=0;double s3=0;  double s4=0; double s5=0; double s6=0;
 	double b1=0; double b2=0;double b3=0;  double b4=0; double b5=0; double b6=0;
 	double max = -10;
@@ -54,16 +62,16 @@ int cat5(int type_int, int signal_sample_num){
 	TString s_names[num_ss] = {"VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "VBFHToBB_M125_13TeV_amcatnlo"};
 	TString tex_s_names[num_ss] = {"VBF powheg, m(H) = 125 GeV","VBF powheg, m(H) = 130 GeV", "VBF amc@NLO, m(H) = 125 GeV"};
 
-	TFile *file_s =  new TFile("BDT_hist_"+s_names[signal_sample_num]+type+".root");
+	TFile *file_s =  new TFile("output_hist/BDT_hist_"+narrow+s_names[signal_sample_num]+type+".root");
 	TH1F *hist_S = (TH1F*)file_s->Get("BDT_output");
 
 	TFile *file_b[num_bgs];
 	TH1F *hist_Bs[num_bgs];
 
-	file_b[0] = new TFile("BDT_hist_"+bg_names[0]+type+".root");
+	file_b[0] = new TFile("output_hist/BDT_hist_"+narrow+bg_names[0]+type+".root");
 	hist_Bs[0] = (TH1F*)file_b[0]->Get("BDT_output");
 	for (int i=1;i<num_bgs;i++){
-		file_b[i] = new TFile("BDT_hist_"+bg_names[i]+type+".root");
+		file_b[i] = new TFile("output_hist/BDT_hist_"+narrow+bg_names[i]+type+".root");
 		hist_Bs[i] = (TH1F*)file_b[i]->Get("BDT_output");
 		hist_Bs[0]->Add(hist_Bs[i]);
 	}
@@ -129,7 +137,7 @@ int cat5(int type_int, int signal_sample_num){
 	leg->AddEntry(hist_S,tex_s_names[signal_sample_num],"L");
 	leg->AddEntry(hist_B,"QCD, H_{T} = 100 - #infty GeV","L");
 	leg->Draw("same");
-	c1->Print("plots/BDT_output_signal_bg_"+s_names[signal_sample_num]+type+".png");
+	c1->Print("plots/"+narrow+"BDT_output_signal_bg_"+s_names[signal_sample_num]+type+".png");
 		
 
 
@@ -209,6 +217,11 @@ int cat5(int type_int, int signal_sample_num){
 						border2=start2;
 						border3=start3;
 						border4=start4;
+						max1_final=max1;
+						max2_final=max2;
+						max3_final=max3;
+						max4_final=max4;
+						max5_final=max5;
 					}
 					start4+=precision;
 				} while (start4<=(END-(NCAT-4)*precision));
@@ -220,12 +233,12 @@ int cat5(int type_int, int signal_sample_num){
 	} while (start1<=(END-(NCAT-1)*precision));
 
 	ofstream out;
-	out.open("output_txt/5categories_"+s_names[signal_sample_num]+type+binning+".txt");
+	out.open("output_txt/"+narrow+"5categories_"+s_names[signal_sample_num]+type+binning+".txt");
 	out<<"borders of categories : "<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< "  , END = "<< END <<endl;
-	out<<"S**2/B in each category : "<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<"  , max = "<<max<<endl;
+	out<<"S**2/B in each category : "<<max1_final<<"   "<<max2_final<<"   " << max3_final<<"   "<<max4_final<<"   "<<max5_final<<"  , max = "<<max<<endl;
 	out.close();
 	cout<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< "  , END = "<< END <<endl;
-	cout<<max1<<"   "<<max2<<"   " << max3<<"   "<<max4<<"   "<<max5<<"  , max = "<<max<<endl;
+	cout<<max1_final<<"   "<<max2_final<<"   " << max3_final<<"   "<<max4_final<<"   "<<max5_final<<"  , max = "<<max<<endl;
 
 return 0;
 

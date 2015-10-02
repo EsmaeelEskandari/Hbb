@@ -134,7 +134,7 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 		int j_num[3] = {};
 		for (int i=0;i<4;i++){
 			if ((i!=btag_max1_number)&&(Jet_id[i]>0)) {
-				js[jcount].SetPtEtaPhiM(Jet_pt[jcount], Jet_eta[jcount], Jet_phi[jcount], Jet_mass[jcount]);
+				js[jcount].SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
 				j_num[jcount] = i;
 				jcount++;
 			}

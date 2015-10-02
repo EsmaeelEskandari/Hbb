@@ -78,14 +78,14 @@ void MakeB_single::Loop()
 	Int_t presel=0;
 	TreeJets TreeJet;
 	Int_t loopJet_max;
-	TFile *output = new TFile("blikelihood_vbf_singlebtag.root","recreate");
+	TFile *output = new TFile("blikelihood_vbf_singlebtag_fixed.root","recreate");
 	TTree *tree = fChain->CloneTree(0);
 	TBranch *blike_b = tree->Branch("Jet_blikelihood_b",TreeJet.blike_b,"Jet_blikelihood_b[nJet]/F");
 //	TBranch *blike_q = tree->Branch("Jet_blikelihood_q",TreeJet.blike_q,"Jet_blikelihood_q[nJet]/F");
 //	TBranch *b_matched = tree->Branch("Jet_b_matched",TreeJet.b_matched,"Jet_b_matched[nJet]/I");
 //	TBranch *q_matched = tree->Branch("Jet_q_matched",TreeJet.q_matched,"Jet_q_matched[nJet]/I");
 //	TBranch *bb_chosen = tree->Branch("Jet_bb_chosen",&TreeJet.bb_chosen,"Jet_bb_chosen/I");
-	TString weightfile_b = "weights/TMVAClassification_BDTG.weights.xml";
+	TString weightfile_b = "weights/TMVA_blikelihood_vbf_singlebtag_fixed.xml";
 //	TString weightfile_q = "weights/TMVAClassification_BDTG_6var_qq_125_08_single.weights.xml";
    TMVA::Reader *reader_b = new TMVA::Reader("Silent");
 	float var1,var2,var3,var4,var5,var6,var7,var8,var9,var10, var11;
@@ -160,7 +160,7 @@ void MakeB_single::Loop()
 		int j_num[3] = {};
 		for (int i=0;i<4;i++){
 			if ((i!=btag_max1_number)&&(Jet_id[i]>0)) {
-				js[jcount].SetPtEtaPhiM(Jet_pt[jcount], Jet_eta[jcount], Jet_phi[jcount], Jet_mass[jcount]);
+				js[jcount].SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
 				j_num[jcount] = i;
 				jcount++;
 			}

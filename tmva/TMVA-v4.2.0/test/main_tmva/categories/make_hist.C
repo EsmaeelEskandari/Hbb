@@ -40,7 +40,7 @@ void make_hist(TString type, TString physics_type, TString sample_str){
 		BDT_output->Fill(BDT,genweight);
 	}
 
-	TFile *f_output = new TFile("BDT_hist_"+physics_type+type+".root","recreate");
+	TFile *f_output = new TFile("output_hist/BDT_hist_"+physics_type+type+".root","recreate");
 	f_output->cd();
    BDT_output->Write();
    f_output->Write();

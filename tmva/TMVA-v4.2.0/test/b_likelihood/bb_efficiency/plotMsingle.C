@@ -28,6 +28,9 @@ Float_t bb_efficiency_find = 0;
 	Int_t loopJet_max;
    if (fChain == 0) return;
 
+	int events_wrong_blike[1000]={};
+	int wrong_blike_counter=0;
+	
    Long64_t nentries = fChain->GetEntriesFast();
 
   float cont_1m=0,cont_2m=0, cont_1m_=0, cont_2m_=0, nevent=0;
@@ -46,6 +49,7 @@ Float_t bb_efficiency_find = 0;
 		if (nJet<4) continue;
 		
 		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
+
 
 		int loopJet_min = 4;
 
@@ -72,7 +76,7 @@ Float_t bb_efficiency_find = 0;
 		int j_num[3] = {};
 		for (int i=0;i<4;i++){
 			if ((i!=btag_max1_number)&&(Jet_id[i]>0)) {
-				js[jcount].SetPtEtaPhiM(Jet_pt[jcount], Jet_eta[jcount], Jet_phi[jcount], Jet_mass[jcount]);
+				js[jcount].SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
 				j_num[jcount] = i;
 				jcount++;
 			}
@@ -91,8 +95,7 @@ Float_t bb_efficiency_find = 0;
 		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
 		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
 
-		if (!((pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
-	
+		if (!((pt_max1_number>=0)&&(pt_max2_number>=0)))	 continue;
 		TLorentzVector Qjet1;
 		Qjet1.SetPtEtaPhiM(Jet_pt[pt_max1_number] ,Jet_eta[pt_max1_number],Jet_phi[pt_max1_number],Jet_mass[pt_max1_number]);
 	
@@ -103,8 +106,8 @@ Float_t bb_efficiency_find = 0;
 			if ( (i!=btag_max1_number)&&(i!=pt_max1_number)&&(i!=pt_max2_number)&&(Jet_id[i]>0)) btag_max2_number=i;
 		}
 
-		if (!((btag_max2_number>=0))) continue;
 
+		if (!((btag_max2_number>=0))) continue;
 
 		TLorentzVector Bjet2;
 		Bjet2.SetPtEtaPhiM(Jet_pt[btag_max2_number],Jet_eta[btag_max2_number],Jet_phi[btag_max2_number],Jet_mass[btag_max2_number]);
@@ -114,10 +117,16 @@ Float_t bb_efficiency_find = 0;
 		Double_t Mqq = qq.M();
 		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) continue;
+		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6)))  continue;
 
 		if (HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v!=1) continue;
 
+
+		if ((Jet_blikelihood_b[0]==-2)&&(Jet_blikelihood_b[1]==-2)&&(Jet_pt[0]>20)&&(Jet_id[0]>0)&&(Jet_pt[1]>20)&&(Jet_id[1]>0)) {
+			wrong_blike_counter+=TMath::Sign(1.,genWeight);
+			continue;
+		}
+ 
 		presel+=TMath::Sign(1.,genWeight);
 
 		int loopJet_max;
@@ -263,11 +272,12 @@ Float_t bb_efficiency_find = 0;
 
   // std::cout<<" purity b-lik "<<cont_1m/nevent<< " 1/2 "<<cont_2m/nevent <<std::endl;
  //  std::cout<<" purity csv "<<cont_1m_/nevent<< " 1/2 "<<cont_2m_/nevent <<std::endl;
-   std::cout<<" preselection purity b-lik "<<cont_1m/presel<< " 1/2 "<<cont_2m/presel <<std::endl;
+   std::cout<<" preselection purity b-lik "<<cont_1m/presel<< " 1/2 "<<cont_2m/presel /* /(presel-wrong_blike_counter)*/ <<std::endl;
    std::cout<<" preselection purity csv "<<cont_1m_/presel<< " 1/2 "<<cont_2m_/presel << " , presel = "<< presel<<std::endl;
   // std::cout<<" preselection purity q-lik "<<cont_1q/presel<< " 1/2 "<<cont_2q/presel <<std::endl;
  //  std::cout<<" preselection purity q_pt "<<cont_1q_/presel<< " 1/2 "<<cont_2q_/presel << " , presel = "<< presel<<std::endl;
 	std::cout<<"bb efficiency to find   = " << bb_efficiency_find/presel<<endl;
+	std::cout<<"after preselection number of events and jets witj blike ==-2 : "<<wrong_blike_counter<<endl;
    gStyle->SetOptStat(0);
    TCanvas *c = new TCanvas("c","c",700,700);
    c->cd();
@@ -279,7 +289,7 @@ Float_t bb_efficiency_find = 0;
    h_mass_csv->SetTitle("csv order");
    h_mass_csv->Draw("same");
    h_mass_ref->SetTitle("highest dijet");
-   h_mass_ref->Draw("same");
+ //  h_mass_ref->Draw("same");
 	c->Print("c.png");
 
    TCanvas *c1 = new TCanvas("c1","c1",700,700);
@@ -290,7 +300,7 @@ Float_t bb_efficiency_find = 0;
    h_mass_ref_pt100->SetTitle("csv order");
 	h_mass_lik_pt100->SetLineColor(4);
    h_mass_lik_pt100->Draw("");   
-   h_mass_ref_pt100->Draw("same");
+//   h_mass_ref_pt100->Draw("same");
    h_mass_csv_pt100->SetLineColor(2);
    h_mass_csv_pt100->Draw("same");
 
@@ -301,6 +311,8 @@ Float_t bb_efficiency_find = 0;
 	d->SetLogy();
 	h_blik->Draw();
 	d->Print("d.png");
+
+
 
 
 }

@@ -12,9 +12,11 @@
 //int main(){
 void efficiency_roc_Nm1(){
 	gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
-	const int n_variables = 13; //19
+	const int n_variables = 13; //13 //19
 //	TString variables_names[n_variables]={"Mqq", "DeltaEtaQQ", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "Etot", "Jet5_pt", "x1", "x2", "VB1", "VB2", "all"};  
-	TString variables_names[n_variables]={"Mqq", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" , "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2",  "Jet5_pt", "VB2", "all"};  
+	//TString variables_names[n_variables]={"Mqq", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" , "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2",  "Jet5_pt", "VB2", "all"};  
+//	TString variables_names[n_variables]={"Mqq", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" , "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "VB2", "all"};  
+	TString variables_names[n_variables]={"Mqq", "DeltaEtaQQ","DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "all"};  
 	TString file_names[n_variables];
 	TString file_names_single[n_variables];
 	Double_t frame2_axisx[n_variables];
@@ -81,12 +83,12 @@ leg->SetTextSize(0.04);
 		line2->SetLineColor(2);
 		line2->SetLineWidth(2);
 		line2->Draw("Lsame`");
-		c2->Print("plots/efficiency_groups_Nm1_double_2.png");
+		c2->Print("plots/efficiency_groups_Nm1_double_4.png");
 
 		TCanvas *c3 = new TCanvas();
 		c3->SetBottomMargin(.12);
 		c3->cd();
-		frame2->SetMinimum(0.855);
+		frame2->SetMinimum(0.85);
       frame2->SetMaximum(.887);
 		frame2->Draw();
 		TGraph *gr_single = new TGraph(n_variables,frame2_axisx,hist_integrals_single);
@@ -107,7 +109,7 @@ leg->SetTextSize(0.04);
 		line3->SetLineWidth(2);
 		line3->Draw("Lsame`");
 	
-		c3->Print("plots/efficiency_groups_Nm1_single_2.png");
+		c3->Print("plots/efficiency_groups_Nm1_single_4.png");
 
 	//	return 0;
 

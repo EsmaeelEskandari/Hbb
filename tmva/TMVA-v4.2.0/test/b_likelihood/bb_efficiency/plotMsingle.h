@@ -1726,9 +1726,9 @@ plotMsingle::plotMsingle(TTree *tree) : fChain(0)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../blikelihood_vbf_singlebtag.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("../blikelihood_vbf_singlebtag_fixed.root");
       if (!f || !f->IsOpen()) {
-         f = new TFile("../blikelihood_vbf_singlebtag.root");
+         f = new TFile("../blikelihood_vbf_singlebtag_fixed.root");
       }
       f->GetObject("tree",tree);
 
@@ -2613,6 +2613,7 @@ void plotMsingle::Init(TTree *tree)
    fChain->SetBranchAddress("GenBQuarkFromTop_mass", &GenBQuarkFromTop_mass, &b_GenBQuarkFromTop_mass);
    fChain->SetBranchAddress("GenBQuarkFromTop_charge", &GenBQuarkFromTop_charge, &b_GenBQuarkFromTop_charge);
    fChain->SetBranchAddress("GenBQuarkFromTop_status", &GenBQuarkFromTop_status, &b_GenBQuarkFromTop_status);
+  // fChain->SetBranchAddress("Jet_blike_VBF", Jet_blikelihood_b, &b_Jet_blikelihood_b);
    fChain->SetBranchAddress("Jet_blikelihood_b", Jet_blikelihood_b, &b_Jet_blikelihood_b);
    fChain->SetBranchAddress("Jet_blikelihood_q", Jet_blikelihood_q, &b_Jet_blikelihood_q);
    fChain->SetBranchAddress("Jet_b_matched", Jet_b_matched, &b_Jet_b_matched);

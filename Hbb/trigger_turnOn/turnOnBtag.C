@@ -352,7 +352,7 @@ do {
 		int j_num[3] = {};
 		for (int i=0;i<4;i++){
 			if ((i!=btag_max1_number_single)) {
-				js[jcount].SetPtEtaPhiM(Jet.pt[jcount], Jet.eta[jcount], Jet.phi[jcount], Jet.mass[jcount]);
+				js[jcount].SetPtEtaPhiM(Jet.pt[i], Jet.eta[i], Jet.phi[i], Jet.mass[i]);
 				j_num[jcount] = i;
 				jcount++;
 			}
