@@ -78,14 +78,14 @@ void MakeB_single::Loop()
 	Int_t presel=0;
 	TreeJets TreeJet;
 	Int_t loopJet_max;
-	TFile *output = new TFile("blikelihood_vbf_singlebtag_fixed.root","recreate");
+	TFile *output = new TFile("blikelihood_vbf_singlebtag_v13.root","recreate");
 	TTree *tree = fChain->CloneTree(0);
 	TBranch *blike_b = tree->Branch("Jet_blikelihood_b",TreeJet.blike_b,"Jet_blikelihood_b[nJet]/F");
 //	TBranch *blike_q = tree->Branch("Jet_blikelihood_q",TreeJet.blike_q,"Jet_blikelihood_q[nJet]/F");
 //	TBranch *b_matched = tree->Branch("Jet_b_matched",TreeJet.b_matched,"Jet_b_matched[nJet]/I");
 //	TBranch *q_matched = tree->Branch("Jet_q_matched",TreeJet.q_matched,"Jet_q_matched[nJet]/I");
 //	TBranch *bb_chosen = tree->Branch("Jet_bb_chosen",&TreeJet.bb_chosen,"Jet_bb_chosen/I");
-	TString weightfile_b = "weights/TMVA_blikelihood_vbf_singlebtag_fixed.xml";
+	TString weightfile_b = "weights/TMVA_blikelihood_vbf_singlebtag_v13.xml";
 //	TString weightfile_q = "weights/TMVAClassification_BDTG_6var_qq_125_08_single.weights.xml";
    TMVA::Reader *reader_b = new TMVA::Reader("Silent");
 	float var1,var2,var3,var4,var5,var6,var7,var8,var9,var10, var11;
@@ -164,17 +164,24 @@ void MakeB_single::Loop()
 				j_num[jcount] = i;
 				jcount++;
 			}
-		}	
+		}
+/////////////////	
+		if (jcount==3) {
+	
 		Float_t deltaEtaJets[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
 		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
 		Float_t max_deltaEta = 0.;
 		int max_deltaEta_num = -1;
 		for (int i=0;i<3;i++){
+	//		cout<<deltaEtaJets[i]<<endl;
 			if (deltaEtaJets[i]>max_deltaEta) {
 				max_deltaEta = deltaEtaJets[i];
 				max_deltaEta_num = i;
 			}
 		}
+	
+			
+		if (max_deltaEta_num==-1) cout<< jentry<<endl;
 		
 		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
 		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
@@ -296,7 +303,7 @@ void MakeB_single::Loop()
 			TreeJet.blike_b[i] = reader_b->EvaluateMVA("BDTG");
 
 	}
-
+	}
 	}
 	}
 	}	

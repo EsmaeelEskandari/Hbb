@@ -23,7 +23,7 @@ do
 	do
 		f=$FILES$current_tree$ROOT
 		echo $f
-		bsub -u nouser -q 8nh batch2.sh $f $current_tree $WORKDIR${output_dir[current_sample]}
+	#	bsub -u nouser -q 8nh batch2.sh $f $current_tree $WORKDIR${output_dir[current_sample]}
 		bsub -u nouser -q 8nh batch2_single.sh $f $current_tree $WORKDIR${output_dir[current_sample]}
  		current_tree=$(( $current_tree + 1 ))
 	done

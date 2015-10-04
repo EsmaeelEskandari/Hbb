@@ -10,10 +10,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "TROOT.h"
+#include "TLatex.h"
+#include "TLegend.h"
 typedef std::map<double, int> JetList;
 void plotMsingle::Loop()
 {
 
+gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
 TH1F * h_mass_lik = new TH1F("h_mass_lik","h_mass_lik", 100, 0, 200);
 TH1F * h_mass_ref = new TH1F("h_mass_ref","h_mass_ref", 100, 0, 200);
 TH1F * h_mass_csv = new TH1F("h_mass_csv","h_mass_csv", 100, 0, 200);
@@ -80,7 +84,10 @@ Float_t bb_efficiency_find = 0;
 				j_num[jcount] = i;
 				jcount++;
 			}
-		}	
+		}
+
+		if (!(jcount==3)) continue;
+			
 		Float_t deltaEtaJets[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
 		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
 		Float_t max_deltaEta = 0.;
@@ -92,6 +99,7 @@ Float_t bb_efficiency_find = 0;
 			}
 		}
 		
+
 		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
 		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
 
@@ -279,38 +287,69 @@ Float_t bb_efficiency_find = 0;
 	std::cout<<"bb efficiency to find   = " << bb_efficiency_find/presel<<endl;
 	std::cout<<"after preselection number of events and jets witj blike ==-2 : "<<wrong_blike_counter<<endl;
    gStyle->SetOptStat(0);
-   TCanvas *c = new TCanvas("c","c",700,700);
+   TCanvas *c = new TCanvas();
+	c->SetBottomMargin(.12);
    c->cd();
    h_mass_lik->SetLineColor(4);
    h_mass_lik->GetXaxis()->SetTitle("m_{H} (GeV)");
-   h_mass_lik->SetTitle("b-likelihood order");
+   h_mass_lik->GetYaxis()->SetTitle("Events / 2 GeV");
+   h_mass_lik->SetTitle("");
+   h_mass_lik->SetLineWidth(2);
    h_mass_lik->Draw("");
    h_mass_csv->SetLineColor(2);
-   h_mass_csv->SetTitle("csv order");
+   h_mass_csv->SetLineWidth(2);
+   h_mass_csv->SetTitle("");
    h_mass_csv->Draw("same");
-   h_mass_ref->SetTitle("highest dijet");
- //  h_mass_ref->Draw("same");
-	c->Print("c.png");
+	TLegend *leg = new TLegend(0.68,0.7,0.9,0.93);
+	leg->SetBorderSize(0);
+	leg->SetTextSize(0.04);
+	leg->AddEntry(h_mass_csv,"btag CSV order","L");
+	leg->AddEntry(h_mass_lik,"b-likelihood order","L");
+	leg->Draw("same");
+	TLatex* tex = new TLatex(0.95,0.95,"13 TeV, PU = 20, bx = 25 ns, 1 pb^{-1}");
+   tex->SetNDC();
+	tex->SetTextAlign(35);
+   tex->SetTextFont(42);
+   tex->SetTextSize(0.04);
+   tex->SetLineWidth(2);
+   TLatex *tex1 = new TLatex(0.22,0.83,"CMS");
+   tex1->SetNDC();
+   tex1->SetTextAlign(20);
+   tex1->SetTextFont(61);
+   tex1->SetTextSize(0.06);
+   tex1->SetLineWidth(2);
+   TLatex* tex2 = new TLatex(0.29,0.77,"Work in progress");
+   tex2->SetNDC();
+   tex2->SetTextAlign(20);
+   tex2->SetTextFont(52);
+   tex2->SetTextSize(0.04);
+  	tex2->SetLineWidth(2);	
+	TLatex* tex_file = new TLatex(0.3,0.95,"SingleBtag");
+   tex_file->SetNDC();
+	tex_file->SetTextAlign(35);
+   tex_file->SetTextFont(42);
+   tex_file->SetTextSize(0.04);
+   tex_file->SetLineWidth(2);	
+	tex->Draw();
+	tex1->Draw();
+	tex2->Draw();
+	tex_file->Draw();
+	c->Print("plots/blike_mh_v13.png");
 
-   TCanvas *c1 = new TCanvas("c1","c1",700,700);
-   c1->cd();
-   h_mass_ref_pt100->GetXaxis()->SetTitle("m_{H} (GeV)");
-   h_mass_lik_pt100->SetTitle("b-likelihood order");
-   h_mass_csv_pt100->SetTitle("csv order");
-   h_mass_ref_pt100->SetTitle("csv order");
-	h_mass_lik_pt100->SetLineColor(4);
-   h_mass_lik_pt100->Draw("");   
-//   h_mass_ref_pt100->Draw("same");
-   h_mass_csv_pt100->SetLineColor(2);
-   h_mass_csv_pt100->Draw("same");
-
-	c1->Print("c1.png");
 
    TCanvas *d =  new TCanvas("d","d");	
 	d->cd();
 	d->SetLogy();
+	h_blik->SetLineWidth(2);
+   h_blik->GetXaxis()->SetTitle("b-likelihood");
+   h_blik->GetYaxis()->SetTitle("Events / 0.02");
+	h_blik->SetLineColor(4);
 	h_blik->Draw();
-	d->Print("d.png");
+	tex->Draw();
+	tex1->Draw();
+	tex2->Draw();
+	tex_file->Draw();
+	d->Print("plots/blike_v13.png");
 
 
 

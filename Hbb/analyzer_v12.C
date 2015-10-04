@@ -30,6 +30,19 @@
 #include <TF1.h>
 
 
+int max_blike(Float_t btag[300], Int_t id[300], Int_t& btag_max1_number ){
+	float btag_max;
+		for (int i=0;i<6;i++){
+		//	cout<<"I am here"<<endl;
+			if ((btag[i]>0.4)&&(id[i]>0)){
+				btag_max=btag[i];
+				btag_max1_number=i;
+			}
+		}
+	return 0;
+}
+
+
 const int njets = 300;
 
 typedef struct {
@@ -73,16 +86,16 @@ TString file_names[nfiles] = {
 "MC_new/QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v2"
 }; */
 
-const int nfiles  = 12;
+const int nfiles  = 11;
 
-TString file_names[nfiles] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "VBFHToBB_M125_13TeV_amcatnlo","v13_test"};
+TString file_names[nfiles] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "VBFHToBB_M125_13TeV_amcatnlo"};
      
 TString type[nfiles]; 		
 for (int i=0;i<nfiles;i++){
 	type[i] = file_names[i];
 }
 
-Double_t xsec[nfiles] = { 2.75E07, 1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,2.16 ,1.96,2.16,2.16};
+Double_t xsec[nfiles] = { 2.75E07, 1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,2.16 ,1.96,2.16};
 
 do {
 	
@@ -92,8 +105,8 @@ do {
 	Int_t global_counter = 0;
 	Float_t HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200;
 	TFile *file_initial;
-	if (files==11) file_initial= new TFile("/afs/cern.ch/work/n/nchernya/Hbb/V13_test/tree.root");
-//	else file_initial = new TFile("skim_trees/"+file_names[files]+"/"+file_names[files]+"_skimmed_tree.root");
+//	if (files==11) file_initial= new TFile("/afs/cern.ch/work/n/nchernya/Hbb/V13_test/tree.root");
+	file_initial = new TFile("skim_trees/"+file_names[files]+"/"+file_names[files]+"_skimmed_tree.root");
    TTree *tree_initial = (TTree*)file_initial->Get("tree");
 	TH1F *countPos = (TH1F*)file_initial->Get("CountPosWeight");
 	TH1F *countNeg = (TH1F*)file_initial->Get("CountNegWeight");
@@ -278,6 +291,11 @@ do {
 		for (int i=0;i<loopJet_min;i++){
 			if (Jet.btag[i]>1) Jet.btag[i]=1.;
 		}
+
+		max_blike(Jet.btag,Jet.id,btag_max1_number);
+		cout <<btag_max1_number<<endl;
+
+
 		for (int i=0;i<loopJet_min;i++){
 			if ((Jet.btag[i]>btag_max)&&(Jet.id[i]>0)){
 				btag_max=Jet.btag[i];
@@ -291,6 +309,10 @@ do {
 				btag_max2_number=i;
 			} 
 		}
+	
+
+
+
 		if (!((btag_max1_number>=0)&&(btag_max2_number>=0))) {continue;}
 		TLorentzVector Bjet1;
 		Bjet1.SetPtEtaPhiM(Jet.pt[btag_max1_number],Jet.eta[btag_max1_number],Jet.phi[btag_max1_number],Jet.mass[btag_max1_number]);

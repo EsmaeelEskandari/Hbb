@@ -6,7 +6,7 @@ g++ run_skim_trees_double_main.C -g -o run `root-config --cflags --glibs`
 g++ run_skim_trees_single_main.C -g -o run_single `root-config --cflags --glibs`
 
 #EOS=root://eoscms//eos/cms/store/group/phys_higgs/hbb/ntuples/V12/
-EOS=root://xrootd.unl.edu/
+EOS=root://t3se01.psi.ch:1094/
 TREE=tree_
 ROOT=.root
 
@@ -21,15 +21,15 @@ do
 #	mkdir ${output_dir[current_sample]}
 	FILES=$EOS$sample$TREE
 	current_tree=1
-	while [ $current_tree -le ${max_trees_number[current_sample]} ]
-#	while [ $current_tree -le 1 ]
+#	while [ $current_tree -le ${max_trees_number[current_sample]} ]
+	while [ $current_tree -le 1 ]
 	do
 		f=$FILES$current_tree$ROOT
 		echo $f
 		bsub -u nouser -q 8nh batch2.sh $f $current_tree $WORKDIR${output_dir[current_sample]}$v13
-		bsub -u nouser -q 8nh batch2_single.sh $f $current_tree $WORKDIR${output_dir[current_sample]}$v13
+	#	bsub -u nouser -q 8nh batch2_single.sh $f $current_tree $WORKDIR${output_dir[current_sample]}$v13
  		current_tree=$(( $current_tree + 1 ))
 	done
 	current_sample=$((current_sample + 1))
-#	break
+	break
 done < samples_paths_v13.txt

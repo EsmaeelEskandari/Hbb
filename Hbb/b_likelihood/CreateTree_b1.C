@@ -154,6 +154,8 @@ void CreateTree_b1::Loop()
 			}
 		}
 		
+		if (max_deltaEta_num==-1) continue;
+		
 		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
 		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
 
