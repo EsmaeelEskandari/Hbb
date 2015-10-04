@@ -5,8 +5,8 @@
 // found on file: root://t3se01.psi.ch//store/t3groups/ethz-higgs/run2/VHBBHeppyV13/VBFHToBB_M-125_13TeV_powheg_pythia8_weightfix/VHBB_HEPPY_V13_VBFHToBB_M-125_13TeV_powheg_pythia8_weightfix__RunIISpring15DR74-Asympt25ns_MCRUN2_74_V9-v1/151002_084651/0000/tree_6.root
 //////////////////////////////////////////////////////////
 
-#ifndef skim_trees_double_h
-#define skim_trees_double_h
+#ifndef skim_trees_single_h
+#define skim_trees_single_h
 
 #include <TROOT.h>
 #include <TChain.h>
@@ -16,7 +16,7 @@
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
 
-class skim_trees_double {
+class skim_trees_single {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
@@ -1762,8 +1762,8 @@ public :
    TBranch        *b_GenBQuarkFromTop_charge;   //!
    TBranch        *b_GenBQuarkFromTop_status;   //!
 
-   skim_trees_double(TTree *tree=0, TString filename = "");
-   virtual ~skim_trees_double();
+   skim_trees_single(TTree *tree=0, TString filename = "");
+   virtual ~skim_trees_single();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -1775,8 +1775,8 @@ public :
 
 #endif
 
-#ifdef skim_trees_double_cxx
-skim_trees_double::skim_trees_double(TTree *tree, TString filename) : fChain(0) 
+#ifdef skim_trees_single_cxx
+skim_trees_single::skim_trees_single(TTree *tree, TString filename) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -1788,19 +1788,19 @@ skim_trees_double::skim_trees_double(TTree *tree, TString filename) : fChain(0)
    Init(tree);
 }
 
-skim_trees_double::~skim_trees_double()
+skim_trees_single::~skim_trees_single()
 {
    if (!fChain) return;
    delete fChain->GetCurrentFile();
 }
 
-Int_t skim_trees_double::GetEntry(Long64_t entry)
+Int_t skim_trees_single::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
-Long64_t skim_trees_double::LoadTree(Long64_t entry)
+Long64_t skim_trees_single::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
    if (!fChain) return -5;
@@ -1813,7 +1813,7 @@ Long64_t skim_trees_double::LoadTree(Long64_t entry)
    return centry;
 }
 
-void skim_trees_double::Init(TTree *tree)
+void skim_trees_single::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
    // a new tree or chain. Typically here the branch addresses and branch
@@ -2700,7 +2700,7 @@ void skim_trees_double::Init(TTree *tree)
    Notify();
 }
 
-Bool_t skim_trees_double::Notify()
+Bool_t skim_trees_single::Notify()
 {
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
@@ -2711,18 +2711,18 @@ Bool_t skim_trees_double::Notify()
    return kTRUE;
 }
 
-void skim_trees_double::Show(Long64_t entry)
+void skim_trees_single::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t skim_trees_double::Cut(Long64_t entry)
+Int_t skim_trees_single::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef skim_trees_double_cxx
+#endif // #ifdef skim_trees_single_cxx
