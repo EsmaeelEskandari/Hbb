@@ -242,6 +242,8 @@ do {
 				jcount++;
 			}
 		}	
+		if (!(jcount==3)) continue;
+	
 		Float_t deltaEtaJets[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
 		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
 		Float_t max_deltaEta = 0.;

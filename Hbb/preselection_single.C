@@ -1,8 +1,8 @@
-int preselection_single(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t Jet_id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq){
+int preselection_single(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t Jet_id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq, Float_t scale=1.){
 	
 	if (nJets<4) return -1;
 
-	if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.)))  return -1;
+	if (!((Jet_pt[0]>92.*scale)&&(Jet_pt[1]>76.*scale)&&(Jet_pt[2]>64.*scale)&&(Jet_pt[3]>30.*scale)))  return -1;
 
 		int loopJet_min = 4;
 
@@ -62,7 +62,7 @@ int preselection_single(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 		Double_t Mqq = qq.M();
 		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) return -1;
+		if (!((Mqq>460*scale)&&(qqDeltaEta>4.1*scale)&&(bbDeltaPhi<1.6*(2-scale)))) return -1;
 		
 		if (trigger!=1) return -1;
 	

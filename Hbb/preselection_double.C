@@ -1,7 +1,7 @@
-int preselection_double(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t Jet_id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq){
+int preselection_double(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t Jet_id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq, Float_t scale=1.){
 	if (nJets<4) return -1;
 
-	if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.)))  return -1;
+	if (!((Jet_pt[0]>92.*scale)&&(Jet_pt[1]>76.*scale)&&(Jet_pt[2]>64.*scale)&&(Jet_pt[3]>30.*scale)))  return -1;
 		Float_t btag_max = 0.4;
 
 		int loopJetmin = 6;
@@ -32,14 +32,14 @@ int preselection_double(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 		Bjet2.SetPtEtaPhiM(Jet_pt[btag_max2_number],Jet_eta[btag_max2_number],Jet_phi[btag_max2_number],Jet_mass[btag_max2_number]);
 
 
-		Float_t pt_max = 20.;
+		Float_t pt_max = 20.*scale;
 		for (int i=0;i<loopJetmin;i++){
 			if ((Jet_pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(Jet_id[i]>0)) {
 				pt_max=Jet_pt[i];
 				pt_max1_number=i;	
 			}
 		}
-		pt_max = 20.;
+		pt_max = 20.*scale;
 		for (int i=0;i<loopJetmin;i++){
 			if ((Jet_pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(i!=pt_max1_number)&&(Jet_id[i]>0)) {
 				pt_max=Jet_pt[i];
@@ -58,7 +58,7 @@ int preselection_double(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Float_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>200)&&(qqDeltaEta>1.2)&&(bbDeltaPhi<2.4))) return -1;		
+		if (!((Mqq>200*scale)&&(qqDeltaEta>1.2*scale)&&(bbDeltaPhi<2.4*(2-scale)))) return -1;		
 		
 		if (trigger!=1) return -1;
 	

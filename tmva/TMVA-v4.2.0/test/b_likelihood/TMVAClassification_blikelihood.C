@@ -141,6 +141,7 @@ void TMVAClassification_blikelihood( TString myMethodList = "" )
    factory->AddVariable( "Jet_pt_idx", "Jet Pt index", "", 'I' );
    factory->AddVariable( "Jet_eta_idx", "Jet #eta index", "", 'I' );
    factory->AddVariable( "Jet_btagCSV_idx", "Jet btag index", "", 'I' );
+ //  factory->AddVariable( "Jet_btagBDT", "Jet btag BDT", "", 'F' );
  //  factory->AddVariable( "Jet_chMult", "Jet charge multiplcity", "", 'I' );
 //	  factory->AddVariable( "Jet_ptd", "Jet ptd", "", 'F' );
  //  factory->AddVariable( "Jet_axis2", "Jet axis 2", "", 'F' );

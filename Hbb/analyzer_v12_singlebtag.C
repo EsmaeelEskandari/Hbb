@@ -280,19 +280,16 @@ do {
 	
 		if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
 
+		presel+=genweight0;
+		
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Float_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-	
-		presel+=genweight0;
-
 		TLorentzVector bb;
 		bb = Bjet1+Bjet2;
 		Float_t Mbb = bb.M();
-
 		TLorentzVector bbqq;
 		bbqq = Bjet1 + Bjet2 + Qjet1 + Qjet2;
-
 		Float_t cosObbqq =TMath::Cos( ( ( Bjet1.Vect() ).Cross(Bjet2.Vect()) ).Angle( ( Qjet1.Vect() ).Cross(Qjet2.Vect()) ) );	
 
 		Float_t EtaBQ1;

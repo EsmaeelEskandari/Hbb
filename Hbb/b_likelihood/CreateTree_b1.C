@@ -11,6 +11,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
+
+
 typedef std::map<Float_t, Int_t> JetList;
 
 #define SWAP(A, B) { Float_t t = A; A = B; B = t; }
@@ -51,6 +54,7 @@ typedef struct {
    Float_t pt;
    Float_t eta;
 	Float_t btagCSV;
+	Float_t btagBDT;
    Int_t pt_idx;
    Int_t eta_idx;
 	Int_t btagCSV_idx;
@@ -79,6 +83,7 @@ void CreateTree_b1::Loop()
 	tree0->Branch("Jet_pt",&TreeJet.pt,"Jet_pt/F");
 	tree0->Branch("Jet_eta",&TreeJet.eta,"Jet_eta/F");
 	tree0->Branch("Jet_btagCSV",&TreeJet.btagCSV,"Jet_btagCSV/F");
+	tree0->Branch("Jet_btagBDT",&TreeJet.btagBDT,"Jet_btagBDT/F");
 	tree0->Branch("Jet_pt_idx",&TreeJet.pt_idx,"Jet_pt_idx/I");
 	tree0->Branch("Jet_eta_idx",&TreeJet.eta_idx,"Jet_eta_idx/I");
 	tree0->Branch("Jet_btagCSV_idx",&TreeJet.btagCSV_idx,"Jet_btagCSV_idx/I");
@@ -109,82 +114,18 @@ void CreateTree_b1::Loop()
 		if (genWeight<0) continue;
 
 
-		if (nJet<4) continue;
-		
-		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
-
-		int loopJet_min = 4;
-
-
-		Double_t btag_max = 0.7;
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet_btagCSV[i]>btag_max)&&(Jet_id[i]>0)){
-				btag_max=Jet_btagCSV[i];
-				btag_max1_number=i;
-			}
-		}
-		if (!((btag_max1_number>=0))) continue;
-		TLorentzVector Bjet1;
-		Bjet1.SetPtEtaPhiM(Jet_pt[btag_max1_number],Jet_eta[btag_max1_number],Jet_phi[btag_max1_number],Jet_mass[btag_max1_number]);
-
-
 		int pt_max1_number = -1;
 		int pt_max2_number = -1;
-
-		TLorentzVector js[3];
-		int jcount = 0;
-		int j_num[3] = {};
-		for (int i=0;i<4;i++){
-			if ((i!=btag_max1_number)&&(Jet_id[i]>0)) {
-				js[jcount].SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
-				j_num[jcount] = i;
-				jcount++;
-			}
-		}	
-		Float_t deltaEtaJets[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
-		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
-		Float_t max_deltaEta = 0.;
-		int max_deltaEta_num = -1;
-		for (int i=0;i<3;i++){
-			if (deltaEtaJets[i]>max_deltaEta) {
-				max_deltaEta = deltaEtaJets[i];
-				max_deltaEta_num = i;
-			}
-		}
-		
-		if (max_deltaEta_num==-1) continue;
-		
-		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
-		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
-
-		if (!((pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
-	
-		TLorentzVector Qjet1;
-		Qjet1.SetPtEtaPhiM(Jet_pt[pt_max1_number] ,Jet_eta[pt_max1_number],Jet_phi[pt_max1_number],Jet_mass[pt_max1_number]);
-	
-		TLorentzVector Qjet2;
-		Qjet2.SetPtEtaPhiM(Jet_pt[pt_max2_number],Jet_eta[pt_max2_number],Jet_phi[pt_max2_number],Jet_mass[pt_max2_number]);
-
-		for (int i=0;i<4;i++){
-			if ( (i!=btag_max1_number)&&(i!=pt_max1_number)&&(i!=pt_max2_number)&&(Jet_id[i]>0)) btag_max2_number=i;
-		}
-
-		if (!((btag_max2_number>=0))) continue;
-
-
+		TLorentzVector Bjet1;
 		TLorentzVector Bjet2;
-		Bjet2.SetPtEtaPhiM(Jet_pt[btag_max2_number],Jet_eta[btag_max2_number],Jet_phi[btag_max2_number],Jet_mass[btag_max2_number]);
-
+		TLorentzVector Qjet1;
+		TLorentzVector Qjet2;
 		TLorentzVector qq;
-		qq = Qjet1+Qjet2;
-		Double_t Mqq = qq.M();
-		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
-		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) continue;
+	
 
-		if (HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v!=1) continue;
+		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
 
 		int loopJet_max = 7;
 		if (nJet<7) loopJet_max = nJet; 
@@ -232,6 +173,7 @@ void CreateTree_b1::Loop()
 		   TreeJet.pt=Jet_pt[i];
 		   TreeJet.eta=TMath::Abs(Jet_eta[i]); 
 		   TreeJet.btagCSV=Jet_btagCSV[i];
+		   TreeJet.btagBDT=Jet_btagBDT[i];
 			TreeJet.ptd=Jet_ptd[i];
 			TreeJet.ch_mult=Jet_chMult[i];
 			TreeJet.axis2=Jet_axis2[i];
@@ -317,10 +259,12 @@ void CreateTree_b1::Loop()
 	out<<"bb efficiency to match b-jets = "<<bb_efficiency/presel<<endl;
 	out<<"qq efficiency to find q-jets = "<<qq_efficiency_find/presel<<endl;
 	out<<"qq efficiency to match q-jets = "<<qq_efficiency/presel<<endl;
+	out<<"presel = "<<presel<<endl;
 	cout<<"bb efficiency to find b-jets = "<<bb_efficiency_find/presel<<endl;
 	cout<<"bb efficiency to match b-jets = "<<bb_efficiency/presel<<endl;
 	cout<<"qq efficiency to find q-jets = "<<qq_efficiency_find/presel<<endl;
 	cout<<"qq efficiency to match q-jets = "<<qq_efficiency/presel<<endl;
+	cout<<"presel = "<<presel<<endl;
 	file.Write();
 	file.Close();
 

@@ -13,6 +13,9 @@
 #include "TROOT.h"
 #include "TLatex.h"
 #include "TLegend.h"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
+
+
 typedef std::map<double, int> JetList;
 void plotMsingle::Loop()
 {
@@ -37,97 +40,29 @@ Float_t bb_efficiency_find = 0;
 	
    Long64_t nentries = fChain->GetEntriesFast();
 
-  float cont_1m=0,cont_2m=0, cont_1m_=0, cont_2m_=0, nevent=0;
-  float cont_1q=0,cont_2q=0, cont_1q_=0, cont_2q_=0;
+   float cont_1m=0,cont_2m=0, cont_1m_=0, cont_2m_=0, nevent=0;
+   float cont_1q=0,cont_2q=0, cont_1q_=0, cont_2q_=0;
    Long64_t nbytes = 0, nb = 0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-      // if (Cut(ientry) < 0) continue;
-      JetList jetList_CSV, jetList_bl, jetList_ql;
-         float jet_isMatched2=0, jet_isMatched=0;
-         float jet_isMatched2Q=0, jet_isMatchedQ=0;
-		
+      
+		JetList jetList_CSV, jetList_bl, jetList_ql;
+     	float jet_isMatched2=0, jet_isMatched=0;
+      float jet_isMatched2Q=0, jet_isMatchedQ=0;
 
-		if (nJet<4) continue;
-		
-		if (!((Jet_pt[0]>92.)&&(Jet_pt[1]>76.)&&(Jet_pt[2]>64.)&&(Jet_pt[3]>30.))) continue;
-
-
-		int loopJet_min = 4;
-
-
-		Double_t btag_max = 0.7;
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet_btagCSV[i]>btag_max)&&(Jet_id[i]>0)){
-				btag_max=Jet_btagCSV[i];
-				btag_max1_number=i;
-			}
-		}
-		if (!((btag_max1_number>=0))) continue;
-		TLorentzVector Bjet1;
-		Bjet1.SetPtEtaPhiM(Jet_pt[btag_max1_number],Jet_eta[btag_max1_number],Jet_phi[btag_max1_number],Jet_mass[btag_max1_number]);
-
-
 		int pt_max1_number = -1;
 		int pt_max2_number = -1;
-
-		TLorentzVector js[3];
-		int jcount = 0;
-		int j_num[3] = {};
-		for (int i=0;i<4;i++){
-			if ((i!=btag_max1_number)&&(Jet_id[i]>0)) {
-				js[jcount].SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
-				j_num[jcount] = i;
-				jcount++;
-			}
-		}
-
-		if (!(jcount==3)) continue;
-			
-		Float_t deltaEtaJets[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
-		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
-		Float_t max_deltaEta = 0.;
-		int max_deltaEta_num = -1;
-		for (int i=0;i<3;i++){
-			if (deltaEtaJets[i]>max_deltaEta) {
-				max_deltaEta = deltaEtaJets[i];
-				max_deltaEta_num = i;
-			}
-		}
-		
-
-		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
-		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
-
-		if (!((pt_max1_number>=0)&&(pt_max2_number>=0)))	 continue;
-		TLorentzVector Qjet1;
-		Qjet1.SetPtEtaPhiM(Jet_pt[pt_max1_number] ,Jet_eta[pt_max1_number],Jet_phi[pt_max1_number],Jet_mass[pt_max1_number]);
-	
-		TLorentzVector Qjet2;
-		Qjet2.SetPtEtaPhiM(Jet_pt[pt_max2_number],Jet_eta[pt_max2_number],Jet_phi[pt_max2_number],Jet_mass[pt_max2_number]);
-
-		for (int i=0;i<4;i++){
-			if ( (i!=btag_max1_number)&&(i!=pt_max1_number)&&(i!=pt_max2_number)&&(Jet_id[i]>0)) btag_max2_number=i;
-		}
-
-
-		if (!((btag_max2_number>=0))) continue;
-
+		TLorentzVector Bjet1;
 		TLorentzVector Bjet2;
-		Bjet2.SetPtEtaPhiM(Jet_pt[btag_max2_number],Jet_eta[btag_max2_number],Jet_phi[btag_max2_number],Jet_mass[btag_max2_number]);
+		TLorentzVector Qjet1;
+		TLorentzVector Qjet2;
+		TLorentzVector qq;	
 
-		TLorentzVector qq;
-		qq = Qjet1+Qjet2;
-		Double_t Mqq = qq.M();
-		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
-		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6)))  continue;
-
-		if (HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v!=1) continue;
+		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
 
 
 		if ((Jet_blikelihood_b[0]==-2)&&(Jet_blikelihood_b[1]==-2)&&(Jet_pt[0]>20)&&(Jet_id[0]>0)&&(Jet_pt[1]>20)&&(Jet_id[1]>0)) {
@@ -277,6 +212,13 @@ Float_t bb_efficiency_find = 0;
 		}
 
    }
+
+	ofstream out;
+	out.open("efficiency_v13.txt");
+   out<<" preselection purity b-lik "<<cont_1m/presel<< " 1/2 "<<cont_2m/presel /* /(presel-wrong_blike_counter)*/ <<std::endl;
+   out<<" preselection purity csv "<<cont_1m_/presel<< " 1/2 "<<cont_2m_/presel << " , presel = "<< presel<<std::endl;
+	out<<"bb efficiency to find   = " << bb_efficiency_find/presel<<endl;
+	out.close();
 
   // std::cout<<" purity b-lik "<<cont_1m/nevent<< " 1/2 "<<cont_2m/nevent <<std::endl;
  //  std::cout<<" purity csv "<<cont_1m_/nevent<< " 1/2 "<<cont_2m_/nevent <<std::endl;

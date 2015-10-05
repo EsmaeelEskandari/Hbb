@@ -9,6 +9,7 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TLorentzVector.h"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
 
 using namespace std;
 
@@ -68,82 +69,17 @@ int main(int argc, char* argv[]){
 		genweight=TMath::Sign(1.,genweight);
 		genweight/=events_generated/(xsec[sample]*10000); //10 fb^-1 normalization
 
-		if (nJets<4) continue;	
-
-		if (!((Jet.pt[0]>92.)&&(Jet.pt[1]>76.)&&(Jet.pt[2]>64.)&&(Jet.pt[3]>30.))) continue;
-
-		int loopJet_min = 4;
-
-
-		Double_t btag_max = 0.7;
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet.btag[i]>btag_max)&&(Jet.id[i]>0)){
-				btag_max=Jet.btag[i];
-				btag_max1_number=i;
-			}
-		}
-		if (!((btag_max1_number>=0))) continue;
-		TLorentzVector Bjet1;
-		Bjet1.SetPtEtaPhiM(Jet.pt[btag_max1_number],Jet.eta[btag_max1_number],Jet.phi[btag_max1_number],Jet.mass[btag_max1_number]);
-
-
 		int pt_max1_number = -1;
 		int pt_max2_number = -1;
-
-		TLorentzVector js[3];
-		int jcount = 0;
-		int j_num[3] = {};
-		for (int i=0;i<4;i++){
-			if ((i!=btag_max1_number)&&(Jet.id[i]>0)) {
-				js[jcount].SetPtEtaPhiM(Jet.pt[i], Jet.eta[i], Jet.phi[i], Jet.mass[i]);
-				j_num[jcount] = i;
-				jcount++;
-			}
-		}
-		if (!(jcount==3)) continue;	
-		Float_t deltaEtaJets[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
-		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
-		Float_t max_deltaEta = 0.;
-		int max_deltaEta_num = -1;
-		for (int i=0;i<3;i++){
-			if (deltaEtaJets[i]>max_deltaEta) {
-				max_deltaEta = deltaEtaJets[i];
-				max_deltaEta_num = i;
-			}
-		}
-		
-		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
-		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
-
-		if (!((pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
-	
-		TLorentzVector Qjet1;
-		Qjet1.SetPtEtaPhiM(Jet.pt[pt_max1_number] ,Jet.eta[pt_max1_number],Jet.phi[pt_max1_number],Jet.mass[pt_max1_number]);
-	
-		TLorentzVector Qjet2;
-		Qjet2.SetPtEtaPhiM(Jet.pt[pt_max2_number],Jet.eta[pt_max2_number],Jet.phi[pt_max2_number],Jet.mass[pt_max2_number]);
-
-		for (int i=0;i<4;i++){
-			if ( (i!=btag_max1_number)&&(i!=pt_max1_number)&&(i!=pt_max2_number)&&(Jet.id[i]>0)) btag_max2_number=i;
-		}
-
-		if (!((btag_max2_number>=0))) continue;
-
-
+		TLorentzVector Bjet1;
 		TLorentzVector Bjet2;
-		Bjet2.SetPtEtaPhiM(Jet.pt[btag_max2_number],Jet.eta[btag_max2_number],Jet.phi[btag_max2_number],Jet.mass[btag_max2_number]);
-
+		TLorentzVector Qjet1;
+		TLorentzVector Qjet2;
 		TLorentzVector qq;
-		qq = Qjet1+Qjet2;
-		Double_t Mqq = qq.M();
-		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
-		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) continue;
 
-		if (HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460!=1) continue;
-
+		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
 
 		TLorentzVector bb;
 		bb = Bjet1+Bjet2;
