@@ -28,19 +28,8 @@
 #include <TLorentzVector.h>
 #include <TMath.h>
 #include <TF1.h>
+#include "preselection_double.C"
 
-
-int max_blike(Float_t btag[300], Int_t id[300], Int_t& btag_max1_number ){
-	float btag_max;
-		for (int i=0;i<6;i++){
-		//	cout<<"I am here"<<endl;
-			if ((btag[i]>0.4)&&(id[i]>0)){
-				btag_max=btag[i];
-				btag_max1_number=i;
-			}
-		}
-	return 0;
-}
 
 
 const int njets = 300;
@@ -277,86 +266,23 @@ do {
 	genweight0 = TMath::Sign(1.,genweight);
 	genweight=TMath::Sign(1.,genweight);
 	genweight/=events_generated/xsec[files]; 
-	
-	if (nJets<4) continue;
 
-	if (!((Jet.pt[0]>92.)&&(Jet.pt[1]>76.)&&(Jet.pt[2]>64.)&&(Jet.pt[3]>30.))) {continue;}
-		Float_t btag_max = 0.4;
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
-
-		int loopJet_min = 6;
-		if (nJets<6) loopJet_min=nJets;
-
-		for (int i=0;i<loopJet_min;i++){
-			if (Jet.btag[i]>1) Jet.btag[i]=1.;
-		}
-
-		max_blike(Jet.btag,Jet.id,btag_max1_number);
-		cout <<btag_max1_number<<endl;
-
-
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet.btag[i]>btag_max)&&(Jet.id[i]>0)){
-				btag_max=Jet.btag[i];
-				btag_max1_number=i;
-			}
-		}
-		btag_max = 0.4;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet.btag[i]>btag_max)&&(i!=btag_max1_number)&&(Jet.id[i]>0)) {
-				btag_max=Jet.btag[i];
-				btag_max2_number=i;
-			} 
-		}
-	
-
-
-
-		if (!((btag_max1_number>=0)&&(btag_max2_number>=0))) {continue;}
-		TLorentzVector Bjet1;
-		Bjet1.SetPtEtaPhiM(Jet.pt[btag_max1_number],Jet.eta[btag_max1_number],Jet.phi[btag_max1_number],Jet.mass[btag_max1_number]);
-		
-		TLorentzVector Bjet2;
-		Bjet2.SetPtEtaPhiM(Jet.pt[btag_max2_number],Jet.eta[btag_max2_number],Jet.phi[btag_max2_number],Jet.mass[btag_max2_number]);
-
-
-		Float_t pt_max = 20.;
 		int pt_max1_number = -1;
 		int pt_max2_number = -1;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet.pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(Jet.id[i]>0)) {
-				pt_max=Jet.pt[i];
-				pt_max1_number=i;	
-			}
-		}
-		pt_max = 20.;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet.pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(i!=pt_max1_number)&&(Jet.id[i]>0)) {
-				pt_max=Jet.pt[i];
-				pt_max2_number=i;	
-			}
-		}
-		
-		if (!((pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
-			
+		TLorentzVector Bjet1;
+		TLorentzVector Bjet2;
 		TLorentzVector Qjet1;
-		Qjet1.SetPtEtaPhiM(Jet.pt[pt_max1_number],Jet.eta[pt_max1_number],Jet.phi[pt_max1_number],Jet.mass[pt_max1_number]);
-		
 		TLorentzVector Qjet2;
-		Qjet2.SetPtEtaPhiM(Jet.pt[pt_max2_number],Jet.eta[pt_max2_number],Jet.phi[pt_max2_number],Jet.mass[pt_max2_number]);
-
-
-
-
 		TLorentzVector qq;
-		qq = Qjet1+Qjet2;
+///////// preselection(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq){
+		if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+	
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Float_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>200)&&(qqDeltaEta>1.2)&&(bbDeltaPhi<2.4))) continue;		
-		
-		if (HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200!=1) continue;
+
 		presel+=genweight0;
 
 		TLorentzVector bb;
@@ -498,7 +424,7 @@ do {
 			global_counter++;
 			if (global_counter%10000==0)cout<<"Number of events processed = "<< entry<<endl;	
         }
-		TFile file("output_hist/skimmed_tree"+type[files]+".root","recreate");
+		TFile file("output_hist/skimmed_tree"+type[files]+"_test.root","recreate");
     
 		for (int i=0;i<numArray;++i){
     	    	histArray[i]->SetLineWidth(2);
@@ -512,7 +438,7 @@ do {
    		} 
     		file.Write();
     		file.Close();
-	 ofstream out("output_txt/skimmed_Spring15_"+type[files]+".txt");
+	 ofstream out("output_txt/skimmed_Spring15_"+type[files]+"_test.txt");
 	out<< "preselection only = "<< presel<<" , all evetns in the begining = "<<events_generated<<", % = "<< (float)presel/events_generated<< "N evets 1 fb-1 = "<<(float)presel/events_generated*xsec[files]*1000.<<endl;
 	out<<"positive weight in so many events : "<<  pos_weight_presel<<endl;
 	out.close();

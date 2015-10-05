@@ -27,6 +27,7 @@
 #include <TLorentzVector.h>
 #include <TMath.h>
 #include <TF1.h>
+#include "preselection_single.C"
 
 
 const int njets = 300;
@@ -266,83 +267,23 @@ do {
 	genweight0 = TMath::Sign(1.,genweight);
 	genweight = TMath::Sign(1.,genweight);
 	genweight/=events_generated/xsec[files]; 
-	
-	
-		if (nJets<4) continue;	
-
-		if (!((Jet.pt[0]>92.)&&(Jet.pt[1]>76.)&&(Jet.pt[2]>64.)&&(Jet.pt[3]>30.))) continue;
-
-		int loopJet_min = 4;
-
-
-		Double_t btag_max = 0.7;
+		
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
-		for (int i=0;i<loopJet_min;i++){
-			if ((Jet.btag[i]>btag_max)&&(Jet.id[i]>0)){
-				btag_max=Jet.btag[i];
-				btag_max1_number=i;
-			}
-		}
-		if (!((btag_max1_number>=0))) continue;
-		TLorentzVector Bjet1;
-		Bjet1.SetPtEtaPhiM(Jet.pt[btag_max1_number],Jet.eta[btag_max1_number],Jet.phi[btag_max1_number],Jet.mass[btag_max1_number]);
-
-
 		int pt_max1_number = -1;
 		int pt_max2_number = -1;
-
-		TLorentzVector js[3];
-		int jcount = 0;
-		int j_num[3] = {};
-		for (int i=0;i<4;i++){
-			if ((i!=btag_max1_number)&&(Jet.id[i]>0)) {
-				js[jcount].SetPtEtaPhiM(Jet.pt[i], Jet.eta[i], Jet.phi[i], Jet.mass[i]);
-				j_num[jcount] = i;
-				jcount++;
-			}
-		}	
-		Float_t deltaEtaJets[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
-		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
-		Float_t max_deltaEta = 0.;
-		int max_deltaEta_num = -1;
-		for (int i=0;i<3;i++){
-			if (deltaEtaJets[i]>max_deltaEta) {
-				max_deltaEta = deltaEtaJets[i];
-				max_deltaEta_num = i;
-			}
-		}
-		
-		pt_max1_number = j_num[ eta_num[max_deltaEta_num][0]];
-		pt_max2_number = j_num[ eta_num[max_deltaEta_num][1]];
-
-		if (!((pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
-	
-		TLorentzVector Qjet1;
-		Qjet1.SetPtEtaPhiM(Jet.pt[pt_max1_number] ,Jet.eta[pt_max1_number],Jet.phi[pt_max1_number],Jet.mass[pt_max1_number]);
-	
-		TLorentzVector Qjet2;
-		Qjet2.SetPtEtaPhiM(Jet.pt[pt_max2_number],Jet.eta[pt_max2_number],Jet.phi[pt_max2_number],Jet.mass[pt_max2_number]);
-
-		for (int i=0;i<4;i++){
-			if ( (i!=btag_max1_number)&&(i!=pt_max1_number)&&(i!=pt_max2_number)&&(Jet.id[i]>0)) btag_max2_number=i;
-		}
-
-		if (!((btag_max2_number>=0))) continue;
-
-
+		TLorentzVector Bjet1;
 		TLorentzVector Bjet2;
-		Bjet2.SetPtEtaPhiM(Jet.pt[btag_max2_number],Jet.eta[btag_max2_number],Jet.phi[btag_max2_number],Jet.mass[btag_max2_number]);
-
+		TLorentzVector Qjet1;
+		TLorentzVector Qjet2;
 		TLorentzVector qq;
-		qq = Qjet1+Qjet2;
-		Double_t Mqq = qq.M();
-		Double_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
-		Double_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
-		if (!((Mqq>460)&&(qqDeltaEta>4.1)&&(bbDeltaPhi<1.6))) continue;
+	
+		if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
 
-		if (HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460!=1) continue;
-
+		Float_t Mqq = qq.M();
+		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
+		Float_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
+	
 		presel+=genweight0;
 
 		TLorentzVector bb;
@@ -484,7 +425,7 @@ do {
 			global_counter++;
 			if (global_counter%10000==0)cout<<"Number of events processed = "<< entry<<endl;	
         }
-		TFile file("output_hist/skimmed_treeSingleBtag_"+type[files]+".root","recreate");
+		TFile file("output_hist/skimmed_treeSingleBtag_"+type[files]+"_test.root","recreate");
     
 		for (int i=0;i<numArray;++i){
     	    	histArray[i]->SetLineWidth(2);
@@ -498,7 +439,7 @@ do {
    		} 
     		file.Write();
     		file.Close();
-	 ofstream out("output_txt/skimmed_Spring15_SingleBtag_"+type[files]+".txt");
+	 ofstream out("output_txt/skimmed_Spring15_SingleBtag_"+type[files]+"_test.txt");
 	out<< "preselection only = "<< presel<<" , all evetns in the begining = "<<events_generated<<", % = "<< (float)presel/events_generated<< "N evets 1 fb-1 = "<<(float)presel/events_generated*xsec[files]*1000.<<endl;
 	out<<"positive weight in so many events : "<<  pos_weight_presel<<endl;
 	out.close();
