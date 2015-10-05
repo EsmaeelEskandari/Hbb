@@ -27,7 +27,7 @@
 #include <TLorentzVector.h>
 #include <TMath.h>
 #include <TF1.h>
-#include "preselection_single.C"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
 
 
 const int njets = 300;
