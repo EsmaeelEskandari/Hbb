@@ -77,7 +77,7 @@ void CreateTree_tmva_double::Loop(TString input_filename,TString output_dir,  in
 	Int_t events_generated = countPos->GetEntries()-countNeg->GetEntries();
 	////genWeight/=events_generated/xsec[sample_type];
  
-	TFile file("main_tmva_tree_"+output_dir+"_double.root","recreate");
+	TFile file("main_tmva_tree_"+output_dir+"_v13_double.root","recreate");
 	TTree *tree0 = new TTree("TMVA","TMVA");
 	tree0->Branch("CSV1",&TMVA.CSV1,"CSV1/F");
 	tree0->Branch("CSV2",&TMVA.CSV2,"CSV2/F");
@@ -117,7 +117,7 @@ void CreateTree_tmva_double::Loop(TString input_filename,TString output_dir,  in
 		TLorentzVector Qjet2;
 		TLorentzVector qq;
 
-		if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
 		
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
@@ -175,9 +175,6 @@ void CreateTree_tmva_double::Loop(TString input_filename,TString output_dir,  in
 			}
 		
 
-		TLorentzVector bbqq;
-		bbqq = Bjet1 + Bjet2 + Qjet1 + Qjet2;
-		Float_t cosOqqbb =TMath::Cos( ( ( Bjet1.Vect() ).Cross(Bjet2.Vect()) ).Angle( ( Qjet1.Vect() ).Cross(Qjet2.Vect()) ) );	
 
 		Float_t Etot = Bjet1.E()+Bjet2.E()+Qjet1.E()+Qjet2.E();
 		Float_t PzTot = Bjet1.Pz()+Bjet2.Pz()+Qjet1.Pz()+Qjet2.Pz();
@@ -205,10 +202,14 @@ void CreateTree_tmva_double::Loop(TString input_filename,TString output_dir,  in
 		VB1_mass = TMath::Abs(VB1.M());
 		VB2_mass = TMath::Abs(VB2.M());
 
+		for (int i=0;i<nJet;i++){
+			if (Jet_btagCSV[i]>1) Jet_btagCSV[i]=1.;
+			if (Jet_btagCSV[i]<0) Jet_btagCSV[i]=0.;
+		}
 
 		TMVA.Mqq = Mqq;
 		TMVA.CSV1 = Jet_btagCSV[btag_max1_number];	
-		TMVA.CSV2 = Jet_btagCSV[btag_max2_number];	
+		TMVA.CSV2 = Jet_btagCSV[btag_max2_number];
 		TMVA.DeltaEtaQQ = qqDeltaEta;
 		TMVA.DeltaPhiQQ = qqDeltaPhi;
 		TMVA.SoftN5 = softActivity_njets5;
@@ -228,8 +229,8 @@ void CreateTree_tmva_double::Loop(TString input_filename,TString output_dir,  in
 		tree0->Fill();	
 		events_saved++;		
 
-		if (sample_type==2) 
-			if (events_saved>=108767) break; //for 500-700
+//		if (sample_type==2) 
+//			if (events_saved>=108767) break; //for 500-700 ///for v12 , needed to be corrected probably....
 	}  
 
 	file.Write();

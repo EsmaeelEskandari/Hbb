@@ -11,7 +11,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
-
 typedef std::map<Float_t, Int_t> JetList;
 
 const int njets = 300;
@@ -75,7 +74,7 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 	Int_t events_generated = countPos->GetEntries()-countNeg->GetEntries();
 //	genWeight/=events_generated/xsec[sample_type];
  
-	TFile file("main_tmva_tree_"+output_dir+"_single.root","recreate");
+	TFile file("main_tmva_tree_"+output_dir+"_v13_single.root","recreate");
 	TTree *tree0 = new TTree("TMVA","TMVA");
 	tree0->Branch("CSV1",&TMVA.CSV1,"CSV1/F");
 	tree0->Branch("CSV2",&TMVA.CSV2,"CSV2/F");
@@ -117,8 +116,7 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 		TLorentzVector qq;
 
 		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
-
-
+		
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Double_t qqDeltaPhi = TMath::Abs(Qjet1.DeltaPhi(Qjet2));
@@ -129,6 +127,8 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 		TLorentzVector bbqq;
 		bbqq = Bjet1 + Bjet2 + Qjet1 + Qjet2;
 		Float_t cosOqqbb =TMath::Cos( ( ( Bjet1.Vect() ).Cross(Bjet2.Vect()) ).Angle( ( Qjet1.Vect() ).Cross(Qjet2.Vect()) ) );	
+
+
 
 		Float_t EtaBQ1;
 	 	Float_t EtaBQ2;
@@ -201,6 +201,10 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 		VB1_mass = TMath::Abs(VB1.M());
 		VB2_mass = TMath::Abs(VB2.M());
 
+		for (int i=0;i<nJet;i++){
+			if (Jet_btagCSV[i]>1) Jet_btagCSV[i]=1.;
+			if (Jet_btagCSV[i]<0) Jet_btagCSV[i]=0.;
+		}
 
 		TMVA.Mqq = Mqq;
 		TMVA.CSV1 = Jet_btagCSV[btag_max1_number];	
@@ -221,13 +225,12 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 		TMVA.VB1 = VB1_mass;
 		TMVA.VB2 = VB2_mass;
 
-//		tree0->SetWeight(genWeight);
 		tree0->Fill();		
 		
 		events_saved++;		
 
-		if (sample_type==2) 
-			if (events_saved>=6422) break;
+//		if (sample_type==2) 
+//			if (events_saved>=6422) break;
 
 	}  
 
@@ -235,4 +238,3 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 	file.Close();
 
 }
-
