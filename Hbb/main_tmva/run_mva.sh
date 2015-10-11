@@ -1,8 +1,9 @@
 export WORKDIR=`pwd`
 cd $WORKDIR
 
-g++ run_create_main_tmva_double.C -g -o run_double `root-config --cflags --glibs` 
-g++ run_create_main_tmva_single.C -g -o run_single `root-config --cflags --glibs` 
+#g++ run_create_main_tmva_double.C -g -o run_double `root-config --cflags --glibs` 
+#g++ run_create_main_tmva_single.C -g -o run_single `root-config --cflags --glibs` 
+g++ run_create_main_tmva_all.C -g -o run_all `root-config --cflags --glibs` 
 
 max_samples_num=4  # -1
 path=/afs/cern.ch/work/n/nchernya/Hbb/skim_trees/
@@ -18,7 +19,11 @@ slash=/
 current_sample=3
 while [ $current_sample -le $max_samples_num ]
 do	
-	./run_double $path${input_dir[ $current_sample ]}$v13$slash${input_dir[ $current_sample ]}$v13$TREE$v13$ROOT ${input_dir[ $current_sample ]} $current_sample
-	./run_single $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]} $current_sample
+#	./run_double $path${input_dir[ $current_sample ]}$v13$slash${input_dir[ $current_sample ]}$v13$TREE$v13$ROOT ${input_dir[ $current_sample ]} $current_sample
+#	./run_single $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]} $current_sample
+
+	./run_all $path${input_dir[ $current_sample ]}$v13$slash${input_dir[ $current_sample ]}$v13$TREE$v13$ROOT ${input_dir[ $current_sample ]} $current_sample 0
+	./run_all $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]} $current_sample 1
+
 	current_sample=$(( $current_sample + 1 ))
 done

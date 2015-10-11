@@ -106,6 +106,7 @@ void CreateTree_tmva_double::Loop(TString input_filename,TString output_dir,  in
 	   nb = fChain->GetEntry(jentry);   nbytes += nb;
 		   
 		if (genWeight <0) continue;
+		if (json!=1) continue;	
 		
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;

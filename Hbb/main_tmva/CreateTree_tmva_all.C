@@ -1,5 +1,5 @@
-#define CreateTree_tmva_single_cxx
-#include "CreateTree_tmva_single.h"
+#define CreateTree_tmva_all_cxx
+#include "CreateTree_tmva_all.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -10,7 +10,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_double.C"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
+
+
 typedef std::map<Float_t, Int_t> JetList;
 
 const int njets = 300;
@@ -56,7 +59,7 @@ typedef struct {
 
 
 
-void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  int sample_type)
+void CreateTree_tmva_all::Loop(TString input_filename,TString output_dir,  int sample_type, int set_type)
 {
    if (fChain == 0) return;
 
@@ -65,6 +68,7 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
    Long64_t nbytes = 0, nb = 0;
 	TMVAstruct TMVA;
 
+	TString dataset_type[2] = {"_double","_single"};	
 
 	int events_saved=0;
 	
@@ -72,9 +76,10 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 	TH1F *countPos = (TH1F*)file_initial->Get("CountPosWeight");
 	TH1F *countNeg = (TH1F*)file_initial->Get("CountNegWeight");
 	Int_t events_generated = countPos->GetEntries()-countNeg->GetEntries();
-//	genWeight/=events_generated/xsec[sample_type];
+	////genWeight/=events_generated/xsec[sample_type];
  
-	TFile file("main_tmva_tree_"+output_dir+"_v13_single.root","recreate");
+
+	TFile file("main_tmva_tree_"+output_dir+"_v13"+dataset_type[set_type]+".root","recreate");
 	TTree *tree0 = new TTree("TMVA","TMVA");
 	tree0->Branch("CSV1",&TMVA.CSV1,"CSV1/F");
 	tree0->Branch("CSV2",&TMVA.CSV2,"CSV2/F");
@@ -94,7 +99,6 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 	tree0->Branch("x2",&TMVA.x2,"x2/F");
 	tree0->Branch("VB1",&TMVA.VB1,"VB1/F");
 	tree0->Branch("VB2",&TMVA.VB2,"VB2/F");
-	
 
 
 
@@ -102,10 +106,10 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 	   Long64_t ientry = LoadTree(jentry);
 	   if (ientry < 0) break;
 	   nb = fChain->GetEntry(jentry);   nbytes += nb;
-	  
-		if (genWeight<0) continue;
+		   
+		if (genWeight <0) continue;
 		if (json!=1) continue;	
-
+		
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
 		int pt_max1_number = -1;
@@ -116,7 +120,13 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 		TLorentzVector Qjet2;
 		TLorentzVector qq;
 
-		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		if (set_type==0) {
+			if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		}
+		else {
+			if (set_type==1) if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		}
+
 		
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
@@ -129,8 +139,7 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 		bbqq = Bjet1 + Bjet2 + Qjet1 + Qjet2;
 		Float_t cosOqqbb =TMath::Cos( ( ( Bjet1.Vect() ).Cross(Bjet2.Vect()) ).Angle( ( Qjet1.Vect() ).Cross(Qjet2.Vect()) ) );	
 
-
-
+		
 		Float_t EtaBQ1;
 	 	Float_t EtaBQ2;
 		Float_t PhiBQ1; 	
@@ -175,7 +184,7 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 			}
 		
 
-		
+
 		Float_t Etot = Bjet1.E()+Bjet2.E()+Qjet1.E()+Qjet2.E();
 		Float_t PzTot = Bjet1.Pz()+Bjet2.Pz()+Qjet1.Pz()+Qjet2.Pz();
 		Float_t PxTot = Bjet1.Px()+Bjet2.Px()+Qjet1.Px()+Qjet2.Px();
@@ -209,7 +218,7 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 
 		TMVA.Mqq = Mqq;
 		TMVA.CSV1 = Jet_btagCSV[btag_max1_number];	
-		TMVA.CSV2 = Jet_btagCSV[btag_max2_number];	
+		TMVA.CSV2 = Jet_btagCSV[btag_max2_number];
 		TMVA.DeltaEtaQQ = qqDeltaEta;
 		TMVA.DeltaPhiQQ = qqDeltaPhi;
 		TMVA.SoftN5 = softActivity_njets5;
@@ -226,16 +235,15 @@ void CreateTree_tmva_single::Loop(TString input_filename,TString output_dir,  in
 		TMVA.VB1 = VB1_mass;
 		TMVA.VB2 = VB2_mass;
 
-		tree0->Fill();		
-		
+		tree0->Fill();	
 		events_saved++;		
 
 //		if (sample_type==2) 
-//			if (events_saved>=6422) break;
-
+//			if (events_saved>=108767) break; //for 500-700 ///for v12 , needed to be corrected probably....
 	}  
 
 	file.Write();
 	file.Close();
 
 }
+
