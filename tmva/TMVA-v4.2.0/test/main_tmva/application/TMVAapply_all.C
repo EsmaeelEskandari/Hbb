@@ -30,7 +30,7 @@ void TMVAapply_all::Loop(TString inputfile, TString output_dir,  int set_type)
 	TTree *tree = fChain->CloneTree(0);
 	float BDT_VBF;
 	TBranch *branchBDT_VBF = tree->Branch("BDT_VBF",&BDT_VBF,"BDT_VBF/F");
-	TString weightfile[2]= {"../weights/TMVAClassification_BDTG_v13_Data_double_all_4.weights.xml","../weights/TMVAClassification_BDTG_v13_Data_single_all_4.weights.xml"}
+	TString weightfile[2]= {"../weights/TMVAClassification_BDTG_v13_Data_double_all_4.weights.xml","../weights/TMVAClassification_BDTG_v13_Data_single_all_4.weights.xml"};
    TMVA::Reader *reader = new TMVA::Reader("Silent");
 	float var1,var2,var3,var4,var5,var6,var7,var8,var9,var10, var11, var12;
 	reader->AddVariable("Mqq",&var1);
@@ -56,7 +56,9 @@ void TMVAapply_all::Loop(TString inputfile, TString output_dir,  int set_type)
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       nb = fChain->GetEntry(jentry);   nbytes += nb;
-		
+	
+		if (json!=1) continue;	
+	
 		int btag_max1_number = -1;
 		int btag_max2_number = -1;
 		int pt_max1_number = -1;
@@ -68,10 +70,10 @@ void TMVAapply_all::Loop(TString inputfile, TString output_dir,  int set_type)
 		TLorentzVector qq;
 
 		if (set_type==0) {
-			if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+			if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
 		}
 		else {
-			if (set_type==1) if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+			if (set_type==1) if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
 		}
 
 

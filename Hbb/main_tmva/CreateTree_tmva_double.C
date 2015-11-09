@@ -118,7 +118,7 @@ void CreateTree_tmva_double::Loop(TString input_filename,TString output_dir,  in
 		TLorentzVector Qjet2;
 		TLorentzVector qq;
 
-		if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
 		
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));

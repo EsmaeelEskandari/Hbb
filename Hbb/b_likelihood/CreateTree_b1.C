@@ -77,7 +77,7 @@ void CreateTree_b1::Loop()
 
    Long64_t nbytes = 0, nb = 0;
 
-	TFile file("spring15_vbf_powheg_new_blike_125_singlebtag_final_v13.root","recreate");
+	TFile file("spring15_vbf_powheg_new_blike_125_singlebtag_final_v13_id.root","recreate");
 	TTree *tree0 = new TTree("Jet_tree_b","Jet_tree_b");
 	TreeJets TreeJet;
 	tree0->Branch("Jet_pt",&TreeJet.pt,"Jet_pt/F");
@@ -125,13 +125,13 @@ void CreateTree_b1::Loop()
 		TLorentzVector qq;
 	
 
-		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
 
 		int loopJet_max = 7;
 		if (nJet<7) loopJet_max = nJet; 
 
 		for(int i=0; i<loopJet_max; i++){
-		   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
+		   if(Jet_pt[i]<20 /*|| Jet_id[i] <=0*/) continue;
 			if (Jet_btagCSV[i]==-10) Jet_btagCSV[i]=0; 
 			if (Jet_btagCSV[i]>1) Jet_btagCSV[i]=1.;
 		   jetList_CSV[Jet_btagCSV[i]]=i;
@@ -148,7 +148,7 @@ void CreateTree_b1::Loop()
 		Float_t eta_sort[30];
 		Float_t btag_sort[30];
 		for (int i=0;i<loopJet_max;i++){
-			if ((Jet_pt[i]>20)&&(Jet_id[i]>0)) {
+			if ((Jet_pt[i]>20)/*&&(Jet_id[i]>0)*/) {
 				TreeJet.eta = TMath::Abs(Jet_eta[i]);
 				eta_sort[i] = TMath::Abs(Jet_eta[i]);
 				actual_jets++;
@@ -165,7 +165,7 @@ void CreateTree_b1::Loop()
 		}*/
 		int btag_0_num = 0;
 	   for(int i=0; i<loopJet_max; i++){
-		   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
+		   if(Jet_pt[i]<20 /*|| Jet_id[i] <=0*/) continue;
 			TreeJet.b_matched=0;
 			TreeJet.q_matched=0;
 			TreeJet.n_matched=0;

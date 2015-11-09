@@ -21,7 +21,7 @@ int main(int argc, char* argv[]){
 	int type_int=atoi(argv[1]);
 	int signal_sample_num=atoi(argv[2]);
 
-	TString narrow = "";
+	TString narrow = "narrow_";
 
 	gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
 	Double_t precision=0.01;
@@ -62,16 +62,16 @@ int main(int argc, char* argv[]){
 	TString s_names[num_ss] = {"VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "VBFHToBB_M125_13TeV_amcatnlo"};
 	TString tex_s_names[num_ss] = {"VBF powheg, m(H) = 125 GeV","VBF powheg, m(H) = 130 GeV", "VBF amc@NLO, m(H) = 125 GeV"};
 
-	TFile *file_s =  new TFile("output_hist/BDT_hist_"+narrow+s_names[signal_sample_num]+type+".root");
+	TFile *file_s =  new TFile("output_hist/v13/BDT_hist_"+narrow+s_names[signal_sample_num]+"_v13"+type+".root");
 	TH1F *hist_S = (TH1F*)file_s->Get("BDT_output");
 
 	TFile *file_b[num_bgs];
 	TH1F *hist_Bs[num_bgs];
 
-	file_b[0] = new TFile("output_hist/BDT_hist_"+narrow+bg_names[0]+type+".root");
+	file_b[0] = new TFile("output_hist/v13/BDT_hist_"+narrow+bg_names[0]+"_v13"+type+".root");
 	hist_Bs[0] = (TH1F*)file_b[0]->Get("BDT_output");
 	for (int i=1;i<num_bgs;i++){
-		file_b[i] = new TFile("output_hist/BDT_hist_"+narrow+bg_names[i]+type+".root");
+		file_b[i] = new TFile("output_hist/v13/BDT_hist_"+narrow+bg_names[i]+"_v13"+type+".root");
 		hist_Bs[i] = (TH1F*)file_b[i]->Get("BDT_output");
 		hist_Bs[0]->Add(hist_Bs[i]);
 	}
@@ -137,7 +137,7 @@ int main(int argc, char* argv[]){
 	leg->AddEntry(hist_S,tex_s_names[signal_sample_num],"L");
 	leg->AddEntry(hist_B,"QCD, H_{T} = 100 - #infty GeV","L");
 	leg->Draw("same");
-	c1->Print("plots/"+narrow+"BDT_output_signal_bg_"+s_names[signal_sample_num]+type+".png");
+	c1->Print("plots/v13/"+narrow+"BDT_output_signal_bg_"+s_names[signal_sample_num]+type+".png");
 		
 
 
@@ -233,7 +233,7 @@ int main(int argc, char* argv[]){
 	} while (start1<=(END-(NCAT-1)*precision));
 
 	ofstream out;
-	out.open("output_txt/"+narrow+"5categories_"+s_names[signal_sample_num]+type+binning+".txt");
+	out.open("output_txt/v13/"+narrow+"5categories_"+s_names[signal_sample_num]+type+binning+".txt");
 	out<<"borders of categories : "<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< "  , END = "<< END <<endl;
 	out<<"S**2/B in each category : "<<max1_final<<"   "<<max2_final<<"   " << max3_final<<"   "<<max4_final<<"   "<<max5_final<<"  , max = "<<max<<endl;
 	out.close();

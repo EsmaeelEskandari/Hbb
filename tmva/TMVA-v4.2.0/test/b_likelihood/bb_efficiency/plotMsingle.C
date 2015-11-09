@@ -62,14 +62,9 @@ Float_t bb_efficiency_find = 0;
 		TLorentzVector Qjet2;
 		TLorentzVector qq;	
 
-		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
 
 
-		if ((Jet_blikelihood_b[0]==-2)&&(Jet_blikelihood_b[1]==-2)&&(Jet_pt[0]>20)&&(Jet_id[0]>0)&&(Jet_pt[1]>20)&&(Jet_id[1]>0)) {
-			wrong_blike_counter+=TMath::Sign(1.,genWeight);
-			continue;
-		}
- 
 		presel+=TMath::Sign(1.,genWeight);
 
 		int loopJet_max;
@@ -78,7 +73,7 @@ Float_t bb_efficiency_find = 0;
 	  
  
         for(int i=0; i<loopJet_max; i++){
-                   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
+                   if(Jet_pt[i]<20 /*|| Jet_id[i] <=0*/) continue;
                    jetList_CSV[Jet_btagCSV[i]]=i;
                    jetList_bl[Jet_blikelihood_b[i]]=i;
                  //  jetList_ql[Jet_blikelihood_q[i]]=i;
@@ -88,7 +83,7 @@ Float_t bb_efficiency_find = 0;
 		int found_idx=0;
 		Float_t bb_found = 0;
         for(int i=0; i<loopJet_max; i++){
-                   if(Jet_pt[i]<20 || Jet_id[i] <=0) continue;
+                   if(Jet_pt[i]<20/* || Jet_id[i] <=0*/) continue;
 							TLorentzVector hJall;
 							hJall.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]);
 						for(int j =0; j<2; j++){
@@ -214,15 +209,15 @@ Float_t bb_efficiency_find = 0;
    }
 
 	ofstream out;
-	out.open("efficiency_v13.txt");
-   out<<" preselection purity b-lik "<<cont_1m/presel<< " 1/2 "<<cont_2m/presel /* /(presel-wrong_blike_counter)*/ <<std::endl;
+	out.open("efficiency_v13_final.txt");
+   out<<" preselection purity b-lik "<<cont_1m/presel<< " 1/2 "<<cont_2m/presel <<std::endl;
    out<<" preselection purity csv "<<cont_1m_/presel<< " 1/2 "<<cont_2m_/presel << " , presel = "<< presel<<std::endl;
 	out<<"bb efficiency to find   = " << bb_efficiency_find/presel<<endl;
 	out.close();
 
   // std::cout<<" purity b-lik "<<cont_1m/nevent<< " 1/2 "<<cont_2m/nevent <<std::endl;
  //  std::cout<<" purity csv "<<cont_1m_/nevent<< " 1/2 "<<cont_2m_/nevent <<std::endl;
-   std::cout<<" preselection purity b-lik "<<cont_1m/presel<< " 1/2 "<<cont_2m/presel /* /(presel-wrong_blike_counter)*/ <<std::endl;
+   std::cout<<" preselection purity b-lik "<<cont_1m/presel<< " 1/2 "<<cont_2m/presel <<std::endl;
    std::cout<<" preselection purity csv "<<cont_1m_/presel<< " 1/2 "<<cont_2m_/presel << " , presel = "<< presel<<std::endl;
   // std::cout<<" preselection purity q-lik "<<cont_1q/presel<< " 1/2 "<<cont_2q/presel <<std::endl;
  //  std::cout<<" preselection purity q_pt "<<cont_1q_/presel<< " 1/2 "<<cont_2q_/presel << " , presel = "<< presel<<std::endl;
@@ -276,7 +271,7 @@ Float_t bb_efficiency_find = 0;
 	tex1->Draw();
 	tex2->Draw();
 	tex_file->Draw();
-	c->Print("plots/blike_mh_v13.png");
+	c->Print("plots/blike_mh_v13_final.png");
 
 
    TCanvas *d =  new TCanvas("d","d");	
@@ -291,7 +286,7 @@ Float_t bb_efficiency_find = 0;
 	tex1->Draw();
 	tex2->Draw();
 	tex_file->Draw();
-	d->Print("plots/blike_v13.png");
+	d->Print("plots/blike_v13_final.png");
 
 
 

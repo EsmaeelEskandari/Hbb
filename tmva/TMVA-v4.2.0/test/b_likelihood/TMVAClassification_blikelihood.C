@@ -109,7 +109,7 @@ void TMVAClassification_blikelihood( TString myMethodList = "" )
 
    // Create a ROOT output file where TMVA will store ntuples, histograms, etc.
  //  TString outfileName( "TMVA_bjet_new_powheg.root" );
-   TString outfileName( "TMVA_blike_singlebtag_final_v13.root" );
+   TString outfileName( "TMVA_blike_singlebtag_final_v13_id.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -157,7 +157,7 @@ void TMVAClassification_blikelihood( TString myMethodList = "" )
 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
-	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_vbf_powheg_new_blike_125_singlebtag_final_v13.root"; 
+	TString fname = "/afs/cern.ch/work/n/nchernya/Hbb/b_likelihood/spring15_vbf_powheg_new_blike_125_singlebtag_final_v13_id.root"; 
 
    if (gSystem->AccessPathName( fname )) { // file does not exist in local directory
 		cout<<"input file "<< fname<<" doesn't exist!"<<endl;

@@ -27,7 +27,7 @@ void efficiency_roc_Nm1(){
 	Double_t hist_integrals[n_variables];
 	Double_t hist_integrals_single[n_variables];
 	for (int i=0;i<n_variables;i++){
-		file_names[i].Prepend("../output/Nm1/TMVA_main_QCD300to700_Nm1_"+variables_names[i]);
+		file_names[i].Prepend("../output/Nm1/TMVA_main_v13_Data_Nm1_"+variables_names[i]);
 		file_names_single[i] = file_names[i];
 		file_names[i].Append("_double.root");
 		file_names_single[i].Append("_single.root");
@@ -54,8 +54,8 @@ leg->SetTextSize(0.04);
 		c2->SetBottomMargin(.12);
 		c2->cd();
 		TH1F *frame2 = new TH1F("frame2","",n_variables,0.,n_variables);
-		frame2->SetMinimum(0.877);
-      frame2->SetMaximum(.897);
+		frame2->SetMinimum(0.83);
+      frame2->SetMaximum(.86);
       frame2->GetYaxis()->SetTitleOffset(1.4);
       frame2->GetXaxis()->SetTitleOffset(1.);
       frame2->SetStats(0);
@@ -73,7 +73,7 @@ leg->SetTextSize(0.04);
 		gr->SetMarkerStyle(20);
 		gr->SetLineWidth(2);
 		gr->Draw("PLsame");
-		TLegend *leg = new TLegend(0.6,0.15,0.9,0.4);
+		TLegend *leg = new TLegend(0.7,0.15,0.9,0.4);
 		leg->SetBorderSize(0);
 		leg->SetTextSize(0.04);
 		leg->AddEntry(gr,"DoubleBtag","PL");
@@ -83,12 +83,12 @@ leg->SetTextSize(0.04);
 		line2->SetLineColor(2);
 		line2->SetLineWidth(2);
 		line2->Draw("Lsame`");
-		c2->Print("plots/efficiency_groups_Nm1_double_4.png");
+		c2->Print("plots/v13/efficiency_v13_Data_Nm1_double_4.png");
 
 		TCanvas *c3 = new TCanvas();
 		c3->SetBottomMargin(.12);
 		c3->cd();
-		frame2->SetMinimum(0.85);
+		frame2->SetMinimum(0.82);
       frame2->SetMaximum(.887);
 		frame2->Draw();
 		TGraph *gr_single = new TGraph(n_variables,frame2_axisx,hist_integrals_single);
@@ -98,7 +98,7 @@ leg->SetTextSize(0.04);
 		gr_single->SetLineWidth(2);
 		gr_single->Draw("PLsame");
 
-		TLegend *leg1 = new TLegend(0.6,0.15,0.9,0.4);
+		TLegend *leg1 = new TLegend(0.7,0.15,0.9,0.4);
 		leg1->SetBorderSize(0);
 		leg1->SetTextSize(0.04);
 		leg1->AddEntry(gr_single,"SingleBtag","PL");
@@ -109,7 +109,7 @@ leg->SetTextSize(0.04);
 		line3->SetLineWidth(2);
 		line3->Draw("Lsame`");
 	
-		c3->Print("plots/efficiency_groups_Nm1_single_4.png");
+		c3->Print("plots/v13/efficiency_v13_Data_Nm1_single_4.png");
 
 	//	return 0;
 

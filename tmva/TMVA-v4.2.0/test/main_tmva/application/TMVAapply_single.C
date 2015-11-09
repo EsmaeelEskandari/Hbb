@@ -12,12 +12,13 @@
 #include "TMVA/Tools.h"
 #include "TMVA/Reader.h"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_double.C"
 
 const Int_t njets = 15;
 
 using namespace std;
 
-void TMVAapply_single::Loop(TString inputfile, TString output_dir,  int sample_type)
+void TMVAapply_single::Loop(TString inputfile, TString output_dir,  int set_type)
 {
    if (fChain == 0) return;
    Long64_t nentries = fChain->GetEntriesFast();
@@ -25,11 +26,11 @@ void TMVAapply_single::Loop(TString inputfile, TString output_dir,  int sample_t
 
 	Int_t presel=0;
 	Int_t loopJet_max;
-	TFile *output = new TFile("main_tmva_4_"+output_dir+".root","recreate");
+	TFile *output = new TFile("main_tmva_v13_Data_4_"+output_dir+".root","recreate");
 	TTree *tree = fChain->CloneTree(0);
 	float BDT_VBF;
 	TBranch *branchBDT_VBF = tree->Branch("BDT_VBF",&BDT_VBF,"BDT_VBF/F");
-	TString weightfile = "../weights/TMVAClassification_BDTG_single_all_4.weights.xml";
+	TString weightfile[2]= {"../weights/TMVAClassification_BDTG_v13_Data_double_all_4.weights.xml","../weights/TMVAClassification_BDTG_v13_Data_single_all_4.weights.xml"}
    TMVA::Reader *reader = new TMVA::Reader("Silent");
 	float var1,var2,var3,var4,var5,var6,var7,var8,var9,var10, var11, var12;
 	reader->AddVariable("Mqq",&var1);
@@ -44,7 +45,7 @@ void TMVAapply_single::Loop(TString inputfile, TString output_dir,  int sample_t
    reader->AddVariable( "DeltaEtaQB2", &var10 );
   	reader->AddVariable("qgl1",&var11);
    reader->AddVariable("qgl2",&var12);
-	reader->BookMVA("BDTG", weightfile);
+	reader->BookMVA("BDTG", weightfile[set_type]);
 	
 	TFile *input_file = new TFile(inputfile);
 	TH1F*	Count = (TH1F*)input_file->Get("Count");
@@ -66,7 +67,13 @@ void TMVAapply_single::Loop(TString inputfile, TString output_dir,  int sample_t
 		TLorentzVector Qjet2;
 		TLorentzVector qq;
 
-		if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		if (set_type==0) {
+			if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
+		}
+		else {
+			if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
+		}
+
 
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
@@ -123,9 +130,6 @@ void TMVAapply_single::Loop(TString inputfile, TString output_dir,  int sample_t
 			}
 		
 
-		TLorentzVector bbqq;
-		bbqq = Bjet1 + Bjet2 + Qjet1 + Qjet2;
-		Float_t cosOqqbb =TMath::Cos( ( ( Bjet1.Vect() ).Cross(Bjet2.Vect()) ).Angle( ( Qjet1.Vect() ).Cross(Qjet2.Vect()) ) );	
 		
 		Float_t Etot = Bjet1.E()+Bjet2.E()+Qjet1.E()+Qjet2.E();
 		Float_t PzTot = Bjet1.Pz()+Bjet2.Pz()+Qjet1.Pz()+Qjet2.Pz();
@@ -155,6 +159,10 @@ void TMVAapply_single::Loop(TString inputfile, TString output_dir,  int sample_t
 		
 
 
+		for (int i=0;i<nJet;i++){
+			if (Jet_btagCSV[i]>1) Jet_btagCSV[i]=1.;
+			if (Jet_btagCSV[i]<0) Jet_btagCSV[i]=0.;
+		}
 
 		var1= Mqq;
 		var6= Jet_btagCSV[btag_max1_number];	

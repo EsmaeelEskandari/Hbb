@@ -113,7 +113,7 @@ void TMVAClassification_main(TString variable_name, TString type)
  
 
 	
-   TString outfileName( "output/Nm1/TMVA_main_QCD300to700_Nm1_"+variable_name+type+".root" );
+   TString outfileName( "output/Nm1/TMVA_main_v13_Data_Nm1_"+variable_name+type+".root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
    // Create the factory object. Later you can choose the methods
@@ -164,8 +164,11 @@ void TMVAClassification_main(TString variable_name, TString type)
 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
-	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBFHToBB_M-125_13TeV_powheg"+type+".root";///single
-	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_BG"+type+".root"; ///single
+//	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBFHToBB_M-125_13TeV_powheg"+type+".root";///single
+//	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_QCD_BG"+type+".root"; ///single
+	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBFHToBB_M-125_13TeV_powheg_v13"+type+".root";///single
+	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_skimmed_data_v13"+type+".root"; ///single
+
 
 
 

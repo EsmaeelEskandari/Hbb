@@ -26,7 +26,7 @@ void TMVAapply_double::Loop(TString inputfile, TString output_dir,  int sample_t
 
 	Int_t presel=0;
 	Int_t loopJet_max;
-	TFile *output = new TFile("main_tmva_4_"+output_dir+".root","recreate");
+	TFile *output = new TFile("main_tmva_v13_Data_4_"+output_dir+".root","recreate");
 	TTree *tree = fChain->CloneTree(0);
 	float BDT_VBF;
 	TBranch *branchBDT_VBF = tree->Branch("BDT_VBF",&BDT_VBF,"BDT_VBF/F");
@@ -69,7 +69,7 @@ void TMVAapply_double::Loop(TString inputfile, TString output_dir,  int sample_t
 		TLorentzVector Qjet2;
 		TLorentzVector qq;
 
-		if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == -1) continue;
+		if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
 
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
@@ -127,9 +127,6 @@ void TMVAapply_double::Loop(TString inputfile, TString output_dir,  int sample_t
 			}
 		
 
-		TLorentzVector bbqq;
-		bbqq = Bjet1 + Bjet2 + Qjet1 + Qjet2;
-		Float_t cosOqqbb =TMath::Cos( ( ( Bjet1.Vect() ).Cross(Bjet2.Vect()) ).Angle( ( Qjet1.Vect() ).Cross(Qjet2.Vect()) ) );	
 
 		Float_t Etot = Bjet1.E()+Bjet2.E()+Qjet1.E()+Qjet2.E();
 		Float_t PzTot = Bjet1.Pz()+Bjet2.Pz()+Qjet1.Pz()+Qjet2.Pz();
@@ -157,6 +154,10 @@ void TMVAapply_double::Loop(TString inputfile, TString output_dir,  int sample_t
 		VB1_mass = TMath::Abs(VB1.M());
 		VB2_mass = TMath::Abs(VB2.M());
 
+		for (int i=0;i<nJet;i++){
+			if (Jet_btagCSV[i]>1) Jet_btagCSV[i]=1.;
+			if (Jet_btagCSV[i]<0) Jet_btagCSV[i]=0.;
+		}
 
 		var1= Mqq;
 		var6= Jet_btagCSV[btag_max1_number];	

@@ -21,13 +21,15 @@ v13=_v13
 double=_double
 single=_single
 slash=/
+int_double=0
+int_single=1
 
-current_sample=0
+current_sample=10
 while [ $current_sample -le $max_samples_num ]
 do	
 	#./run_double $path${input_dir[ $current_sample ]}$v13$slash${input_dir[ $current_sample ]}$TREE$v13$ROOT ${input_dir[ $current_sample ]}$v13$double $current_sample
 	#./run_single $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]}$v13$single $current_sample
-	./run_all $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]}$v13$single $current_sample
-	./run_all $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]}$v13$single $current_sample
+	./run_all $path${input_dir[ $current_sample ]}$v13$slash${input_dir[ $current_sample ]}$v13$TREE$v13$ROOT ${input_dir[ $current_sample ]}$v13$double $int_double
+	./run_all $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]}$v13$single $int_single
 	current_sample=$(( $current_sample + 1 ))
 done

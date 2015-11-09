@@ -1,1 +1,0 @@
-g++ analyzer_v12_singlebtag.C -g -o analyzer_single `root-config --cflags --glibs`  && ./analyzer_single 0 11
