@@ -73,20 +73,24 @@ int main(int argc, char* argv[]){
 gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
  
 const int nfiles  = 16;
-TString leg_names[nfiles] = {"Data, 13 TeV, bx = 25 ns",/*"powheg, m(H) = 130 GeV","amc@NLO, m(H) = 125 GeV",*/"VBF, m(H) = 125 GeV","GF, m(H) = 125 GeV","t#bar{t}H, H#rightarrow b#bar{b}","t#bar{t}H, non b#bar{b}","QCD, H_{T}=100-200 GeV","QCD, H_{T}=200-300 GeV","QCD, H_{T}=300-500 GeV","QCD, H_{T}=500-700 GeV","QCD, H_{T}=700-1000 GeV","QCD, H_{T}=1000-1500 GeV","QCD, H_{T}=1500-2000 GeV","QCD, H_{T}=2000-Inf GeV","t#bar{t}","single top (tW)","Z(qq) + jets"};
+TString leg_names[nfiles] = {"Data, 13 TeV, bx = 25 ns",/*"powheg, m(H) = 130 GeV","amc@NLO, m(H) = 125 GeV",*/"VBF, m(H) = 125 GeV","t#bar{t}H, H#rightarrow b#bar{b}","t#bar{t}H, non b#bar{b}","QCD","QCD, H_{T}=200-300 GeV","QCD, H_{T}=300-500 GeV","QCD, H_{T}=500-700 GeV","QCD, H_{T}=700-1000 GeV","QCD, H_{T}=1000-1500 GeV","QCD, H_{T}=1500-2000 GeV","QCD, H_{T}=2000-Inf GeV","t#bar{t}","single top (tW)","Z(qq) + jets","Z(ll) + jets"};
 //TString file_names[nfiles] = { "data_BTagCSV",/*"Spring15_powheg_M130","Spring15_amcatnlo_M125",*/"VBFHToBB_M-125_13TeV_powheg","QCD_HT100to200","QCD_HT200to300","QCD_HT300to500","QCD_HT500to700","QCD_HT700to1000","QCD_HT1000to1500","QCD_HT1500to2000","QCD_HT2000toInf"}; 		
-TString file_names[nfiles] = { "BTagCSV",/*"VBFHToBB_M-130_13TeV_powheg",*/"VBFHToBB_M-125_13TeV_powheg","GF","ttHtobb","ttHtoNbb","DYtoQQ","ST_tW","TTbar","QCD_HT2000toInf","QCD_HT1500to2000","QCD_HT1000to1500","QCD_HT100to200","QCD_HT700to1000","QCD_HT200to300","QCD_HT500to700","QCD_HT300to500"}; 
+TString file_names[nfiles] = { "BTagCSV",/*"VBFHToBB_M-130_13TeV_powheg",*/"VBFHToBB_M-125_13TeV_powheg","ttHtobb","ttHtoNbb","DYtoQQ","DYtoLL","ST_tW","TTbar","QCD_HT2000toInf","QCD_HT1500to2000","QCD_HT1000to1500","QCD_HT100to200","QCD_HT700to1000","QCD_HT200to300","QCD_HT500to700","QCD_HT300to500"}; 
 
-int FILLCOLOR[nfiles] = {1,1,kViolet+1,kBlue+0,kCyan+2,kSpring+8,kSpring+5,kOrange-2,kRed+2,kRed+1,kRed+0, kRed-7,kRed-9,kRed-6,kRed-8,kRed-10};
-int LINECOLOR[nfiles] = {1,1,kViolet+1,kBlue+0,kCyan+2,kSpring+8,kSpring+5,kOrange-2,kRed+2,kRed+1,kRed+0, kRed-7,kRed-9,kRed-6,kRed-8,kRed-10};
-int LINESTYLE[nfiles] = {1,1,3,2,8,1,1,1,1,1,1,1,1,1,1,1};
-int LINEWIDTH[nfiles] = {1,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1};
+//int FILLCOLOR[nfiles+1] = {1,1,kBlue+0,kCyan+2,kGreen+1,kSpring+8,kSpring+5,kOrange-2,kRed+2,kRed+1,kRed+0, kRed-7,kRed-9,kRed-6,kRed-8,kRed-10};
+//int LINECOLOR[nfiles+1] = {1,1,kBlue+0,kCyan+2,kGreen+1,kSpring+8,kSpring+5,kOrange-2,kRed+2,kRed+1,kRed+0, kRed-7,kRed-9,kRed-6,kRed-8,kRed-10};
+int FILLCOLOR[nfiles+1] = {1,1,kBlue+0,kCyan+2,kGreen+1,kSpring+8,kSpring+5,kOrange-2,kRed+2,kRed+2,kRed+2,kRed+2,kRed+2,kRed+2,kRed+2,kRed+2};
+int LINECOLOR[nfiles+1] = {1,1,kBlue+0,kCyan+2,kGreen+1,kSpring+8,kSpring+5,kOrange-2,kRed+2,kRed+2,kRed+2,kRed+2,kRed+2,kRed+2,kRed+2,kRed+2};
+int LINESTYLE[nfiles+1] = {1,1,2,8,1,1,1,1,1,1,1,1,1,1,1,1};
+int LINEWIDTH[nfiles+1] = {1,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1};
 //int FILLSTYLE[nfiles] = {1001,3324,3001,3144,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001};
-int FILLSTYLE[nfiles] = {1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001};
+int FILLSTYLE[nfiles+1] = {1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001,1001};
 	
 //int order_legend[nfiles] = {0,1,6,8,10,9,7,5,4,3,2};
-int order[nfiles] = {0,1,2,3,4,15,14,13,12,11,10,5,9,6,8,7};
-int order_legend[nfiles] = {0,1,2,3,4,11,13,15,14,12,10,9,8,7,6,5};
+//int order[nfiles] = {0,1,2,3,14,13,12,11,10,9,4,8,5,7,6};
+//int order_legend[nfiles] = {0,1,2,3,10,12,14,13,11,9,8,7,6,5,4};
+int order[nfiles+1] = {0,1,2,3,14,15,13,12,11,10,9,4,8,5,7,6};
+int order_legend[nfiles+1] = {0,1,2,3,11,13,15,14,12,10,9,8,7,6,4,5};
 	
 
 int set_type = atoi(argv[1]); //0 - double, 1 - single
@@ -96,18 +100,14 @@ TString region[3]={"_analysis","_controlTop","_controlDY"}; // 0 - analysis, 1 -
 
 for (int i=0;i<nfiles;i++){
 	if (set_type==1) file_names[i].Prepend("_single");
-	if (set_type==0) file_names[i].Prepend("_double");
 	file_names[i].Prepend(region[region_type]);
 	file_names[i].Prepend("skimmed_tree");
 	file_names[i].Prepend("../../output_hist/v14/");
-//	file_names[i].Append("_v14_exclusive_pu_triggerWeight_single");
 //	file_names[i].Append("_v14_exclusive_blike_pu");
-	file_names[i].Append("_v14_qgl");
-//	file_names[i].Append("_v14_exclusive_pu_triggerWeight_single_vtype23");
+	file_names[i].Append("_v14_exclusive_pu_triggerWeight_single_vtype23");
 	file_names[i].Append(".root");
 }
-TString trigger[2] = {"RatioDoubleBtag_blike_", "RatioSingleBtag_blike_"};
-//TString trigger[2] = {"trigWeightRatioDoubleBtag_", "trigWeightSilvioRatioSingleBtag_"};
+TString trigger[2] = {"RatioDoubleBtag_", "trigWeightRatioSingleBtag_blike_"};
 //TString dir_name= "plots_powheg_130/";
 TString dir_name= "plots_powheg_125_exclusive";
 dir_name.Append(region[region_type]+"/");
@@ -117,7 +117,8 @@ Float_t lumi = 1280.23;
 	
 
 
-TLegend *leg = new TLegend(0.4,0.6,0.62,0.9);
+TLegend *leg = new TLegend(0.68,0.6,0.85,0.9);
+//TLegend *leg = new TLegend(0.4,0.6,0.62,0.9);
 leg->SetFillColor(0);
 leg->SetBorderSize(0);
 leg->SetTextSize(0.04);
@@ -126,8 +127,8 @@ leg2->SetFillColor(0);
 leg2->SetBorderSize(0);
 leg2->SetTextSize(0.04);
 
-const int nhistos = 69; //40//52
-TString hist_names[nhistos]={"hJet1_pt","hJet2_pt","hJet3_pt","hJet4_pt","hJet1_eta","hJet2_eta","hJet3_eta","hJet4_eta","hJet1_phi","hJet2_phi","hJet3_phi","hJet4_phi","hMqq", "hEtaQQ", "hPhiBB","hMbb","hbtag","hbtag2","hcosOqqbb","hEtaQB1", "hEtaQB2", "hPhiQB1", "hPhiQB2","hx1","hx2","hVB1_mass","hVB2_mass","hEtot","hPxtot","hPytot","hPztot","hJet5_pt","hPtqqbb","hEtaqqbb","hPhiqqbb","hJet1_pt_bin","hJet2_pt_bin","hJet3_pt_bin","hJet4_pt_bin", "hMqq_bin","hEtaSoftJets", "hPtSoftJets","hMassSoftJets","hHTsoft","hSoft_n2","hSoft_n5","hSoft_n10","hqgl","hqgl2", "hPtSoftJets2","hPtSoftJets3","hPVs", "hJet1q_pt", "hJet1q_eta", "hJet1q_ptd", "hJet1q_axis2", "hJet1q_mult", "hJet2q_pt", "hJet2q_eta", "hJet2q_ptd", "hJet2q_axis2", "hJet2q_mult","hMbb_regVBF","hMbb_regVBF_fsr","hblike1","hblike2", "hmet", "hqgl1_VBF", "hqgl2_VBF"};
+const int nhistos = 71; //40//52
+TString hist_names[nhistos]={"hJet1_pt","hJet2_pt","hJet3_pt","hJet4_pt","hJet1_eta","hJet2_eta","hJet3_eta","hJet4_eta","hJet1_phi","hJet2_phi","hJet3_phi","hJet4_phi","hMqq", "hEtaQQ", "hPhiBB","hMbb","hbtag","hbtag2","hcosOqqbb","hEtaQB1", "hEtaQB2", "hPhiQB1", "hPhiQB2","hx1","hx2","hVB1_mass","hVB2_mass","hEtot","hPxtot","hPytot","hPztot","hJet5_pt","hPtqqbb","hEtaqqbb","hPhiqqbb","hJet1_pt_bin","hJet2_pt_bin","hJet3_pt_bin","hJet4_pt_bin", "hMqq_bin","hEtaSoftJets", "hPtSoftJets","hMassSoftJets","hHTsoft","hSoft_n2","hSoft_n5","hSoft_n10","hqgl","hqgl2", "hPtSoftJets2","hPtSoftJets3","hPVs", "hJet1q_pt", "hJet1q_eta", "hJet1q_ptd", "hJet1q_axis2", "hJet1q_mult", "hJet2q_pt", "hJet2q_eta", "hJet2q_ptd", "hJet2q_axis2", "hJet2q_mult","hMbb_regVBF","hMbb_regVBF_fsr","hblike1","hblike2", "hmet",  "hselLeptons_tightId" , "hselLeptons_relIso03" , "hselLeptons_chargedHadRelIso03", "hselLeptons_pfRelIso03"};
 TString hist_names_sum[nhistos]={};
 TString sum_histos_names[nhistos]={};
 std::string hist_names_sort[nhistos];
@@ -159,7 +160,6 @@ TH1F *signal_histos[nhistos];
 TH1F *signal_histos2[nhistos];
 TH1F *tthbb_histos[nhistos];
 TH1F *tthnbb_histos[nhistos];
-TH1F *gf_histos[nhistos];
 TH1F *sum_histos[nhistos];
 TH1F *histos_forUnc[nhistos];
 TH1F *histos_for_legened[nhistos];
@@ -184,12 +184,10 @@ ofstream out_discrimination;
 out_efficiency.open(trigger[set_type]+dir_name+"efficiency.txt"); 
 
 
-//Float_t MC_data[2] = {1.,1.};////////////for efficiency 
+Float_t MC_data[2] = {1.,1.};////////////for efficiency 
 //Float_t MC_data[2] = {1./0.708,1./.9};////////////TO BE CHANGED
 //Float_t MC_data[2] = {1./0.704,1./.899};////////////for trigger logic
 //Float_t MC_data[2] = {1./0.703,1./.964};////////////for blike single btag logic
-Float_t MC_data[2] = {1./0.74,1./.95};////////////for blike single btag logic and with PU weight
-//Float_t MC_data[2] = {1./0.74,1./2.81};////////////for blike single btag logic and with PU weight for triggers
 Float_t lumi_qcd=lumi/MC_data[set_type];
 do{
 	
@@ -197,10 +195,11 @@ do{
 //	file_initial->ls();   
 	TH1F *histos[100];
 	for (int hist=0;hist<nhistos;++hist){
+		if (region_type==2) ((TH1F*)file_initial->Get(hist_names[hist]))->Rebin(2);
 		histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone("h");
 		if (files==0) data_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone("data");
-		if ((files>0)&&(files<8))histos[hist]->Scale(lumi);
-		if (files>=8)histos[hist]->Scale(lumi_qcd);
+		if ((files>0)&&(files<7))histos[hist]->Scale(lumi);
+		if (files>=7)histos[hist]->Scale(lumi_qcd);
 		
 		if (files==1) 	sum_histos[hist] = (TH1F*)histos[hist]->Clone(sum_histos_names[hist]);
 		if (files>1)	sum_histos[hist]->Add(histos[hist]); 
@@ -230,14 +229,6 @@ do{
 			tthnbb_histos[hist]->SetLineColor(LINECOLOR[files]);
 			tthnbb_histos[hist]->SetLineStyle(LINESTYLE[files]);
 		}
-		if (files==4) {
-			gf_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone(hist_names_sum[hist]+"tthnb");
-			gf_histos[hist]->Scale(lumi);
-			gf_histos[hist]->Sumw2(kFALSE);
-			gf_histos[hist]->SetLineColor(LINECOLOR[files]);
-			gf_histos[hist]->SetLineStyle(LINESTYLE[files]);
-		}
-		histos[hist]->SetLineColor(LINECOLOR[files]);
 		histos[hist]->SetLineColor(LINECOLOR[files]);
 		histos[hist]->SetLineStyle(LINESTYLE[files]);
 		histos[hist]->SetLineWidth(LINEWIDTH[files]);
@@ -250,16 +241,16 @@ do{
 			data_histos[hist]->SetMarkerStyle(20);
 			data_histos[hist]->SetMarkerSize(.8);
 		}
-	 	if (files>=5) stacks[hist]->Add(histos[hist]);
+	 	if (files>=4) stacks[hist]->Add(histos[hist]);
 		if (hist==0) histos_for_legened[files] = (TH1F*)histos[0]->Clone("newd");
-		if (files==5)	discr_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone("discr");
-		if (files>5)	discr_histos[hist]->Add(histos[hist]); 
+		if (files==4)	discr_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone("discr");
+		if (files>4)	discr_histos[hist]->Add(histos[hist]); 
    	}
-	if (files>4) totalBG+=histos[4]->Integral();
-	if (files>7) totalQCD+=histos[4]->Integral();
+	if (files>3) totalBG+=histos[4]->Integral();
+	if (files>6) totalQCD+=histos[4]->Integral();
 	if (files>0) totalMC+=histos[4]->Integral();
 	if (files==0) {totalData+=histos[4]->Integral(); totalDataQCD+=histos[4]->Integral();}
-	if ((files>0)&&(files<8)) {totalDataQCD-=histos[4]->Integral();}
+	if ((files>0)&&(files<7)) {totalDataQCD-=histos[4]->Integral();}
 	if (files==0) out_efficiency<<"Sample & \t\t\t yield(per "<< lumi<<" $pb^{-1}$)"<<endl;
 	if (files==0) out_efficiency<<leg_names[order[files]]<<"&\t \t \t"<< std::setprecision(5)<<histos[4]->Integral() <<endl;
 	else out_efficiency<<leg_names[order[files]]<<"&\t\t\t  "<<std::setprecision(5)<<histos[4]->Integral()<<endl;
@@ -299,8 +290,8 @@ for (int hist=0;hist<nhistos;hist++){
 
 
 
-Float_t TSF[2] = {0.452433,0.525697};
-//Float_t TSF[2] = {1.,1.};
+//Float_t TSF[2] = {0.452433,0.525697};
+Float_t TSF[2] = {1.,1.};
 Float_t kfactors[2] = {0.,0.};
 kfactors[set_type] = 1./(MC_data[set_type] * TSF[set_type]);
 cout<<"kfactor = "<<kfactors[set_type]<<endl;
@@ -310,15 +301,16 @@ cout<<"Data/MC = "<< MC_data[set_type]<<endl;
 
 
 for (int i=0;i<nfiles;i++){
-	if ((i<5) || (i>12)) {
 	if (i==0) leg->AddEntry(histos_for_legened[order_legend[i]],leg_names[i],"P");
-	else if ((i==1)||(i==2)||(i==3) || (i==4))  leg->AddEntry(histos_for_legened[order_legend[i]],leg_names[i],"L");
-	else leg->AddEntry(histos_for_legened[order_legend[i]],leg_names[i],"F");
+	if (i>11) {
+//	else if ((i==1)||(i==2)||(i==3))  leg->AddEntry(histos_for_legened[order_legend[i]],leg_names[i],"L");
+		leg->AddEntry(histos_for_legened[order_legend[i]],leg_names[i],"F");
 	}
 }
+	leg->AddEntry(histos_for_legened[order_legend[4]],leg_names[4],"F");
 	leg->AddEntry(hBkgUncUp[0],"MC stat. unc.","F");
 for (int i=0;i<nfiles;i++){
-	if ((i>=5) && (i<=12)) {
+	if ((i>=4) && (i<=11)) {
 	leg2->AddEntry(histos_for_legened[order_legend[i]],leg_names[i],"F");
 	}
 }
@@ -337,7 +329,6 @@ for (int d=0;d<nhistos;d++){
 	out_discrimination<<"$"<<hist_names_sort[d]<<"$"<<" & \t "<< std::setprecision(2)<< discriminators[d]<<endl;
 }
 out_discrimination.close();
-	//	TLatex* tex = new TLatex(0.95,0.95,"13 TeV, PU = 20, bx = 25 ns, 1280.23 pb^{-1}");
 		TLatex* tex = new TLatex(0.95,0.95,"13 TeV, bx = 25 ns, 1280.23 pb^{-1}");
       tex->SetNDC();
 		tex->SetTextAlign(35);
@@ -356,6 +347,7 @@ out_discrimination.close();
       tex2->SetTextFont(52);
       tex2->SetTextSize(0.045);
     	tex2->SetLineWidth(2);
+//		TLatex* tex_file = new TLatex(0.3,0.95,"v13, DoubleBtag");
 		TLatex* tex_file;
 		if (set_type==0) tex_file = new TLatex(0.32,0.95, btag[set_type]);
 		if (set_type==1) tex_file = new TLatex(0.38,0.95, btag[set_type]);
@@ -375,8 +367,7 @@ out_discrimination.close();
       tex_k->SetTextSize(0.05);
       tex_k->SetLineWidth(2);
 	for (int i=0;i<nhistos;i++){
-		//temp_str.Form("%2.2f",Discr(discr_histos[i],signal_histos2[i]));
-		temp_str.Form("%2.2f",Discr((TH1F*)data_histos[i]->Clone("data2"),signal_histos2[i]));
+		temp_str.Form("%2.2f",Discr(discr_histos[i],signal_histos2[i]));
 		TString disc_value = temp_str.Prepend(" d = ");
 		TLatex *disc_value_text = new TLatex(0.92,0.903,disc_value);
       disc_value_text->SetNDC();
@@ -388,10 +379,10 @@ out_discrimination.close();
 		TCanvas *c1 = new TCanvas();
 		c1->SetBottomMargin(.1);
 		c1->cd();
-		if ((i!=51)||(i!=67)||(i!=68)|| (i!=52)||(i!=53)||(i!=54)||(i!=55)||(i!=56)||(i!=57)||(i!=58)||(i!=59)||(i!=60)||(i!=61) ) c1->SetLogy();
+	//	if ((i!=51)&&(i<=65)/*||(i!=15)||(i!=63)||(i!=62)*/) c1->SetLogy();
  		TPad *pad1 = new TPad("pad1","pad1", 0, 0.3, 1, 1.0);
    	pad1->SetBottomMargin(0); // Upper and lower plot are joined
-  		if ((i!=51)&&(i!=67)&&(i!=68) && (i!=52)&&(i!=53)&&(i!=54)&&(i!=55)&&(i!=56)&&(i!=57)&&(i!=58)&&(i!=59)&&(i!=60)&&(i!=61) ) pad1->SetLogy();
+  	//	if ((i!=51)&&(i<=65)/*&&(i!=15)&&(i!=63)&&(i!=62)*/) pad1->SetLogy();
     	pad1->SetBottomMargin(.03);
 		pad1->SetTopMargin(0.06);
 		pad1->SetTicks(1,1);
@@ -400,14 +391,20 @@ out_discrimination.close();
 
 		Double_t xmin = signal_histos[i]->GetBinCenter(0);
 		Double_t xmax = signal_histos[i]->GetBinCenter(signal_histos[i]->GetNbinsX())*1.02;
-	//	if (i==70) {xmin=0.;xmax=0.5;}
-	//	if (i==68) {xmin=0.;xmax=0.6;}
+//		if (i==70) {xmin=-2.;xmax=0.5;}
+//		if (i==68) {xmin=0.;xmax=0.6;}
+		if (i==66) {xmin=0.;xmax=400;}
 		TH1F *frame = new TH1F("frame","",1,xmin,xmax);
 		frame->SetMinimum(1e-4);
-      frame->SetMaximum(1e16);
-		if ((i==51)||(i==67)||(i==68)|| (i==52)||(i==53)||(i==54)||(i==55)||(i==56)||(i==57)||(i==58)||(i==59)||(i==60)||(i==61) ) {
+      frame->SetMaximum(1e18);
+	//	if ((i==51)||(i>65)/*||(i==15)||(i==63)||(i==62)*/) {
 			frame->SetMinimum(0.);
-      	frame->SetMaximum(data_histos[i]->GetMaximum()*1.5);
+      	frame->SetMaximum((hBkgVis[i]->GetMaximum())*1.7);
+		//	if (set_type==1)  frame->SetMaximum((hBkgVis[i]->GetMaximum())*1.7);
+	//	}
+		if ((i>67)/*||(i==15)||(i==63)||(i==62)*/) {
+      	frame->SetMaximum(data_histos[i]->GetBinContent(9)*5);
+			if (set_type==1)  frame->SetMaximum(hBkgVis[i]->GetBinContent(9)*5);
 		}
       frame->GetYaxis()->SetTitleOffset(0.9);
       frame->GetXaxis()->SetTitleOffset(0.91);
@@ -434,20 +431,19 @@ out_discrimination.close();
 		if ((i==33) || (i==33))frame->SetYTitle("Events / 0.01");
 		else frame->SetYTitle("Events");
       frame->Draw();
+		//tex_k->Draw();
+	//	stacks[i]->Scale(TSF[set_type]);
+	//	stacks[i]->Scale(kfactors[set_type]);	
+	//	leg2->Draw("same");
+    	stacks[i]->Draw("same");	
 		tex->Draw();
 		tex1->Draw();
 		tex2->Draw();
-		tex_k->Draw();
 		tex_file->Draw();
-	//	stacks[i]->Scale(TSF[set_type]);
-	//	stacks[i]->Scale(kfactors[set_type]);	
-    	stacks[i]->Draw("same");	
 		leg->Draw("same");
-		leg2->Draw("same");
-		signal_histos[i]->Draw("same");
-		tthbb_histos[i]->Draw("same");
-		tthnbb_histos[i]->Draw("same");
-		gf_histos[i]->Draw("same");
+//		signal_histos[i]->Draw("same");
+//		tthbb_histos[i]->Draw("same");
+	//	tthnbb_histos[i]->Draw("same");
 /////////////////cross check of stupid THStack//////
 //
 //		sum_histos[i]->SetLineColor(kCyan);
@@ -459,7 +455,7 @@ out_discrimination.close();
 	//	data_histos[i]->Scale(1./kfactors[set_type]);	
 		data_histos[i]->Draw("Psame");
 		hBkgVis[i]->Draw("same E2");
-		disc_value_text->Draw();
+		//disc_value_text->Draw();
 	
 		c1->cd();          // Go back to the main canvas before defining pad2
    	TPad *pad2 = new TPad("pad2", "pad2", 0, 0.0, 1, 0.3);

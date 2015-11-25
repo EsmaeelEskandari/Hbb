@@ -29,15 +29,31 @@
 #include <TLorentzVector.h>
 #include <TMath.h>
 #include <TF1.h>
+#include<vector>
+#include <algorithm> 
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_double.C"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single_blike.C"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/trigger_maps.C"
 
 
-Double_t erf( Double_t *x, Double_t *par){
-  return par[0]/2.*(1.+TMath::Erf((x[0]-par[1])/par[2]));
+//Double_t erf( Double_t *x, Double_t *par){
+ // return par[0]/2.*(1.+TMath::Erf((x[0]-par[1])/par[2]));
+ //	return TMath::Erf(x[0]);
+//}
+
+#define SWAP2(A, B) { TLorentzVector t = A; A = B; B = t; }
+void SortByEta(std::vector<TLorentzVector> &jets){
+  int i, j;
+	int n=jets.size();
+  for (i = n - 1; i >= 0; i--){
+    for (j = 0; j < i; j++){
+      if (jets[j].Eta() < jets[j + 1].Eta() ){
+        SWAP2( jets[j], jets[j + 1] );
+		}
+    }
+	}
 }
-
 typedef std::map<double, int> JetList;
 const int njets = 300;
 
@@ -63,8 +79,6 @@ typedef struct {
 	Float_t axis2[njets];
 	Int_t mult[njets];
 	Float_t blike_VBF[njets];
-	Float_t qgl1_VBF[njets];
-	Float_t qgl2_VBF[njets];
 } Jets;
 
 using namespace std;
@@ -82,14 +96,16 @@ TString file_postfix[2] = {"_v14","_v14"};
 
 const int nfiles  = 20;
 
-TString file_names[nfiles] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "VBFHToBB_M-125_13TeV_powheg", "GF", "BTagCSV","TTbar","DYtoQQ","ST_tW","ttHtobb","ttHtoNbb", "DYtoLL"};
+TString file_names[nfiles] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "BTagCSV","TTbar","DYtoQQ","ST_tW","ttHtobb","ttHtoNbb", "DYtoLL", "GF","JetHT_D05" };
+Float_t BG[nfiles] = {1.,1.,1.,1.,1.,1.,1.,1,0.,0.,0.,1.,1.,1.,0.,0.,1.,0.,0.};
+Float_t data[nfiles]={0.,0.,0.,0.,0.,0.,0.,0,0.,0.,1.,0.,0.,0.,0.,0.,0.,0.,1.};
      
 TString type[nfiles]; 		
 for (int i=0;i<nfiles;i++){
 	type[i] = file_names[i];
 }
 
-Double_t xsec[nfiles] = { 2.75E07, 1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,2.16 ,1.96,1.,816.,1461., 71.7,0.2934,  0.2151,  6025.2, 25.17  };
+Double_t xsec[nfiles] = { 2.75E07, 1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,2.16 ,1.96,1.,816.,1461., 71.7,0.2934,  0.2151,  6025.2, 43.92,1.  };
 
 do {
 	
@@ -107,25 +123,17 @@ do {
 	TFile *file_initial;
 	TChain *tree_initial;
 
-//	TString path = "/shome/nchernya/Hbb/skim_trees/v14/";
-//	file_initial = TFile::Open(path+file_names[files]+"_v14"+dataset_type[set_type]+"/"+file_names[files]+file_postfix[set_type]+dataset_type[set_type]+".root");
-
-/////////////////qgd//////////////
-	dataset_type[0] = "_double";
-	dataset_type[1] = "_single";
 	TString path ;
-	path= "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat///store/user/nchernya/Hbb/v14/qgd/";
-	if (set_type==0)	file_initial = TFile::Open(path+file_names[files]+dataset_type[set_type]+".root");
-	if (set_type==1) file_initial = TFile::Open(path+"qgd_"+file_names[files]+dataset_type[set_type]+"_2jets"+".root");
-////////////////////////////
+	path= "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat///store/user/nchernya/Hbb/v14/skimmed/";
 
-	cout<<files<<endl;
+	file_initial = TFile::Open(path+file_names[files]+file_postfix[set_type]+dataset_type[set_type]+".root");
 	
 	tree_initial = (TChain*)file_initial->Get("tree");
 	Int_t events_generated;
 	TH1F *countPos;
 	TH1F *countNeg;
-	if ((files!=10)){
+	cout<<files<<endl;
+	if ((data[files]!=1)){
 		countPos = (TH1F*)file_initial->Get("CountPosWeight");
  		countNeg = (TH1F*)file_initial->Get("CountNegWeight");
  		events_generated = countPos->GetEntries()-countNeg->GetEntries();
@@ -187,14 +195,13 @@ do {
 	tree_initial->SetBranchAddress("selLeptons_chargedHadRelIso03",selLeptons_chargedHadRelIso03);
 	tree_initial->SetBranchAddress("selLeptons_pfRelIso03",selLeptons_pfRelIso03);
 
-	tree_initial->SetBranchAddress("Jet_qgl1_VBF",Jet.qgl1_VBF);
-	tree_initial->SetBranchAddress("Jet_qgl2_VBF",Jet.qgl2_VBF);
 
 
 
-
-	if (files==10) genweight = 1.;
-	if (files==10) puweight=1.;
+	if (data[files]==1) {
+		genweight = 1.;
+		puweight=1.;
+	}
 
  	
     TH1F *hJet1_pt_bin = new TH1F("hJet1_pt_bin", "", 50, 90., 140.);
@@ -370,15 +377,10 @@ do {
 	TH1F *hselLeptons_pfRelIso03= new TH1F("hselLeptons_pfRelIso03","",50,-5.5,-0.5 );
 	hselLeptons_pfRelIso03->GetXaxis()->SetTitle("selLeptons_pfRelIso03[0]");
 
-	TH1F *hqgl1_VBF = new TH1F("hqgl1_VBF","",50,0,1);
-	hqgl1_VBF->GetXaxis()->SetTitle("VBF QGD of the first quark jet candidate");
-	TH1F *hqgl2_VBF = new TH1F("hqgl2_VBF","",50,0,1);
-	hqgl2_VBF->GetXaxis()->SetTitle("VBF QGD of the second quark jet candidate");
 
 
-
-   		const int numArray= 73; //54 without qgl stuff
-   		TH1F* histArray[numArray] = {hJet1_pt,hJet2_pt,hJet3_pt,hJet4_pt,  hJet1_eta,hJet2_eta,hJet3_eta,hJet4_eta,  hJet1_phi,hJet2_phi,hJet3_phi,hJet4_phi, hMqq, hEtaQQ, hPhiBB, hEtaSoftJets, hPtSoftJets,hMassSoftJets,hHTsoft,hSoft_n2,hSoft_n5,hSoft_n10,hMbb,hqgl,hbtag,hqgl2,hbtag2,hPtSoftJets2,hPtSoftJets3,hcosOqqbb,hEtaQB1, hEtaQB2, hPhiQB1, hPhiQB2,hx1,hx2,hVB1_mass, hVB2_mass, hEtot, hPxtot, hPytot, hPztot, hJet5_pt,hPtqqbb, hPhiqqbb, hEtaqqbb, hJet1_pt_bin,hJet2_pt_bin,hJet3_pt_bin,hJet4_pt_bin, hMqq_bin, hnPVs, hMbb_regVBF, hMbb_regVBF_fsr, hJet1q_pt, hJet1q_eta, hJet1q_ptd, hJet1q_axis2, hJet1q_mult, hJet2q_pt, hJet2q_eta, hJet2q_ptd, hJet2q_axis2, hJet2q_mult,hblike1,hblike2, hmet,  hselLeptons_tightId , hselLeptons_relIso03 , hselLeptons_chargedHadRelIso03, hselLeptons_pfRelIso03, hqgl1_VBF,hqgl2_VBF };
+   		const int numArray= 71; //54 without qgl stuff
+   		TH1F* histArray[numArray] = {hJet1_pt,hJet2_pt,hJet3_pt,hJet4_pt,  hJet1_eta,hJet2_eta,hJet3_eta,hJet4_eta,  hJet1_phi,hJet2_phi,hJet3_phi,hJet4_phi, hMqq, hEtaQQ, hPhiBB, hEtaSoftJets, hPtSoftJets,hMassSoftJets,hHTsoft,hSoft_n2,hSoft_n5,hSoft_n10,hMbb,hqgl,hbtag,hqgl2,hbtag2,hPtSoftJets2,hPtSoftJets3,hcosOqqbb,hEtaQB1, hEtaQB2, hPhiQB1, hPhiQB2,hx1,hx2,hVB1_mass, hVB2_mass, hEtot, hPxtot, hPytot, hPztot, hJet5_pt,hPtqqbb, hPhiqqbb, hEtaqqbb, hJet1_pt_bin,hJet2_pt_bin,hJet3_pt_bin,hJet4_pt_bin, hMqq_bin, hnPVs, hMbb_regVBF, hMbb_regVBF_fsr, hJet1q_pt, hJet1q_eta, hJet1q_ptd, hJet1q_axis2, hJet1q_mult, hJet2q_pt, hJet2q_eta, hJet2q_ptd, hJet2q_axis2, hJet2q_mult,hblike1,hblike2, hmet,  hselLeptons_tightId , hselLeptons_relIso03 , hselLeptons_chargedHadRelIso03, hselLeptons_pfRelIso03 };
 			for (int i=0;i<numArray;i++){
 				histArray[i]->Sumw2();
 			}
@@ -411,17 +413,17 @@ do {
 		}
 		else if (region_type==2) {
 			if (!((v_type==0)||(v_type==1))) continue;
-		//	if (met_pt>100) continue;
 			if (!((selLeptons_tightId[0]==1)||(selLeptons_tightId[0]==3))) continue;
 			if (!((selLeptons_tightId[1]==1)||(selLeptons_tightId[1]==3))) continue;
 		}
 		
 
-		if (files==10) PU=1.;
+		if (data[files]==1) PU=1.;
 		else PU=puweight;
 		genweight0 = TMath::Sign(1.,genweight)*PU;
 		genweight=TMath::Sign(1.,genweight)*PU;
 		genweight/=events_generated/xsec[files]; 
+
 
 
 
@@ -434,19 +436,28 @@ do {
 		TLorentzVector Qjet1;
 		TLorentzVector Qjet2;
 		TLorentzVector qq;
-		
-		int flag=0;
-
 ///////// preselection(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq, Float_t scale=1.)
 		if (set_type==0) {
-		//	if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue;
+	//		if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue;
 		 if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue;
 
 			if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
 		}
-		else {
+		else if (set_type==1){
 		//	if (set_type==1) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
-			if (set_type==1) if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+//	if (set_type==1) {
+	//	 (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq)) ;
+//		if (!((btag_max1_number>=0)&&(btag_max2_number>=0)&&(pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
+
+
+//		if (files>7) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+
+//		}
+	//	if (files<=7) if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+		if (BG[files]==1) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+
+		if (BG[files] == 0) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+	//	if (files > 7) if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
 		}
 	
 
@@ -471,7 +482,34 @@ do {
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Float_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
 
+		vector<TLorentzVector> jets;
+		vector<Float_t> jets_btag;
+		for (int i=0;i<4;i++){
+			TLorentzVector jet0;
+			jet0.SetPtEtaPhiM(Jet.pt[i],Jet.eta[i],Jet.phi[i],Jet.mass[i]);
+			jets.push_back(jet0);
+			jets_btag.push_back(Jet.btag[i]);
+		}
+		SortByEta(jets);
+		TLorentzVector Qjet1_eta = jets[0];	
+		TLorentzVector Qjet2_eta = jets[3];
+		jets.clear();
+		Float_t Mqq_eta=(Qjet1_eta+Qjet2_eta).M();	
+		Float_t Detaqq_eta = TMath::Abs(Qjet1_eta.Eta()-Qjet2_eta.Eta());
+		std::sort(jets_btag.begin(), jets_btag.end(),std::greater<int>()); 
+		Float_t CSV1;
+		if (jets_btag[0]>1.) CSV1 = 1.;
+		else CSV1=jets_btag[0];
+		
+	
+//float SingleBtagVBFTriggerWeight(float pt1, float pt2, float pt3, float pt4 , float CSV1, float DeltaEtaqq_eta, float Mqq_eta, float DeltaPhibb_single, float DeltaEtaqq_single)
 
+		if ((BG[files]==1)&&(set_type==1)) {
+		//	cout<< SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi, qqDeltaEta)<<endl;
+			genweight*=SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi, qqDeltaEta);
+		}
+
+/*
 		Float_t Mqq_parametersQCD[3] = {};
 		Float_t Mqq_parametersData[3] = {};
 		if (set_type==1)  {Mqq_parametersQCD[0]= 1. ; Mqq_parametersQCD[1]=5.42e02 ;Mqq_parametersQCD[2]=3.99e02;}
@@ -490,7 +528,7 @@ do {
 
 
 	//	if (files!=10)	genweight*=funcData->Eval(Mqq)/funcQCD->Eval(Mqq);
-
+*/
 
 
 
@@ -685,8 +723,6 @@ do {
 				if (selLeptons_pfRelIso03[0] > TMath::Exp(-5)) logIso = TMath::Log(selLeptons_pfRelIso03[0]);
 				hselLeptons_pfRelIso03->Fill(logIso,genweight);
  
-			hqgl1_VBF->Fill(Jet.qgl1_VBF[pt_max1_number],genweight);
-			hqgl2_VBF->Fill(Jet.qgl2_VBF[pt_max2_number],genweight);
 
 		//		cout<<"first quark jet candidate, entry =  "<< entry<< "  , ptd = "<< Jet.ptd[pt_max1_number]<< " , axis2 = "<<Jet.axis2[pt_max1_number]<<" , mult = " << Jet.mult[pt_max1_number]<< " , qgl = "<<Jet.qgl[pt_max1_number]<<endl;
 	//			cout<<"second quark jet candidate, entry =  "<< entry<< "  , ptd = "<< Jet.ptd[pt_max2_number]<< " , axis2 = "<<Jet.axis2[pt_max2_number]<<" , mult = " << Jet.mult[pt_max2_number]<< " , qgl = "<<Jet.qgl[pt_max2_number]<<endl;
@@ -697,7 +733,7 @@ do {
 				
 			global_counter++;
         }
-		TFile file("output_hist/v14/skimmed_tree"+region[region_type]+dataset_type[set_type]+type[files]+"_v14_qgl2.root","recreate");
+		TFile file("output_hist/v14/skimmed_tree"+region[region_type]+dataset_type[set_type]+type[files]+"_v14_exclusive_pu_triggerWeight_single_vtype23.root","recreate");
     
 		for (int i=0;i<numArray;++i){
     	    	histArray[i]->SetLineWidth(2);
@@ -711,15 +747,6 @@ do {
    		} 
     		file.Write();
     		file.Close();
-	 ofstream out("output_txt/v14/skimmed"+region[region_type]+dataset_type[set_type]+type[files]+"_v14_qgl2.txt");
-	out<< "preselection only = "<< presel<<" , all evetns in the begining = "<<events_generated<<", % = "<< (float)presel/events_generated<< "N evets 1 fb-1 = "<<(float)presel/events_generated*xsec[files]*1000.<<endl;
-	out<<"positive weight in so many events : "<<  pos_weight_presel<<endl;
-	out<<"rates for v_type : " <<endl;
-	for (int i=0;i<7;i++){
-		out<<i-1<<"    "<<(float)presel_vtype[i]/events_generated*xsec[files]<<endl;
-	}
-	out.close();
-//	cout<<"qq matched ratio : "<<qq_matching/qq_matching_all <<endl;
 	files++;
 } while (files<files_max); 
 
