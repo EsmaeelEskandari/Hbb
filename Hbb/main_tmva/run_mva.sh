@@ -1,29 +1,25 @@
 export WORKDIR=`pwd`
 cd $WORKDIR
 
-#g++ run_create_main_tmva_double.C -g -o run_double `root-config --cflags --glibs` 
-#g++ run_create_main_tmva_single.C -g -o run_single `root-config --cflags --glibs` 
 g++ run_create_main_tmva_all.C -g -o run_all `root-config --cflags --glibs` 
 
-max_samples_num=4  # -1
-path=/afs/cern.ch/work/n/nchernya/Hbb/skim_trees/
-input_dir=(VBFHToBB_M-125_13TeV_powheg QCD_HT300to500 QCD_HT500to700 skimmed_data VBFHToBB_M-125_13TeV_powheg )
-TREE=_skimmed_tree
+max_samples_num=2  
+path=dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat///store/user/nchernya/Hbb/v14/qgd/
+input_dir=( BTagCSV VBFHToBB_M-125_13TeV_powheg )
+data=(1 0)
 ROOT=.root
-v13=_v13
+v14=_v14
 single=_single
-slash=/
+double=_double
+qgd=qgd_
+jets=_2jets
 
-###please before run on QCD 300 and 500 make sure that they are in correct proportion
 
-current_sample=3
-while [ $current_sample -le $max_samples_num ]
+current_sample=0
+while [ $current_sample -lt 1 ] #$max_samples_num ]
 do	
-#	./run_double $path${input_dir[ $current_sample ]}$v13$slash${input_dir[ $current_sample ]}$v13$TREE$v13$ROOT ${input_dir[ $current_sample ]} $current_sample
-#	./run_single $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]} $current_sample
-
-	./run_all $path${input_dir[ $current_sample ]}$v13$slash${input_dir[ $current_sample ]}$v13$TREE$v13$ROOT ${input_dir[ $current_sample ]} $current_sample 0
-	./run_all $path${input_dir[ $current_sample ]}$v13$single$slash${input_dir[ $current_sample ]}$TREE$v13$single$ROOT ${input_dir[ $current_sample ]} $current_sample 1
+	./run_all $path${input_dir[ $current_sample ]}$double$ROOT ${input_dir[ $current_sample ]} ${data[ $current_sample ]} 0
+	./run_all $path$qgd${input_dir[ $current_sample ]}$single$jets$ROOT ${input_dir[ $current_sample ]} ${data[ $current_sample ]} 1
 
 	current_sample=$(( $current_sample + 1 ))
 done

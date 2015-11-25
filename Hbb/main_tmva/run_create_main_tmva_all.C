@@ -16,13 +16,13 @@ using namespace std;
 int main(int argc, char* argv[]){
 		TString input_filename = std::string(argv[1]);
 		TString output_dir = std::string(argv[2]);
-		int sample_type = atoi(argv[3]);
+		int data = atoi(argv[3]);
 		int set_type = atoi(argv[4]);
 		
 		TFile *f = TFile::Open(input_filename);
 		if (f!=0){	
 			CreateTree_tmva_all	*c = new CreateTree_tmva_all(0,input_filename);
-			c->Loop(input_filename,output_dir,sample_type,set_type);
+			c->Loop(input_filename,output_dir,data, set_type);
 		}
 	return 0;
 }

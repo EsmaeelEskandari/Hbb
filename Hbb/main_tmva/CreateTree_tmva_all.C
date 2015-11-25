@@ -11,34 +11,16 @@
 #include <string.h>
 #include <stdlib.h>
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_double.C"
-#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single_blike.C"
 
-
-typedef std::map<Float_t, Int_t> JetList;
 
 const int njets = 300;
-typedef struct {
-   Float_t eta[njets];
-   Float_t pt[njets];
-   Float_t phi[njets];
-	Float_t mass[njets];
-	Float_t btag[njets];
-	Int_t nsoft;
-	Float_t soft_pt[njets];
-	Float_t soft_eta[njets];
-	Float_t soft_mass[njets];
-	Float_t qgl[njets];
-	Int_t nsoft2;
-	Int_t nsoft5;
-	Int_t nsoft10;
-	Int_t id[njets];
-	Float_t HTsoft;			
-} Jets;
 
 typedef struct {
 	Float_t CSV1;
 	Float_t CSV2;
 	Float_t Mqq;
+	Float_t Mbb;
 	Float_t DeltaEtaQQ;
 	Float_t DeltaPhiQQ;
 	Int_t SoftN5;
@@ -46,20 +28,22 @@ typedef struct {
 	Float_t DeltaEtaQB1;
 	Float_t DeltaEtaQB2;
 	Float_t cosOqqbb;
-	Float_t qgl1;
-	Float_t qgl2;
+	Float_t qgl1_VBF;
+	Float_t qgl2_VBF;
 	Float_t x1;
 	Float_t x2;
 	Float_t VB1;
 	Float_t VB2;
 	Float_t Jet5_pt;
 	Float_t Etot;
+	Float_t blike1_VBF;
+	Float_t blike2_VBF;
 }TMVAstruct;
 
 
+using namespace std;
 
-
-void CreateTree_tmva_all::Loop(TString input_filename,TString output_dir,  int sample_type, int set_type)
+void CreateTree_tmva_all::Loop(TString input_filename,TString output_dir, int data, int set_type)
 {
    if (fChain == 0) return;
 
@@ -72,18 +56,14 @@ void CreateTree_tmva_all::Loop(TString input_filename,TString output_dir,  int s
 
 	int events_saved=0;
 	
-	TFile *file_initial = new TFile(input_filename);
-	TH1F *countPos = (TH1F*)file_initial->Get("CountPosWeight");
-	TH1F *countNeg = (TH1F*)file_initial->Get("CountNegWeight");
-	Int_t events_generated = countPos->GetEntries()-countNeg->GetEntries();
-	////genWeight/=events_generated/xsec[sample_type];
  
 
-	TFile file("main_tmva_tree_"+output_dir+"_v13"+dataset_type[set_type]+".root","recreate");
+	TFile file("main_tmva_tree_"+output_dir+"_v14"+dataset_type[set_type]+".root","recreate");
 	TTree *tree0 = new TTree("TMVA","TMVA");
 	tree0->Branch("CSV1",&TMVA.CSV1,"CSV1/F");
 	tree0->Branch("CSV2",&TMVA.CSV2,"CSV2/F");
 	tree0->Branch("Mqq",&TMVA.Mqq,"Mqq/F");
+	tree0->Branch("Mbb",&TMVA.Mbb,"Mbb/F");
 	tree0->Branch("DeltaEtaQQ",&TMVA.DeltaEtaQQ,"DeltaEtaQQ/F");
 	tree0->Branch("DeltaPhiQQ",&TMVA.DeltaPhiQQ,"DeltaPhiQQ/F");
 	tree0->Branch("SoftN5",&TMVA.SoftN5,"SoftN5/I");
@@ -91,14 +71,16 @@ void CreateTree_tmva_all::Loop(TString input_filename,TString output_dir,  int s
 	tree0->Branch("DeltaEtaQB1",&TMVA.DeltaEtaQB1,"DeltaEtaQB1/F");
 	tree0->Branch("DeltaEtaQB2",&TMVA.DeltaEtaQB2,"DeltaEtaQB2/F");
 	tree0->Branch("cosOqqbb",&TMVA.cosOqqbb,"cosOqqbb/F");
-	tree0->Branch("qgl1",&TMVA.qgl1,"qgl1/F");
-	tree0->Branch("qgl2",&TMVA.qgl2,"qgl2/F");
+	tree0->Branch("qgl1_VBF",&TMVA.qgl1_VBF,"qgl1_VBF/F");
+	tree0->Branch("qgl2_VBF",&TMVA.qgl2_VBF,"qgl2_VBF/F");
 	tree0->Branch("Etot",&TMVA.Etot,"Etot/F");
 	tree0->Branch("Jet5_pt",&TMVA.Jet5_pt,"Jet5_pt/F");
 	tree0->Branch("x1",&TMVA.x1,"x1/F");
 	tree0->Branch("x2",&TMVA.x2,"x2/F");
 	tree0->Branch("VB1",&TMVA.VB1,"VB1/F");
 	tree0->Branch("VB2",&TMVA.VB2,"VB2/F");
+	tree0->Branch("blike1_VBF",&TMVA.blike1_VBF,"blike1_VBF/F");
+	tree0->Branch("blike2_VBF",&TMVA.blike2_VBF,"blike2_VBF/F");
 
 
 
@@ -106,7 +88,8 @@ void CreateTree_tmva_all::Loop(TString input_filename,TString output_dir,  int s
 	   Long64_t ientry = LoadTree(jentry);
 	   if (ientry < 0) break;
 	   nb = fChain->GetEntry(jentry);   nbytes += nb;
-		   
+			   
+		if (data==1) genWeight = 1.;
 		if (genWeight <0) continue;
 		if (json!=1) continue;	
 		
@@ -121,11 +104,20 @@ void CreateTree_tmva_all::Loop(TString input_filename,TString output_dir,  int s
 		TLorentzVector qq;
 
 		if (set_type==0) {
+			if (preselection_single_blike(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_blike_VBF, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) ==0) continue;
+
 			if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0 ) continue;
 		}
 		else {
-			if (set_type==1) if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
+			if (set_type==1) if (preselection_single_blike(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_blike_VBF, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
 		}
+
+		Float_t alpha_bjet1_reg = 1; 
+		Float_t alpha_bjet2_reg = 1 ;
+		if (Jet_pt_regVBF[btag_max1_number]>0) alpha_bjet1_reg = Jet_pt_regVBF[btag_max1_number]/Jet_pt[btag_max1_number];
+  		if (Jet_pt_regVBF[btag_max2_number]>0) alpha_bjet2_reg = Jet_pt_regVBF[btag_max2_number]/Jet_pt[btag_max2_number];
+		Bjet1*=alpha_bjet1_reg;
+		Bjet2*=alpha_bjet2_reg;
 
 		
 		Float_t Mqq = qq.M();
@@ -226,20 +218,22 @@ void CreateTree_tmva_all::Loop(TString input_filename,TString output_dir,  int s
 		TMVA.DeltaEtaQB1 = EtaBQ1;
 		TMVA.DeltaEtaQB2 = EtaBQ2;
 		TMVA.cosOqqbb = cosOqqbb;
-		TMVA.qgl1 = Jet_qgl[pt_max1_number];
-		TMVA.qgl2 = Jet_qgl[pt_max2_number];
+		TMVA.qgl1_VBF = Jet_qgl1_VBF[pt_max1_number];
+		TMVA.qgl2_VBF = Jet_qgl2_VBF[pt_max2_number];
 		TMVA.Jet5_pt = Jet_pt[4];
 		TMVA.Etot = Etot;
 		TMVA.x1 = x1;
 		TMVA.x2 = x2;
 		TMVA.VB1 = VB1_mass;
 		TMVA.VB2 = VB2_mass;
+		TMVA.blike1_VBF = Jet_blike_VBF[btag_max1_number];
+		TMVA.blike2_VBF = Jet_blike_VBF[btag_max2_number];
+		TMVA.Mbb = Mbb;
 
 		tree0->Fill();	
 		events_saved++;		
+		if (events_saved>=200000) break;
 
-//		if (sample_type==2) 
-//			if (events_saved>=108767) break; //for 500-700 ///for v12 , needed to be corrected probably....
 	}  
 
 	file.Write();
