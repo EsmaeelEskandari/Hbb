@@ -21,7 +21,7 @@ mva=main_mva_v14_
 current_sample=0
 while [ $current_sample -lt 1 ]  #$max_samples_num ]
 do	
-#	qsub -q short.q batch2.sh $path${input_dir[ $current_sample ]}$double$ROOT $mva${input_dir[ $current_sample ]} 0
-	qsub -q short.q batch2.sh $path$qgd${input_dir[ $current_sample ]}$single$jets$ROOT $mva${input_dir[ $current_sample ]} 1
+	qsub -q short.q batch2.sh $path${input_dir[ $current_sample ]}$double$ROOT $mva${input_dir[ $current_sample ]} 0
+#	qsub -q short.q batch2.sh $path$qgd${input_dir[ $current_sample ]}$single$jets$ROOT $mva${input_dir[ $current_sample ]} 1
 	current_sample=$(( $current_sample + 1 ))
 done
