@@ -11,7 +11,7 @@
 #include "TMVA/Factory.h"
 #include "TMVA/Tools.h"
 #include "TMVA/Reader.h"
-#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single_blike.C"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_double.C"
 
 const Int_t njets = 15;
@@ -23,34 +23,35 @@ void TMVAapply_all::Loop(TString inputfile, TString output_dir,  int set_type)
    if (fChain == 0) return;
    Long64_t nentries = fChain->GetEntriesFast();
    Long64_t nbytes = 0, nb = 0;
+	TString dataset_type[2] = {"_double","_single"};	
 
 	Int_t presel=0;
 	Int_t loopJet_max;
-	TFile *output = new TFile("v13/main_tmva_v13_Data_4_"+output_dir+".root","recreate");
+	TFile *output = TFile::Open(output_dir+dataset_type[set_type]+".root","recreate");
 	TTree *tree = fChain->CloneTree(0);
 	float BDT_VBF;
 	TBranch *branchBDT_VBF = tree->Branch("BDT_VBF",&BDT_VBF,"BDT_VBF/F");
-	TString weightfile[2]= {"../weights/TMVAClassification_BDTG_v13_Data_double_all_4.weights.xml","../weights/TMVAClassification_BDTG_v13_Data_single_all_4.weights.xml"};
+	TString weightfile[2]= {"/shome/nchernya/Hbb/tmva/main_mva/weights/TMVAClassification_BDTG_main_tmva_2ndIter_all_single.weights.xml","/shome/nchernya/Hbb/tmva/main_mva/weights/TMVAClassification_BDTG_main_tmva_2ndIter_all_double.weights.xml"};
    TMVA::Reader *reader = new TMVA::Reader("Silent");
 	float var1,var2,var3,var4,var5,var6,var7,var8,var9,var10, var11, var12;
 	reader->AddVariable("Mqq",&var1);
-	reader->AddVariable("DeltaEtaQQ",&var2);
-	reader->AddVariable("DeltaPhiQQ",&var3);
-	reader->AddVariable("SoftN5",&var4);
-	reader->AddVariable("HTsoft",&var5);
-	reader->AddVariable("CSV1",&var6);
-   reader->AddVariable( "CSV2", &var7 );
-	reader->AddVariable( "cosOqqbb", &var8 );
-   reader->AddVariable( "DeltaEtaQB1", &var9 );
-   reader->AddVariable( "DeltaEtaQB2", &var10 );
-  	reader->AddVariable("qgl1",&var11);
-   reader->AddVariable("qgl2",&var12);
+	reader->AddVariable("DeltaPhiQQ",&var2);
+	reader->AddVariable("SoftN5",&var3);
+	reader->AddVariable("HTsoft",&var4);
+	reader->AddVariable("CSV1",&var5);
+   reader->AddVariable( "CSV2", &var6 );
+   reader->AddVariable( "DeltaEtaQB1", &var7 );
+   reader->AddVariable( "DeltaEtaQB2", &var8 );
+  	reader->AddVariable("qgl1_VBF",&var9);
+   reader->AddVariable("qgl2_VBF",&var10);
+   reader->AddVariable("Jet5_pt",&var11);
 	reader->BookMVA("BDTG", weightfile[set_type]);
 	
-	TFile *input_file = new TFile(inputfile);
+	TFile *input_file = TFile::Open(inputfile);
 	TH1F*	Count = (TH1F*)input_file->Get("Count");
 	TH1F*	CountPosWeight = (TH1F*)input_file->Get("CountPosWeight");
 	TH1F*	CountNegWeight =(TH1F*)input_file->Get("CountNegWeight");
+	TH1F*	CountWeighted =(TH1F*)input_file->Get("CountWeighted");
 
 	int events_saved=0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -70,12 +71,19 @@ void TMVAapply_all::Loop(TString inputfile, TString output_dir,  int set_type)
 		TLorentzVector qq;
 
 		if (set_type==0) {
-			if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+		 if (preselection_single_blike(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_blike_VBF, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue;
+			if (preselection_double( nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_blike_VBF, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
 		}
 		else {
-			if (set_type==1) if (preselection_single(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) !=0) continue;
+			if (set_type==1) if (preselection_single_blike(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_blike_VBF, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_SingleBTagCSV_VBF_Mqq460_v, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
 		}
 
+		Float_t alpha_bjet1_reg = 1; 
+		Float_t alpha_bjet2_reg = 1 ;
+		if (Jet_pt_regVBF[btag_max1_number]>0) alpha_bjet1_reg = Jet_pt_regVBF[btag_max1_number]/Jet_pt[btag_max1_number];
+  		if (Jet_pt_regVBF[btag_max2_number]>0) alpha_bjet2_reg = Jet_pt_regVBF[btag_max2_number]/Jet_pt[btag_max2_number];
+		Bjet1*=alpha_bjet1_reg;
+		Bjet2*=alpha_bjet2_reg;
 
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
@@ -167,25 +175,22 @@ void TMVAapply_all::Loop(TString inputfile, TString output_dir,  int set_type)
 		}
 
 		var1= Mqq;
-		var6= Jet_btagCSV[btag_max1_number];	
-		var7= Jet_btagCSV[btag_max2_number];	
-		var2= qqDeltaEta;
-		var3= qqDeltaPhi;
-		var4= softActivity_njets5;
-		var5= softActivity_HT;
-		var9= EtaBQ1;
-		var10= EtaBQ2;
-		var8= cosOqqbb;
-		var11=Jet_qgl[pt_max1_number];
-		var12 = Jet_qgl[pt_max2_number];
+		var2= qqDeltaPhi;
+		var3= softActivity_njets5;
+		var4= softActivity_HT;
+		var5= Jet_btagCSV[btag_max1_number];	
+		var6= Jet_btagCSV[btag_max2_number];	
+		var7= EtaBQ1;
+		var8= EtaBQ2;
+		var9=Jet_qgl1_VBF[pt_max1_number];
+		var10 = Jet_qgl2_VBF[pt_max2_number];
+		var11 = Jet_pt[4];
+		
 	
 		BDT_VBF = reader->EvaluateMVA("BDTG");
 
 
 	tree->Fill();
-	//	events_saved++;		
-//		if (sample_type==2) 
-//			if (events_saved>=108767) break; //for 500-700
 
 	}
 	delete reader;
@@ -194,5 +199,6 @@ void TMVAapply_all::Loop(TString inputfile, TString output_dir,  int set_type)
 	Count->Write();
 	CountPosWeight->Write();
 	CountNegWeight->Write();
+	CountWeighted->Write();
 	output->Close();
 }
