@@ -46,8 +46,6 @@ int main(int argc, char* argv[]){
 	double start5=-1+5*precision;
 
 	
-	const int num_bgs=8;  //8; //BGs
-	const int num_ss=3;   //3;		//Ss
 
 //	int type_int; //double  =0; single=1
 	
@@ -55,28 +53,36 @@ int main(int argc, char* argv[]){
 	if (type_int==0) type = "_double";
 	if (type_int==1) type = "_single";
 	TString text_type;
-	if (type_int==0) text_type = "Spring 15, DoubleBtag";
-	if (type_int==1) text_type = "Spring 15, SingleBtag";
+	if (type_int==0) text_type = "DoubleBtag";
+	if (type_int==1) text_type = "SingleBtag";
 	
 
+	TString dir="output_hist/v14/";
+	const int num_bgs=8;  //8; //BGs
+	const int num_ss=3;   //3;		//Ss
 	TString bg_names[num_bgs] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf"};
 	TString s_names[num_ss] = {"VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "VBFHToBB_M125_13TeV_amcatnlo"};
 	TString tex_s_names[num_ss] = {"VBF powheg, m(H) = 125 GeV","VBF powheg, m(H) = 130 GeV", "VBF amc@NLO, m(H) = 125 GeV"};
+	TString data_names[1] = {"BTagCSV"};
 
-	TFile *file_s =  new TFile("output_hist/BDT_hist_"+narrow+s_names[signal_sample_num]+type+".root");
+	TFile *file_s =  TFile::Open(dir+"BDT_hist_"+narrow+s_names[signal_sample_num]+type+".root");
 	TH1F *hist_S = (TH1F*)file_s->Get("BDT_output");
 
 	TFile *file_b[num_bgs];
 	TH1F *hist_Bs[num_bgs];
 
-	file_b[0] = new TFile("output_hist/BDT_hist_"+narrow+bg_names[0]+type+".root");
+	file_b[0] = TFile::Open(dir+"BDT_hist_"+bg_names[0]+type+".root");
 	hist_Bs[0] = (TH1F*)file_b[0]->Get("BDT_output");
 	for (int i=1;i<num_bgs;i++){
-		file_b[i] = new TFile("output_hist/BDT_hist_"+narrow+bg_names[i]+type+".root");
+		file_b[i] = TFile::Open(dir+"BDT_hist_"+bg_names[i]+type+".root");
 		hist_Bs[i] = (TH1F*)file_b[i]->Get("BDT_output");
 		hist_Bs[0]->Add(hist_Bs[i]);
 	}
-	TH1F *hist_B = (TH1F*)hist_Bs[0]->Clone(); 
+//	TH1F *hist_B = (TH1F*)hist_Bs[0]->Clone(); 
+	TFile *file_data =  TFile::Open(dir+"BDT_hist_"+data_names[0]+type+".root");
+	TH1F *hist_D = (TH1F*)file_s->Get("BDT_output");
+////if we use data as BG
+	TH1F *hist_B = (TH1F*)hist_D->Clone(); 
 	
 	double END = hist_B->GetBinCenter(hist_B->FindLastBinAbove(0.)); //right end of BDT distibution
 
@@ -93,11 +99,11 @@ int main(int argc, char* argv[]){
    frame2->SetTitleFont(42,"x");
 	frame2->SetTitleFont(42,"y");
    frame2->SetTitleSize(0.05, "XYZ");
-	frame2->SetYTitle("Events / 10 fb^{-1}");
+	frame2->SetYTitle("Events / 1280.23 pb^{-1}");
 	frame2->SetXTitle("BDT output");	
 	frame2->GetXaxis()->SetLabelSize(0.05);
 	frame2->Draw();
-	TLatex* tex = new TLatex(0.95,0.95,"13 TeV, PU = 20, bx = 25 ns, 10 fb^{-1}");
+	TLatex* tex = new TLatex(0.95,0.95,"13 TeV, bx = 25 ns, 1280.23 pb^{-1}");
    tex->SetNDC();
 	tex->SetTextAlign(35);
    tex->SetTextFont(42);
@@ -135,9 +141,10 @@ int main(int argc, char* argv[]){
 	leg->SetBorderSize(0);
 	leg->SetTextSize(0.04);
 	leg->AddEntry(hist_S,tex_s_names[signal_sample_num],"L");
-	leg->AddEntry(hist_B,"QCD, H_{T} = 100 - #infty GeV","L");
+//	leg->AddEntry(hist_B,"QCD, H_{T} = 100 - #infty GeV","L");
+	leg->AddEntry(hist_B,"QCD, Data BTagCSV","L");
 	leg->Draw("same");
-	c1->Print("plots/"+narrow+"BDT_output_signal_bg_"+s_names[signal_sample_num]+type+".png");
+	c1->Print("plots/v14/BDT_output_signal_bg_"+s_names[signal_sample_num]+type+".png");
 		
 
 
@@ -251,7 +258,7 @@ int main(int argc, char* argv[]){
 	} while (start1<=(END-(NCAT-1)*precision));
 
 	ofstream out;
-	out.open("output_txt/"+narrow+"6categories_"+s_names[signal_sample_num]+type+binning+".txt");
+	out.open("output_txt/v14/6categories_"+s_names[signal_sample_num]+type+binning+".txt");
 	out<<"borders of categories : "<<border1<<"   "<<border2<<"   "<<border3<< "  "<<border4<<"  "<< border5<< "  , END = "<< END <<endl;
 	out<<"S**2/B in each category : "<<max1_final<<"   "<<max2_final<<"   " << max3_final<<"   "<<max4_final<<"   "<<max5_final<<"  "<< max6_final<<"  , max = "<<max<<endl;
 	out.close();
