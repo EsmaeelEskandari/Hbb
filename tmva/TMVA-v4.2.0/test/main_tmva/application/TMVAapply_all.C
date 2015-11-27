@@ -31,7 +31,7 @@ void TMVAapply_all::Loop(TString inputfile, TString output_dir,  int set_type)
 	TTree *tree = fChain->CloneTree(0);
 	float BDT_VBF;
 	TBranch *branchBDT_VBF = tree->Branch("BDT_VBF",&BDT_VBF,"BDT_VBF/F");
-	TString weightfile[2]= {"/shome/nchernya/Hbb/tmva/main_mva/weights/TMVAClassification_BDTG_main_tmva_2ndIter_all_single.weights.xml","/shome/nchernya/Hbb/tmva/main_mva/weights/TMVAClassification_BDTG_main_tmva_2ndIter_all_double.weights.xml"};
+	TString weightfile[2]= {"/shome/nchernya/Hbb/tmva/main_mva/weights/TMVAClassification_BDTG_main_tmva_2ndIter_all_double.weights.xml","/shome/nchernya/Hbb/tmva/main_mva/weights/TMVAClassification_BDTG_main_tmva_2ndIter_all_single.weights.xml"};
    TMVA::Reader *reader = new TMVA::Reader("Silent");
 	float var1,var2,var3,var4,var5,var6,var7,var8,var9,var10, var11, var12;
 	reader->AddVariable("Mqq",&var1);
