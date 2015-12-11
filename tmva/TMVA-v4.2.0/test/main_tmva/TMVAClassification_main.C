@@ -50,7 +50,7 @@
 
 using namespace std;
 
-void TMVAClassification_main(TString variable_name, TString type)
+int TMVAClassification_main(TString variable_name, TString type)
 {
 	TString myMethodList = ""; 
    // The explicit loading of the shared libTMVA is done in TMVAlogon.C, defined in .rootrc
@@ -113,8 +113,11 @@ void TMVAClassification_main(TString variable_name, TString type)
  
 
 	
-   TString outfileName( "output/Nm1/v14/TMVA_main_v14_Data_Nm1_"+variable_name+type+".root" );
+  // TString outfileName( "/afs/cern.ch/work/n/nchernya/tmva/TMVA-v4.2.0/test/main_tmva/output/Nm2/v14/TMVA_main_v14_Data_Nm2_"+variable_name+type+".root" );
+   TString outfileName("output/NmN/v14/SignN_1/TMVA_main_v14_Data_Nm1_"+variable_name+type+".root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
+	ofstream out;
+	out.open("output/NmN/v14/SingN_1/txt/TMVA_main_v14_Data_Nm1_"+variable_name+type+".txt"); 
 
    // Create the factory object. Later you can choose the methods
    // whose performance you'd like to investigate. The factory is 
@@ -132,7 +135,11 @@ void TMVAClassification_main(TString variable_name, TString type)
    // If you wish to modify default settings
    // (please check "src/Config.h" to see all available global options)
    //    (TMVA::gConfig().GetVariablePlotting()).fTimesRMS = 8.0;
-   //    (TMVA::gConfig().GetIONames()).fWeightFileDir = "myWeightDirectory";
+   
+		TString weightDirName = "weights/TMVAClassification_BDTG_";
+		weightDirName.Append(variable_name);
+		weightDirName.Append(type);
+  	   (TMVA::gConfig().GetIONames()).fWeightFileDir = weightDirName;
 
    // Define the input variables that shall be used for the MVA training
    // note that you may also use variable expressions, such as: "3*var1/var2*abs(var3)"
@@ -140,20 +147,28 @@ void TMVAClassification_main(TString variable_name, TString type)
   // factory->AddVariable( "myvar1 := var1+var2", 'F' );
   // factory->AddVariable( "myvar2 := var1-var2", "Expression 2", "", 'F' );
 
-	const int max_variables_number=18;
-	TString variables_names[max_variables_number]={"Mqq", "DeltaEtaQQ", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1_VBF", "qgl2_VBF" ,"Etot", "Jet5_pt","x1", "x2", "VB1", "VB2"};  
- 
+
+
+//second itereatin final order "Mqq" "DeltaPhiQQ",  "SoftN5", "HTsoft", "CSV1", "CSV2","DeltaEtaQB1", "DeltaEtaQB2",  "qgl1_VBF", "qgl2_VBF"  "Jet5_pt"
+
+	const int max_variables_number=10;
+	TString variables_names[max_variables_number]={"Mqq" /*,"DeltaEtaQQ"*/,"DeltaPhiQQ", /* "SoftN5", */"HTsoft",/* "CSV1", "CSV2",*/ /*"cosOqqbb",*/"DeltaEtaQB1", "DeltaEtaQB2",  "qgl1_VBF", "qgl2_VBF" /*,"Etot"*/, "Jet5_pt"/*,"x1"*/, "x2", "VB1"/*, "VB2"*/}; 
+
+ 	out<<"We used variables : "<<endl;
 	for (int i=0;i<max_variables_number;i++){
 		if (variable_name.CompareTo("all")==0){
 			factory->AddVariable(variables_names[i], "", "", 'F' );
+			out<<variables_names[i]<<"   ,   ";
 		}
 		else {	 
 			if (variables_names[i].CompareTo(variable_name)!=0) {
 				factory->AddVariable(variables_names[i], "", "", 'F' );
+				out<<variables_names[i]<<"   ,   ";
 			}
 		}
 	}
-
+	out.close();
+	
 
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
@@ -164,8 +179,10 @@ void TMVAClassification_main(TString variable_name, TString type)
 
    // Read training and test data
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
-	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBFHToBB_M-125_13TeV_powheg_v14"+type+".root";
-	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_BTagCSV_v14"+type+".root";
+//	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBFHToBB_M-125_13TeV_powheg_v14"+type+".root";
+//	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_BTagCSV_v14"+type+".root";
+	TString fname_signal ="main_tmva_tree_VBFHToBB_M-125_13TeV_powheg_v14"+type+".root";
+	TString fname_bg ="main_tmva_tree_BTagCSV_v14"+type+".root";
 
 
 
@@ -273,5 +290,7 @@ void TMVAClassification_main(TString variable_name, TString type)
 
    // Launch the GUI for the root macros
    if (!gROOT->IsBatch()) TMVAGui( outfileName );
+
+	return 0;
 
 }

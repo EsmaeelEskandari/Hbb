@@ -34,7 +34,7 @@
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_double.C"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single_blike.C"
-#include "/afs/cern.ch/work/n/nchernya/Hbb/trigger_maps.C"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/trigger_maps2.C"
 
 
 //Double_t erf( Double_t *x, Double_t *par){
@@ -96,16 +96,16 @@ TString file_postfix[2] = {"_v14","_v14"};
 
 const int nfiles  = 20;
 
-TString file_names[nfiles] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "BTagCSV","TTbar","DYtoQQ","ST_tW","ttHtobb","ttHtoNbb", "DYtoLL", "GF","JetHT_D05" };
-Float_t BG[nfiles] = {1.,1.,1.,1.,1.,1.,1.,1,0.,0.,0.,1.,1.,1.,0.,0.,1.,0.,0.};
-Float_t data[nfiles]={0.,0.,0.,0.,0.,0.,0.,0,0.,0.,1.,0.,0.,0.,0.,0.,0.,0.,1.};
+TString file_names[nfiles] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "VBFHToBB_M-125_13TeV_powheg", "VBFHToBB_M-130_13TeV_powheg", "BTagCSV","TTbar","DYtoQQ","ST_tW","ttHtobb","ttHtoNbb", "DYtoLL", "GF","SingleElectron" /* "JetHT_D05"*/ };
+Float_t BG[nfiles] = {1.,1.,1.,1.,1.,1.,1.,1,0.,0.,0.,1.,1.,1.,0.,0.,1.,0.,  1.};
+Float_t data[nfiles]={0.,0.,0.,0.,0.,0.,0.,0,0.,0.,1.,0.,0.,0.,0.,0.,0.,0.,  1.};
      
 TString type[nfiles]; 		
 for (int i=0;i<nfiles;i++){
 	type[i] = file_names[i];
 }
 
-Double_t xsec[nfiles] = { 2.75E07, 1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,2.16 ,1.96,1.,816.,1461., 71.7,0.2934,  0.2151,  6025.2, 43.92,1.  };
+Double_t xsec[nfiles] = { 2.75E07, 1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,2.16 ,1.96,1.,816.,1461., 71.7,0.2934,  0.2151,  6025.2, 25.17,1.  };
 
 do {
 	
@@ -120,14 +120,22 @@ do {
 	Int_t global_counter = 0;
 	Float_t HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200;
 	Float_t HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460;
+	Float_t HLT_BIT_HLT_Ele23_WPLoose_Gsf_v;
+	Float_t HLT_BIT_HLT_DiPFJetAve40_v;
+	Float_t HLT_BIT_HLT_DiPFJetAve60_v;
 	TFile *file_initial;
 	TChain *tree_initial;
 
-	TString path ;
-	path= "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat///store/user/nchernya/Hbb/v14/skimmed/";
+//	TString path ;
+//	path= "dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat///store/user/nchernya/Hbb/v14/skimmed/";
 
-	file_initial = TFile::Open(path+file_names[files]+file_postfix[set_type]+dataset_type[set_type]+".root");
-	
+//	file_initial = TFile::Open(path+file_names[files]+file_postfix[set_type]+dataset_type[set_type]+".root");
+//	file_initial = TFile::Open("/afs/cern.ch/user/s/sdonato/AFSwork/public/website/VBF/TriggerPerformanceData/Heppy/SingleElectronVBF.root");	
+// file_initial = TFile::Open("/shome/nchernya/Hbb/skim_trees/v14/SingleElectron_D05_v14_single/SingleElectron_v14.root");
+ file_initial = TFile::Open("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat///store/user/nchernya/Hbb/v14/skimmed/SingleElectron_D05.root");
+//  file_initial = TFile::Open("dcap://t3se01.psi.ch:22125//pnfs/psi.ch/cms/trivcat///store/user/nchernya/Hbb/v14/skimmed/JetHT_D05.root");
+
+
 	tree_initial = (TChain*)file_initial->Get("tree");
 	Int_t events_generated;
 	TH1F *countPos;
@@ -194,8 +202,9 @@ do {
 	tree_initial->SetBranchAddress("selLeptons_relIso03",selLeptons_relIso03);
 	tree_initial->SetBranchAddress("selLeptons_chargedHadRelIso03",selLeptons_chargedHadRelIso03);
 	tree_initial->SetBranchAddress("selLeptons_pfRelIso03",selLeptons_pfRelIso03);
-
-
+ 	tree_initial->SetBranchAddress("HLT_BIT_HLT_Ele23_WPLoose_Gsf_v",&HLT_BIT_HLT_Ele23_WPLoose_Gsf_v);
+	tree_initial->SetBranchAddress("HLT_BIT_HLT_DiPFJetAve40_v",&HLT_BIT_HLT_DiPFJetAve40_v);
+	tree_initial->SetBranchAddress("HLT_BIT_HLT_DiPFJetAve60_v",&HLT_BIT_HLT_DiPFJetAve60_v);
 
 
 	if (data[files]==1) {
@@ -395,12 +404,20 @@ do {
     for (int entry=0; entry<nentries;++entry){
         tree_initial->GetEntry(entry);
 
+
 		if (JSON!=1) {
 			continue;
 		}
 
+		float ex=0;
+		for (int i=0;i<nJets;i++){
+			if ((isnan(Jet.btag[i])==1)||(isinf(Jet.btag[i]==1)) ) ex=1;
+		}
+		if (ex==1) continue;
+		if (nJets<4) continue;
+		if (Jet.pt[3]<30) continue;
 	
-		
+	/*	
 		if (region_type==0) {
 			if (!((v_type==-1)||(v_type==4))) continue;
 	
@@ -415,7 +432,7 @@ do {
 			if (!((v_type==0)||(v_type==1))) continue;
 			if (!((selLeptons_tightId[0]==1)||(selLeptons_tightId[0]==3))) continue;
 			if (!((selLeptons_tightId[1]==1)||(selLeptons_tightId[1]==3))) continue;
-		}
+		}*/
 		
 
 		if (data[files]==1) PU=1.;
@@ -423,6 +440,7 @@ do {
 		genweight0 = TMath::Sign(1.,genweight)*PU;
 		genweight=TMath::Sign(1.,genweight)*PU;
 		genweight/=events_generated/xsec[files]; 
+
 
 
 
@@ -438,26 +456,48 @@ do {
 		TLorentzVector qq;
 ///////// preselection(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq, Float_t scale=1.)
 		if (set_type==0) {
-	//		if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue;
-		 if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue;
-
-			if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+			if (BG[files]==1) {
+		//		preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq);
+      ////////////////////////////////////////// 
+	//			if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue; 	
+	//			if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+		/////////////////////////////////////////
+				if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue; 	
+				if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+		/////////////////////////////////////////
+			}
+			if (BG[files]==0){
+		//		preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq); 
+			/////////////////////////////////////////
+		//		if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue; 	
+		//		if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0 )continue;
+			////////////////////////////////////////	
+				if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue; 	
+				if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+		/////////////////////////////////////////
+				if (HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200!=1) continue;	
+			}
 		}
 		else if (set_type==1){
-		//	if (set_type==1) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
-//	if (set_type==1) {
-	//	 (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq)) ;
-//		if (!((btag_max1_number>=0)&&(btag_max2_number>=0)&&(pt_max1_number>=0)&&(pt_max2_number>=0))) continue;
+			if (BG[files]==1) {
+	//			preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq); 
+			////////////////////////////////////////		
+	//			if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue; 
+			////////////////////////////////////////
+		if 	(preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+			////////////////////////////////////////
 
+			}
 
-//		if (files>7) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
-
-//		}
-	//	if (files<=7) if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
-		if (BG[files]==1) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
-
-		if (BG[files] == 0) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
-	//	if (files > 7) if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+			if (BG[files] == 0) { 
+		//		preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq); 
+			////////////////////////////////////////	
+		//		if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+			////////////////////////////////////////	
+			if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+			////////////////////////////////////////	
+				if (HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460!=1) continue;	
+			}
 		}
 	
 
@@ -488,7 +528,6 @@ do {
 			TLorentzVector jet0;
 			jet0.SetPtEtaPhiM(Jet.pt[i],Jet.eta[i],Jet.phi[i],Jet.mass[i]);
 			jets.push_back(jet0);
-			jets_btag.push_back(Jet.btag[i]);
 		}
 		SortByEta(jets);
 		TLorentzVector Qjet1_eta = jets[0];	
@@ -496,17 +535,59 @@ do {
 		jets.clear();
 		Float_t Mqq_eta=(Qjet1_eta+Qjet2_eta).M();	
 		Float_t Detaqq_eta = TMath::Abs(Qjet1_eta.Eta()-Qjet2_eta.Eta());
-		std::sort(jets_btag.begin(), jets_btag.end(),std::greater<int>()); 
+		for (int i=0;i<nJets;i++){
+			if (Jet.pt[i]>30)	jets_btag.push_back(Jet.btag[i]);
+		}
+		std::sort(jets_btag.begin(), jets_btag.end()); 
+		std::reverse(jets_btag.begin(), jets_btag.end()); 
 		Float_t CSV1;
+		Float_t CSV2;
 		if (jets_btag[0]>1.) CSV1 = 1.;
+		if (jets_btag[0]<0.) CSV1 = 0.;
 		else CSV1=jets_btag[0];
+		if (jets_btag[1]>1.) CSV2 = 1.;
+		if (jets_btag[1]<0.) CSV2 = 0.;
+		else CSV2=jets_btag[1];
 		
-	
+	if (HLT_BIT_HLT_Ele23_WPLoose_Gsf_v!=1) continue;	
+//	if (!( (HLT_BIT_HLT_DiPFJetAve40_v==1)||(HLT_BIT_HLT_DiPFJetAve60_v==1) ) ) continue;
+		
 //float SingleBtagVBFTriggerWeight(float pt1, float pt2, float pt3, float pt4 , float CSV1, float DeltaEtaqq_eta, float Mqq_eta, float DeltaPhibb_single, float DeltaEtaqq_single)
 
+
+/////////////////////////
+
 		if ((BG[files]==1)&&(set_type==1)) {
-		//	cout<< SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi, qqDeltaEta)<<endl;
-			genweight*=SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi, qqDeltaEta);
+//////////////////Single Preselection following trigger logic:
+		int btag_max1_number_tr = -1;
+		int btag_max2_number_tr = -1;
+		int pt_max1_number_tr = -1;
+		int pt_max2_number_tr = -1;
+		TLorentzVector Bjet1_tr;
+		TLorentzVector Bjet2_tr;
+		TLorentzVector Qjet1_tr;
+		TLorentzVector Qjet2_tr;
+		TLorentzVector qq_tr;
+		preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number_tr, btag_max2_number_tr, pt_max1_number_tr, pt_max2_number_tr, 1., Bjet1_tr, Bjet2_tr, Qjet1_tr, Qjet2_tr, qq_tr); 
+		Float_t Mqq_tr = qq_tr.M();
+		Float_t bbDeltaPhi_tr = TMath::Abs(Bjet1_tr.DeltaPhi(Bjet2_tr));
+		Float_t qqDeltaEta_tr = TMath::Abs(Qjet1_tr.Eta()-Qjet2_tr.Eta());
+/////////////////////////////
+			Float_t trigger_weight=0.;
+		//	if (	SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi_tr, qqDeltaEta_tr)>1.e-05)	
+			//	trigger_weight=SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi_tr, qqDeltaEta_tr);
+			if (	SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi, qqDeltaEta)>1.e-05)	
+				trigger_weight=SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi, qqDeltaEta);
+			genweight*=trigger_weight;
+	}
+
+
+
+		if ((BG[files]==1)&&(set_type==0)) {
+			Float_t trigger_weight=0.;
+			if (DoubleBtagVBFTriggerWeight(Jet.pt[0], Jet.pt[1], Jet.pt[2], Jet.pt[3],CSV1, CSV2, Detaqq_eta,Mqq_eta, qqDeltaEta, Mqq)>1.e-05)
+				trigger_weight = DoubleBtagVBFTriggerWeight(Jet.pt[0], Jet.pt[1], Jet.pt[2], Jet.pt[3],CSV1, CSV2, Detaqq_eta,Mqq_eta, qqDeltaEta, Mqq) ;
+			genweight*=trigger_weight;
 		}
 
 /*
@@ -730,10 +811,11 @@ do {
 
 		
 			if (genweight>0) pos_weight_presel++;
+			if (entry%100000==0) cout<<entry<<endl;
 				
 			global_counter++;
         }
-		TFile file("output_hist/v14/skimmed_tree"+region[region_type]+dataset_type[set_type]+type[files]+"_v14_exclusive_pu_triggerWeight_single_vtype23.root","recreate");
+		TFile file("output_hist/v14/skimmed_tree"+region[region_type]+dataset_type[set_type]+type[files]+"_v14_exclusive_pu_triggerWeight_Data_blike_diffrVar.root","recreate");
     
 		for (int i=0;i<numArray;++i){
     	    	histArray[i]->SetLineWidth(2);

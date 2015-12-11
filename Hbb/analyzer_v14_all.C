@@ -32,10 +32,23 @@
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_double.C"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single.C"
 #include "/afs/cern.ch/work/n/nchernya/Hbb/preselection_single_blike.C"
+#include "/afs/cern.ch/work/n/nchernya/Hbb/trigger_maps3.C"
 
 
-Double_t erf( Double_t *x, Double_t *par){
-  return par[0]/2.*(1.+TMath::Erf((x[0]-par[1])/par[2]));
+//Double_t erf( Double_t *x, Double_t *par){
+//  return par[0]/2.*(1.+TMath::Erf((x[0]-par[1])/par[2]));
+//}
+#define SWAP2(A, B) { TLorentzVector t = A; A = B; B = t; }
+void SortByEta(std::vector<TLorentzVector> &jets){
+  int i, j;
+	int n=jets.size();
+  for (i = n - 1; i >= 0; i--){
+    for (j = 0; j < i; j++){
+      if (jets[j].Eta() < jets[j + 1].Eta() ){
+        SWAP2( jets[j], jets[j + 1] );
+		}
+    }
+	}
 }
 
 typedef std::map<double, int> JetList;
@@ -69,6 +82,9 @@ typedef struct {
 
 using namespace std;
 
+
+///////    0 18 0/1 0/1/2
+
 int main(int argc, char* argv[]){
 
 int files=atoi(argv[1]);
@@ -83,13 +99,16 @@ TString file_postfix[2] = {"_v14","_v14"};
 const int nfiles  = 20;
 
 TString file_names[nfiles] = {"QCD_HT100to200", "QCD_HT200to300", "QCD_HT300to500","QCD_HT500to700", "QCD_HT700to1000", "QCD_HT1000to1500", "QCD_HT1500to2000", "QCD_HT2000toInf", "VBFHToBB_M-125_13TeV_powheg", "GF", "BTagCSV","TTbar","DYtoQQ","ST_tW","ttHtobb","ttHtoNbb", "DYtoLL"};
+Double_t xsec[nfiles] = { 2.75E07, 1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,  2.16 , 25.17 ,1.,816.,1461., 71.7,0.2934,  0.2151,  6025.2  };
+//Float_t BG[nfiles] = {1.,1.,1.,1.,1.,1.,1.,1,1.,1.,0.,1.,1.,1.,1.,1.,1.}; //it is actually all MC not only BG
+Float_t BG[nfiles] =   {0.,0.,0, 0, 0, 0, 0, 0,0 ,0 ,0.,0.,0.,0.,0.,0.,0.}; //it is actually all MC not only BG
+Float_t data[nfiles]={0.,0.,0.,0.,0.,0.,0.,0,0.,0.,1.,0.,0.,0.,0.,0.,0.};
      
 TString type[nfiles]; 		
 for (int i=0;i<nfiles;i++){
 	type[i] = file_names[i];
 }
 
-Double_t xsec[nfiles] = { 2.75E07, 1.74E06,  3.67E05, 2.94E04, 6.52E03,1.064E03,   121.5,  2.54E01,2.16 ,1.96,1.,816.,1461., 71.7,0.2934,  0.2151,  6025.2, 25.17  };
 
 do {
 	
@@ -125,7 +144,7 @@ do {
 	Int_t events_generated;
 	TH1F *countPos;
 	TH1F *countNeg;
-	if ((files!=10)){
+	if ((data[files]!=1)){
 		countPos = (TH1F*)file_initial->Get("CountPosWeight");
  		countNeg = (TH1F*)file_initial->Get("CountNegWeight");
  		events_generated = countPos->GetEntries()-countNeg->GetEntries();
@@ -193,8 +212,10 @@ do {
 
 
 
-	if (files==10) genweight = 1.;
-	if (files==10) puweight=1.;
+	if (data[files]==1){
+		genweight = 1.;
+		puweight=1.;
+	}
 
  	
     TH1F *hJet1_pt_bin = new TH1F("hJet1_pt_bin", "", 50, 90., 140.);
@@ -245,6 +266,9 @@ do {
    
 	TH1F *hEtaQQ = new TH1F("hEtaQQ","",80,0.,8.);
 	hEtaQQ->GetXaxis()->SetTitle("|#Delta#eta_{qq}|");
+
+	TH1F *hPhiQQ = new TH1F("hPhiQQ","",32,0.,3.2);
+	hPhiQQ->GetXaxis()->SetTitle("|#Delta#phi_{qq}|");
     
 	TH1F *hPhiBB = new TH1F("hPhiBB","",32,0.,3.2);
 	hPhiBB->GetXaxis()->SetTitle("|#Delta#phi_{bb}|");
@@ -377,8 +401,8 @@ do {
 
 
 
-   		const int numArray= 73; //54 without qgl stuff
-   		TH1F* histArray[numArray] = {hJet1_pt,hJet2_pt,hJet3_pt,hJet4_pt,  hJet1_eta,hJet2_eta,hJet3_eta,hJet4_eta,  hJet1_phi,hJet2_phi,hJet3_phi,hJet4_phi, hMqq, hEtaQQ, hPhiBB, hEtaSoftJets, hPtSoftJets,hMassSoftJets,hHTsoft,hSoft_n2,hSoft_n5,hSoft_n10,hMbb,hqgl,hbtag,hqgl2,hbtag2,hPtSoftJets2,hPtSoftJets3,hcosOqqbb,hEtaQB1, hEtaQB2, hPhiQB1, hPhiQB2,hx1,hx2,hVB1_mass, hVB2_mass, hEtot, hPxtot, hPytot, hPztot, hJet5_pt,hPtqqbb, hPhiqqbb, hEtaqqbb, hJet1_pt_bin,hJet2_pt_bin,hJet3_pt_bin,hJet4_pt_bin, hMqq_bin, hnPVs, hMbb_regVBF, hMbb_regVBF_fsr, hJet1q_pt, hJet1q_eta, hJet1q_ptd, hJet1q_axis2, hJet1q_mult, hJet2q_pt, hJet2q_eta, hJet2q_ptd, hJet2q_axis2, hJet2q_mult,hblike1,hblike2, hmet,  hselLeptons_tightId , hselLeptons_relIso03 , hselLeptons_chargedHadRelIso03, hselLeptons_pfRelIso03, hqgl1_VBF,hqgl2_VBF };
+   		const int numArray= 74; //54 without qgl stuff
+   		TH1F* histArray[numArray] = {hJet1_pt,hJet2_pt,hJet3_pt,hJet4_pt,  hJet1_eta,hJet2_eta,hJet3_eta,hJet4_eta,  hJet1_phi,hJet2_phi,hJet3_phi,hJet4_phi, hMqq, hEtaQQ, hPhiBB, hEtaSoftJets, hPtSoftJets,hMassSoftJets,hHTsoft,hSoft_n2,hSoft_n5,hSoft_n10,hMbb,hqgl,hbtag,hqgl2,hbtag2,hPtSoftJets2,hPtSoftJets3,hcosOqqbb,hEtaQB1, hEtaQB2, hPhiQB1, hPhiQB2,hx1,hx2,hVB1_mass, hVB2_mass, hEtot, hPxtot, hPytot, hPztot, hJet5_pt,hPtqqbb, hPhiqqbb, hEtaqqbb, hJet1_pt_bin,hJet2_pt_bin,hJet3_pt_bin,hJet4_pt_bin, hMqq_bin, hnPVs, hMbb_regVBF, hMbb_regVBF_fsr, hJet1q_pt, hJet1q_eta, hJet1q_ptd, hJet1q_axis2, hJet1q_mult, hJet2q_pt, hJet2q_eta, hJet2q_ptd, hJet2q_axis2, hJet2q_mult,hblike1,hblike2, hmet,  hselLeptons_tightId , hselLeptons_relIso03 , hselLeptons_chargedHadRelIso03, hselLeptons_pfRelIso03, hqgl1_VBF,hqgl2_VBF, hPhiQQ };
 			for (int i=0;i<numArray;i++){
 				histArray[i]->Sumw2();
 			}
@@ -411,13 +435,12 @@ do {
 		}
 		else if (region_type==2) {
 			if (!((v_type==0)||(v_type==1))) continue;
-		//	if (met_pt>100) continue;
 			if (!((selLeptons_tightId[0]==1)||(selLeptons_tightId[0]==3))) continue;
 			if (!((selLeptons_tightId[1]==1)||(selLeptons_tightId[1]==3))) continue;
 		}
 		
 
-		if (files==10) PU=1.;
+		if (data[files]==1) PU=1.;
 		else PU=puweight;
 		genweight0 = TMath::Sign(1.,genweight)*PU;
 		genweight=TMath::Sign(1.,genweight)*PU;
@@ -437,17 +460,55 @@ do {
 		
 		int flag=0;
 
+
 ///////// preselection(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq, Float_t scale=1.)
 		if (set_type==0) {
-		//	if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue;
-		 if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue;
+			if (BG[files]==1) {
+		//		preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq);
+      ////////////////////////////////////////// 
+	//			if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue; 	
+	//			if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+		/////////////////////////////////////////
+				if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue; 	
+				if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+		/////////////////////////////////////////
+			}
+			if (BG[files]==0){
+		//		preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq); 
+			/////////////////////////////////////////
+		//		if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue; 	
+		//		if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0 )continue;
+			////////////////////////////////////////	
+				if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) == 0) continue; 	
+				if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+		/////////////////////////////////////////
+				if (HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200!=1) continue;	
+			}
+		}
+		else if (set_type==1){
+			if (BG[files]==1) {
+	//			preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq); 
+			////////////////////////////////////////		
+				//if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue; 
+			////////////////////////////////////////
+		if 	(preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+			////////////////////////////////////////
 
-			if (preselection_double(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_DoubleBTag_CSV_VBF_Mqq200, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+			}
+
+			if (BG[files] == 0) { 
+//			preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq); 
+			////////////////////////////////////////	
+//				if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
+			////////////////////////////////////////	
+			if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, 1., Bjet1, Bjet2, Qjet1, Qjet2, qq)!=0) continue;
+			////////////////////////////////////////	
+				if (HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460!=1) continue;	
+			}
 		}
-		else {
-		//	if (set_type==1) if (preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
-			if (set_type==1) if (preselection_single_blike(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.blike_VBF, Jet.id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_QuadPFJet_SingleBTag_CSV_VBF_Mqq460, Bjet1, Bjet2, Qjet1, Qjet2, qq) != 0) continue;
-		}
+	
+
+
 	
 
 		int matched_qq = 0;
@@ -470,8 +531,74 @@ do {
 		Float_t Mqq = qq.M();
 		Float_t bbDeltaPhi = TMath::Abs(Bjet1.DeltaPhi(Bjet2));
 		Float_t qqDeltaEta = TMath::Abs(Qjet1.Eta()-Qjet2.Eta());
+		Float_t qqDeltaPhi = TMath::Abs(Qjet1.DeltaPhi(Qjet2));
 
 
+////////////////////////////
+
+		vector<TLorentzVector> jets;
+		vector<Float_t> jets_btag;
+		for (int i=0;i<4;i++){
+			TLorentzVector jet0;
+			jet0.SetPtEtaPhiM(Jet.pt[i],Jet.eta[i],Jet.phi[i],Jet.mass[i]);
+			jets.push_back(jet0);
+		}
+		SortByEta(jets);
+		TLorentzVector Qjet1_eta = jets[0];	
+		TLorentzVector Qjet2_eta = jets[3];
+		jets.clear();
+		Float_t Mqq_eta=(Qjet1_eta+Qjet2_eta).M();	
+		Float_t Detaqq_eta = TMath::Abs(Qjet1_eta.Eta()-Qjet2_eta.Eta());
+		for (int i=0;i<nJets;i++){
+			if (Jet.pt[i]>30)	jets_btag.push_back(Jet.btag[i]);
+		}
+		std::sort(jets_btag.begin(), jets_btag.end()); 
+		std::reverse(jets_btag.begin(), jets_btag.end()); 
+		Float_t CSV1;
+		Float_t CSV2;
+		if (jets_btag[0]>1.) CSV1 = 1.;
+		if (jets_btag[0]<0.) CSV1 = 0.;
+		else CSV1=jets_btag[0];
+		if (jets_btag[1]>1.) CSV2 = 1.;
+		if (jets_btag[1]<0.) CSV2 = 0.;
+		else CSV2=jets_btag[1];
+		
+		if ((BG[files]==1)&&(set_type==1)) {
+//////////////////Single Preselection following trigger logic:
+		int btag_max1_number_tr = -1;
+		int btag_max2_number_tr = -1;
+		int pt_max1_number_tr = -1;
+		int pt_max2_number_tr = -1;
+		TLorentzVector Bjet1_tr;
+		TLorentzVector Bjet2_tr;
+		TLorentzVector Qjet1_tr;
+		TLorentzVector Qjet2_tr;
+		TLorentzVector qq_tr;
+		preselection_single(nJets, Jet.pt,Jet.eta, Jet.phi, Jet.mass, Jet.btag, Jet.id, btag_max1_number_tr, btag_max2_number_tr, pt_max1_number_tr, pt_max2_number_tr, 1., Bjet1_tr, Bjet2_tr, Qjet1_tr, Qjet2_tr, qq_tr); 
+		Float_t Mqq_tr = qq_tr.M();
+		Float_t bbDeltaPhi_tr = TMath::Abs(Bjet1_tr.DeltaPhi(Bjet2_tr));
+		Float_t qqDeltaEta_tr = TMath::Abs(Qjet1_tr.Eta()-Qjet2_tr.Eta());
+/////////////////////////////
+			Float_t trigger_weight=0.;
+		//	if (	SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi_tr, qqDeltaEta_tr)>1.e-05)	
+		//		trigger_weight=SingleBtagVBFTriggerWeight(Jet.pt[0],Jet.pt[1],Jet.pt[2],Jet.pt[3],CSV1, Detaqq_eta , Mqq_eta ,  bbDeltaPhi_tr, qqDeltaEta_tr);
+	//		genweight*=trigger_weight;
+	}
+
+
+
+		if ((BG[files]==1)&&(set_type==0)) {
+			Float_t trigger_weight=0.;
+	//		if (DoubleBtagVBFTriggerWeight(Jet.pt[0], Jet.pt[1], Jet.pt[2], Jet.pt[3],CSV1, CSV2, Detaqq_eta,Mqq_eta, qqDeltaEta, Mqq)>1.e-05)
+			//	trigger_weight = DoubleBtagVBFTriggerWeight(Jet.pt[0], Jet.pt[1], Jet.pt[2], Jet.pt[3],CSV1, CSV2, Detaqq_eta,Mqq_eta, qqDeltaEta, Mqq) ;
+		//	genweight*=trigger_weight;
+		}
+
+////////////////////////////
+
+
+
+/*
 		Float_t Mqq_parametersQCD[3] = {};
 		Float_t Mqq_parametersData[3] = {};
 		if (set_type==1)  {Mqq_parametersQCD[0]= 1. ; Mqq_parametersQCD[1]=5.42e02 ;Mqq_parametersQCD[2]=3.99e02;}
@@ -489,9 +616,9 @@ do {
 		funcData->FixParameter(2,Mqq_parametersData[2]);
 
 
-	//	if (files!=10)	genweight*=funcData->Eval(Mqq)/funcQCD->Eval(Mqq);
+	//	if (data[files]!=1)	genweight*=funcData->Eval(Mqq)/funcQCD->Eval(Mqq);
 
-
+*/
 
 
 		presel+=genweight0;
@@ -621,6 +748,7 @@ do {
             hVtype->Fill(v_type,genweight);
 			hMqq->Fill(Mqq,genweight);
 			hEtaQQ->Fill(qqDeltaEta,genweight);
+			hPhiQQ->Fill(qqDeltaPhi,genweight);
 			hPhiBB->Fill(bbDeltaPhi,genweight);
 			hEtaSoftJets->Fill(Jet.soft_eta[0],genweight);
 			hPtSoftJets->Fill(Jet.soft_pt[0],genweight);

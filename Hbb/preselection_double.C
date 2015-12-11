@@ -13,25 +13,26 @@ int preselection_double(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 	if (!(Jet_pt[2]>64.*scale)) not_pass=-4;
 	if (!(Jet_pt[3]>30.*scale))  not_pass = -5;
 
-		Float_t btag_max = 0.0;
+		Float_t btag_max = -100.;
 
 		int loopJetmin = 6;
 		if (nJets<6) loopJetmin=nJets;
 
 		for (int i=0;i<loopJetmin;i++){
+			if ((isnan(Jet_btagCSV[i])==1)||(isinf(Jet_btagCSV[i]==1)) ) Jet_btagCSV[i]=1.; 
 			if (Jet_btagCSV[i]>1) Jet_btagCSV[i]=1.;
 		}
 
 
 		for (int i=0;i<loopJetmin;i++){
-			if ((Jet_btagCSV[i]>=btag_max)/*&&(Jet_id[i]>0)*/){
+			if ((Jet_btagCSV[i]>btag_max)/*&&(Jet_id[i]>0)*/){
 				btag_max=Jet_btagCSV[i];
 				btag_max1_number=i;
 			}
 		}
-		btag_max = 0.0;
+		btag_max = -100.;
 		for (int i=0;i<loopJetmin;i++){
-			if ((Jet_btagCSV[i]>=btag_max)&&(i!=btag_max1_number)/*&&(Jet_id[i]>0)*/) {
+			if ((Jet_btagCSV[i]>btag_max)&&(i!=btag_max1_number)/*&&(Jet_id[i]>0)*/) {
 				btag_max=Jet_btagCSV[i];
 				btag_max2_number=i;
 			} 
