@@ -19,11 +19,8 @@
 using namespace std;
 
 int main(int argc, char* argv[]){
-	TString type = std::string(argv[1]);
-	TString physics_type = std::string(argv[2]);
-	int sample = atoi(argv[3]);
-	char cmd[50];
-	sprintf(cmd,".x make_hist.C(\"%s\",\"%s\",\"%s\")",argv[1],argv[2],argv[3]); //argv[1] = type - single/double;   physics_type (VBF/QCD) ; number of the physics type	
+			  char cmd[50];
+	sprintf(cmd,".x make_hist.C(\"%s\",\"%s\",\"%s\")",argv[1],argv[2]); 
 	gROOT->ProcessLine(cmd);
 	return 0;
 }
