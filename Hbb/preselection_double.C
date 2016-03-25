@@ -8,15 +8,22 @@ int preselection_double(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 	int not_pass=0;
 	if (nJets<4) return -1;
 
-	if (!(Jet_pt[0]>92.*scale)) not_pass= -2;
-	if (!(Jet_pt[1]>76.*scale)) not_pass = -3;
-	if (!(Jet_pt[2]>64.*scale)) not_pass=-4;
-	if (!(Jet_pt[3]>30.*scale))  not_pass = -5;
+	float Jet_pt_first[17];
+	int tmp_count = 0;
+	for (int i=0;i<nJets;i++){
+		if (!((Jet_id[i]>2)&&(Jet_puId[i]>0))) continue;
+		Jet_pt_first[tmp_count] = Jet_pt[i]; 
+	}
 
-		Float_t btag_max = -100.;
+	if (!(Jet_pt_first[0]>92.*scale)) not_pass= -2;
+	if (!(Jet_pt_first[1]>76.*scale)) not_pass = -3;
+	if (!(Jet_pt_first[2]>64.*scale)) not_pass=-4;
+	if (!(Jet_pt_first[3]>30.*scale))  not_pass = -5;
 
-		int loopJetmin = 6;
-		if (nJets<6) loopJetmin=nJets;
+		Float_t btag_max = 0.5;
+
+		int loopJetmin = 7;
+		if (nJets<7) loopJetmin=nJets;
 
 		for (int i=0;i<loopJetmin;i++){
 			if ((isnan(Jet_btagCSV[i])==1)||(isinf(Jet_btagCSV[i]==1)) ) Jet_btagCSV[i]=1.; 
@@ -25,14 +32,14 @@ int preselection_double(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 
 
 		for (int i=0;i<loopJetmin;i++){
-			if ((Jet_btagCSV[i]>btag_max)/*&&(Jet_id[i]>0)*/){
+			if ((Jet_btagCSV[i]>btag_max)&&(Jet_id[i]>2)&&(Jet_puId[i]>0)){
 				btag_max=Jet_btagCSV[i];
 				btag_max1_number=i;
 			}
 		}
-		btag_max = -100.;
+		btag_max = 0.5;
 		for (int i=0;i<loopJetmin;i++){
-			if ((Jet_btagCSV[i]>btag_max)&&(i!=btag_max1_number)/*&&(Jet_id[i]>0)*/) {
+			if ((Jet_btagCSV[i]>btag_max)&&(i!=btag_max1_number)&&(Jet_id[i]>2)&&(Jet_puId[i]>0)) {
 				btag_max=Jet_btagCSV[i];
 				btag_max2_number=i;
 			} 
@@ -46,14 +53,14 @@ int preselection_double(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 
 		Float_t pt_max = 20.*scale;
 		for (int i=0;i<loopJetmin;i++){
-			if ((Jet_pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)/*&&(Jet_id[i]>0)*/) {
+			if ((Jet_pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(Jet_id[i]>2)&&(Jet_puId[i]>0)) {
 				pt_max=Jet_pt[i];
 				pt_max1_number=i;	
 			}
 		}
 		pt_max = 20.*scale;
 		for (int i=0;i<loopJetmin;i++){
-			if ((Jet_pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(i!=pt_max1_number)/*&&(Jet_id[i]>0)*/) {
+			if ((Jet_pt[i]>pt_max)&&(i!=btag_max1_number)&&(i!=btag_max2_number)&&(i!=pt_max1_number)&&(Jet_id[i]>2)&&(Jet_puId[i]>0)) {
 				pt_max=Jet_pt[i];
 				pt_max2_number=i;	
 			}

@@ -12,10 +12,18 @@ int preselection_single_blike(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[
 	
 	if (nJets<4) return -1;
 
-	if (!(Jet_pt[0]>92.*scale)) not_pass= -2;
-	if (!(Jet_pt[1]>76.*scale)) not_pass = -3;
-	if (!(Jet_pt[2]>64.*scale)) not_pass=-4;
-	if (!(Jet_pt[3]>30.*scale))  not_pass = -5;
+	float Jet_pt_first[17];
+	int tmp_count = 0;
+	for (int i=0;i<nJets;i++){
+		if (!((Jet_id[i]>2)&&(Jet_puId[i]>0))) continue;
+		Jet_pt_first[tmp_count] = Jet_pt[i]; 
+	}
+
+	if (!(Jet_pt_first[0]>92.*scale)) not_pass= -2;
+	if (!(Jet_pt_first[1]>76.*scale)) not_pass = -3;
+	if (!(Jet_pt_first[2]>64.*scale)) not_pass=-4;
+	if (!(Jet_pt_first[3]>30.*scale))  not_pass = -5;
+
 
 		int loopJet_max;
 		if (nJets<7) loopJet_max = nJets; 
@@ -29,18 +37,20 @@ int preselection_single_blike(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[
 	int cont=0;
 	do{
  		int i = iJet->second;
+		if (!((Jet_id[i]>2)&&(Jet_puId[i]>0))) {iJet++;continue;}
 		if(cont==0) { Bjet1.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]); btag_max1_number=i; }
 		if(cont==1) { Bjet2.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]); btag_max2_number=i;}
 		cont++;
 		iJet++;
 	}while (cont<2);
-      for(int i=0; i<loopJet_max; i++){
-  			if ((i!=btag_max1_number)&&(i!=btag_max2_number)) jetList_pt[Jet_pt[i]]=i;
-		}
+	for(int i=0; i<loopJet_max; i++){
+  		if ((i!=btag_max1_number)&&(i!=btag_max2_number)) jetList_pt[Jet_pt[i]]=i;
+	}
 	cont=0;
 	JetList::reverse_iterator iJet2=jetList_pt.rbegin();
 	do{
  		int i = iJet2->second;
+		if (!((Jet_id[i]>2)&&(Jet_puId[i]>0))) {iJet2++; continue;}
 		if(cont==0) { Qjet1.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]); pt_max1_number=i; }
 		if(cont==1) { Qjet2.SetPtEtaPhiM(Jet_pt[i],Jet_eta[i],Jet_phi[i],Jet_mass[i]); pt_max2_number=i;}
 		cont++;
