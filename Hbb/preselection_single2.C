@@ -1,4 +1,4 @@
-int preselection_single(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t Jet_id[300], Int_t Jet_puId[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq, Float_t scale=1.){
+int preselection_single(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], Float_t Jet_phi[300], Float_t Jet_mass[300], Float_t Jet_btagCSV[300], Int_t Jet_id[300], Int_t& btag_max1_number, Int_t& btag_max2_number, Int_t& pt_max1_number, Int_t& pt_max2_number, Float_t trigger, TLorentzVector& Bjet1,TLorentzVector& Bjet2, TLorentzVector& Qjet1, TLorentzVector& Qjet2,TLorentzVector& qq, Float_t scale=1.){
 
 	btag_max1_number = -1;
 	btag_max2_number = -1;
@@ -8,29 +8,19 @@ int preselection_single(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 	int not_pass=0;
 	
 	if (nJets<4) return -1;
-	float Jet_pt_first[17];
-	int tmp_count = 0;
-	for (int i=0;i<nJets;i++){
-		if (!((Jet_id[i]>2)&&(Jet_puId[i]>0))) continue;
-		Jet_pt_first[tmp_count] = Jet_pt[i];
-		tmp_count++; 
-	}
-	
-	if (tmp_count<4) return -1;
-	
-	if (!(Jet_pt_first[0]>92.*scale)) not_pass= -2;
-	if (!(Jet_pt_first[1]>76.*scale)) not_pass = -3;
-	if (!(Jet_pt_first[2]>64.*scale)) not_pass=-4;
-	if (!(Jet_pt_first[3]>30.*scale))  not_pass = -5;
 
+	if (!(Jet_pt[0]>92.*scale)) not_pass= -2;
+	if (!(Jet_pt[1]>76.*scale)) not_pass = -3;
+	if (!(Jet_pt[2]>64.*scale)) not_pass=-4;
+	if (!(Jet_pt[3]>30.*scale))  not_pass = -5;
 
 		int loopJet_min = 4;
 
 
 		Double_t btag_max = -100.;
 		for (int i=0;i<loopJet_min;i++){
-			if ((isnan(Jet_btagCSV[i])==1)||(isinf(Jet_btagCSV[i]==1)) ) Jet_btagCSV[i]=1.; 
-			if ((Jet_btagCSV[i]>btag_max)&&(Jet_id[i]>2)&&(Jet_puId[i]>0)){
+	//		if ((isnan(Jet_btagCSV[i])==1)||(isinf(Jet_btagCSV[i]==1)) ) Jet_btagCSV[i]=1.; 
+			if ((Jet_btagCSV[i]>btag_max)/*&&(Jet_id[i]>0)*/){
 				btag_max=Jet_btagCSV[i];
 				btag_max1_number=i;
 			}
@@ -45,7 +35,7 @@ int preselection_single(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 		int jcount = 0;
 		int j_num[3] = {};
 		for (int i=0;i<4;i++){
-			if ((i!=btag_max1_number)&&(Jet_id[i]>2)&&(Jet_puId[i]>0)) {
+			if ((i!=btag_max1_number)/*&&(Jet_id[i]>0)*/) {
 				js[jcount].SetPtEtaPhiM(Jet_pt[i], Jet_eta[i], Jet_phi[i], Jet_mass[i]);
 				j_num[jcount] = i;
 				jcount++;
@@ -54,7 +44,7 @@ int preselection_single(Int_t nJets, Float_t Jet_pt[300], Float_t Jet_eta[300], 
 		if (!(jcount==3)) not_pass = -1;
 	
 	
-		Double_t deltaEtaJet_[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
+		Float_t deltaEtaJet_[3] = {TMath::Abs(js[0].Eta()-js[1].Eta()),TMath::Abs(js[1].Eta()-js[2].Eta()), TMath::Abs(js[0].Eta()-js[2].Eta())};
 		int eta_num[3][2] = {{0,1}, {1,2} ,{0,2}};
 		Float_t max_deltaEta = 0.;
 		int max_deltaEta_num = -1;
