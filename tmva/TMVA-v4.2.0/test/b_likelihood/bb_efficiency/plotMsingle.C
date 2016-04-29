@@ -209,7 +209,7 @@ Float_t bb_efficiency_find = 0;
    }
 
 	ofstream out;
-	out.open("efficiency_v13_final.txt");
+	out.open("efficiency_v14_cmssw76_h21b.txt");
    out<<" preselection purity b-lik "<<cont_1m/presel<< " 1/2 "<<cont_2m/presel <<std::endl;
    out<<" preselection purity csv "<<cont_1m_/presel<< " 1/2 "<<cont_2m_/presel << " , presel = "<< presel<<std::endl;
 	out<<"bb efficiency to find   = " << bb_efficiency_find/presel<<endl;
@@ -238,6 +238,7 @@ Float_t bb_efficiency_find = 0;
    h_mass_csv->SetTitle("");
    h_mass_csv->Draw("same");
 	TLegend *leg = new TLegend(0.68,0.7,0.9,0.93);
+	leg->SetFillColor(0);
 	leg->SetBorderSize(0);
 	leg->SetTextSize(0.04);
 	leg->AddEntry(h_mass_csv,"btag CSV order","L");
@@ -271,7 +272,7 @@ Float_t bb_efficiency_find = 0;
 	tex1->Draw();
 	tex2->Draw();
 	tex_file->Draw();
-	c->Print("plots/blike_mh_v13_final.png");
+	c->Print("plots/blike_mh_v14_cmssw76_h21b.png");
 
 
    TCanvas *d =  new TCanvas("d","d");	
@@ -286,7 +287,7 @@ Float_t bb_efficiency_find = 0;
 	tex1->Draw();
 	tex2->Draw();
 	tex_file->Draw();
-	d->Print("plots/blike_v13_final.png");
+	d->Print("plots/blike_v14_cmssw76_h21b.png");
 
 
 

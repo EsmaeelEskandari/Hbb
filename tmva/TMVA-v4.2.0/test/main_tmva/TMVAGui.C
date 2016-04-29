@@ -46,7 +46,13 @@ void ActionButton( TControlBar* cbar,
 }
 
 // main GUI
-void TMVAGui( const char* fName = "output/TMVA_main_QCD300to700_Nm1_Mqq_single.root" ) 
+//void TMVAGui( const char* fName = "/shome/nchernya/Hbb/tmva/main_mva/output/v21/TMVA_main_v21_Data_Nm1_all_double_more_variables_noeta_030trees.root" ) 
+//void TMVAGui( const char* fName = "/shome/nchernya/Hbb/tmva/main_mva/output/v21/TMVA_main_v21_Data_Nm1_all_single_more_variables_noeta_030trees.root" ) 
+//void TMVAGui( const char* fName = "/shome/nchernya/Hbb/tmva/main_mva/output/v21/TMVA_main_v21_Data_Nm1_all_single_final.root" ) 
+//void TMVAGui( const char* fName = "/shome/nchernya/Hbb/tmva/main_mva/output/v21/TMVA_main_v21_Data_Nm1_all_double_final.root" ) 
+
+void TMVAGui( const char* fName = "/afs/cern.ch/user/s/scoopers/public/For_Nadya/TMVA_13TeV_April18_allVar_H125Sig_0b1b2bWjetsTTbarBkg_Mjj.root" )
+
 {   
    // Use this script in order to run the various individual macros
    // that plot the output of TMVA (e.g. running TMVAClassification.C),

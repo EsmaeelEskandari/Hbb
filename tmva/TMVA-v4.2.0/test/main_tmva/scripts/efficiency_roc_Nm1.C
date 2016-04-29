@@ -12,11 +12,9 @@
 //int main(){
 void efficiency_roc_Nm1(){
 	gROOT->ProcessLine(".x /afs/cern.ch/work/n/nchernya/setTDRStyle.C");
-	const int n_variables = 13; //13 //19
-//	TString variables_names[n_variables]={"Mqq", "DeltaEtaQQ", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "Etot", "Jet5_pt", "x1", "x2", "VB1", "VB2", "all"};  
-	//TString variables_names[n_variables]={"Mqq", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" , "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2",  "Jet5_pt", "VB2", "all"};  
-//	TString variables_names[n_variables]={"Mqq", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" , "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "VB2", "all"};  
-	TString variables_names[n_variables]={"Mqq", "DeltaEtaQQ","DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" ,"cosOqqbb", "DeltaEtaQB1", "DeltaEtaQB2", "qgl1", "qgl2", "all"};  
+	const int n_variables = 13 ;//10;// 11; // 18;//19;
+	TString variables_names[n_variables]={"Mqq", "DeltaEtaQQ", "DeltaPhiQQ", "SoftN5","CSV1", "CSV2" , "DeltaEtaQB",  "Jet5_pt", "axis2_jet1", "axis2_jet2", "qqbb_pt","qqbb_pz", "all"};  
+//	TString variables_names[n_variables]={"Mqq", "DeltaPhiQQ", "SoftN5", "HTsoft", "CSV1", "CSV2" , "qgl1_VBF", "qgl2_VBF", "Jet5_pt",  "all"};  
 	TString file_names[n_variables];
 	TString file_names_single[n_variables];
 	Double_t frame2_axisx[n_variables];
@@ -27,16 +25,18 @@ void efficiency_roc_Nm1(){
 	Double_t hist_integrals[n_variables];
 	Double_t hist_integrals_single[n_variables];
 	for (int i=0;i<n_variables;i++){
-		file_names[i].Prepend("../output/Nm1/TMVA_main_v13_Data_Nm1_"+variables_names[i]);
+//		file_names[i].Prepend("../output/Nm2/v14/TMVA_main_v14_Data_Nm2_"+variables_names[i]);
+		file_names[i].Prepend("/shome/nchernya/Hbb/tmva/main_mva/output/v21/TMVA_main_v21_Data_Nm1_"+variables_names[i]);
 		file_names_single[i] = file_names[i];
-		file_names[i].Append("_double.root");
-		file_names_single[i].Append("_single.root");
+		file_names[i].Append("_double_final.root");
+		file_names_single[i].Append("_single_final.root");
 	}
 TLegend *leg = new TLegend(0.12,0.17,0.45,0.4);
 leg->SetBorderSize(0);
 leg->SetTextSize(0.04);
 
-	for (int current_file=n_variables-1;current_file>=0;current_file--){
+	for (int current_file=0;current_file<n_variables;current_file++){
+//	for (int current_file=n_variables-1;current_file>=0;current_file--){
 		TFile *file = new TFile(file_names[current_file]);
 		file->cd("Method_BDT/BDTG");
 		file->ls();
@@ -54,8 +54,10 @@ leg->SetTextSize(0.04);
 		c2->SetBottomMargin(.12);
 		c2->cd();
 		TH1F *frame2 = new TH1F("frame2","",n_variables,0.,n_variables);
-		frame2->SetMinimum(0.83);
-      frame2->SetMaximum(.86);
+		frame2->SetMinimum(0.81);
+      frame2->SetMaximum(.84);
+      frame2->SetMinimum(hist_integrals[n_variables-1]*0.97);
+      frame2->SetMaximum(hist_integrals[n_variables-1]*1.007);
       frame2->GetYaxis()->SetTitleOffset(1.4);
       frame2->GetXaxis()->SetTitleOffset(1.);
       frame2->SetStats(0);
@@ -73,7 +75,8 @@ leg->SetTextSize(0.04);
 		gr->SetMarkerStyle(20);
 		gr->SetLineWidth(2);
 		gr->Draw("PLsame");
-		TLegend *leg = new TLegend(0.7,0.15,0.9,0.4);
+		TLegend *leg = new TLegend(0.7,0.86,0.9,0.9);
+		leg->SetFillColor(0);
 		leg->SetBorderSize(0);
 		leg->SetTextSize(0.04);
 		leg->AddEntry(gr,"DoubleBtag","PL");
@@ -83,13 +86,15 @@ leg->SetTextSize(0.04);
 		line2->SetLineColor(2);
 		line2->SetLineWidth(2);
 		line2->Draw("Lsame`");
-		c2->Print("plots/v13/efficiency_v13_Data_Nm1_double_4.png");
+		c2->Print("plots/v21/05_04_2016/efficiency_v21_Data_final_double.png");
 
 		TCanvas *c3 = new TCanvas();
 		c3->SetBottomMargin(.12);
 		c3->cd();
-		frame2->SetMinimum(0.82);
-      frame2->SetMaximum(.887);
+      frame2->SetMinimum(hist_integrals_single[n_variables-1]*0.95);
+//		frame2->SetMinimum(0.84);
+  //    frame2->SetMaximum(.887);
+      frame2->SetMaximum(hist_integrals_single[n_variables-1]*1.01);
 		frame2->Draw();
 		TGraph *gr_single = new TGraph(n_variables,frame2_axisx,hist_integrals_single);
 		gr_single->SetMarkerStyle(25);
@@ -98,7 +103,8 @@ leg->SetTextSize(0.04);
 		gr_single->SetLineWidth(2);
 		gr_single->Draw("PLsame");
 
-		TLegend *leg1 = new TLegend(0.7,0.15,0.9,0.4);
+		TLegend *leg1 = new TLegend(0.7,0.86,0.9,0.9);
+		leg1->SetFillColor(0);
 		leg1->SetBorderSize(0);
 		leg1->SetTextSize(0.04);
 		leg1->AddEntry(gr_single,"SingleBtag","PL");
@@ -109,8 +115,6 @@ leg->SetTextSize(0.04);
 		line3->SetLineWidth(2);
 		line3->Draw("Lsame`");
 	
-		c3->Print("plots/v13/efficiency_v13_Data_Nm1_single_4.png");
-
-	//	return 0;
+		c3->Print("plots/v21/05_04_2016/efficiency_v21_Data_final_single.png");
 
 }

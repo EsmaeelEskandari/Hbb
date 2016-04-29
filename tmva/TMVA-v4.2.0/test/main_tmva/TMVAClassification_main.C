@@ -114,10 +114,10 @@ int TMVAClassification_main(TString variable_name, TString type)
 
 	
   // TString outfileName( "/afs/cern.ch/work/n/nchernya/tmva/TMVA-v4.2.0/test/main_tmva/output/Nm2/v14/TMVA_main_v14_Data_Nm2_"+variable_name+type+".root" );
-   TString outfileName("output/NmN/v14/SignN_1/TMVA_main_v14_Data_Nm1_"+variable_name+type+".root" );
+   TString outfileName("output/v21/TMVA_main_v21_Data_Nm1_"+variable_name+type+"_final.root" );
    TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 	ofstream out;
-	out.open("output/NmN/v14/SingN_1/txt/TMVA_main_v14_Data_Nm1_"+variable_name+type+".txt"); 
+	out.open("output/v21/txt/TMVA_main_v21_Data_Nm1_"+variable_name+type+"_final.txt"); 
 
    // Create the factory object. Later you can choose the methods
    // whose performance you'd like to investigate. The factory is 
@@ -139,6 +139,7 @@ int TMVAClassification_main(TString variable_name, TString type)
 		TString weightDirName = "weights/TMVAClassification_BDTG_";
 		weightDirName.Append(variable_name);
 		weightDirName.Append(type);
+		weightDirName.Append("_v21");
   	   (TMVA::gConfig().GetIONames()).fWeightFileDir = weightDirName;
 
    // Define the input variables that shall be used for the MVA training
@@ -151,24 +152,27 @@ int TMVAClassification_main(TString variable_name, TString type)
 
 //second itereatin final order "Mqq" "DeltaPhiQQ",  "SoftN5", "HTsoft", "CSV1", "CSV2","DeltaEtaQB1", "DeltaEtaQB2",  "qgl1_VBF", "qgl2_VBF"  "Jet5_pt"
 
-	const int max_variables_number=10;
-	TString variables_names[max_variables_number]={"Mqq" /*,"DeltaEtaQQ"*/,"DeltaPhiQQ", /* "SoftN5", */"HTsoft",/* "CSV1", "CSV2",*/ /*"cosOqqbb",*/"DeltaEtaQB1", "DeltaEtaQB2",  "qgl1_VBF", "qgl2_VBF" /*,"Etot"*/, "Jet5_pt"/*,"x1"*/, "x2", "VB1"/*, "VB2"*/}; 
+	const int max_variables_number=12;
+	TString variables_names[max_variables_number]={/*"Mbb",*/"Mqq" ,"DeltaEtaQQ","DeltaPhiQQ" , "SoftN5", "CSV1", "CSV2", "Jet5_pt","axis2_jet1", "axis2_jet2","DeltaEtaQB","qqbb_pt","qqbb_pz"}; 
+	//TString variables_names[max_variables_number]={"Mbb","Mqq" ,"DeltaEtaQQ","DeltaPhiQQ" , "SoftN5", "CSV1", "CSV2", "cosOqqbb","DeltaEtaQB1", "DeltaEtaQB2","DeltaEtaQB",  "Jet5_pt","x1", "x2", "axis2_jet1", "axis2_jet2"}; 
 
  	out<<"We used variables : "<<endl;
 	for (int i=0;i<max_variables_number;i++){
 		if (variable_name.CompareTo("all")==0){
-			factory->AddVariable(variables_names[i], "", "", 'F' );
+			if (variables_names[i].CompareTo("SoftN5")!=0) factory->AddVariable(variables_names[i], "", "", 'F' );
+			else factory->AddVariable(variables_names[i], "", "", 'I' );
 			out<<variables_names[i]<<"   ,   ";
 		}
 		else {	 
 			if (variables_names[i].CompareTo(variable_name)!=0) {
-				factory->AddVariable(variables_names[i], "", "", 'F' );
+				if (variables_names[i].CompareTo("SoftN5")!=0) factory->AddVariable(variables_names[i], "", "", 'F' );
+				else factory->AddVariable(variables_names[i], "", "", 'I' );
 				out<<variables_names[i]<<"   ,   ";
 			}
 		}
 	}
 	out.close();
-	
+	factory->AddSpectator( "Mbb",  "Mbb", "GeV", 'F' );	
 
 
    // You can add so-called "Spectator variables", which are not used in the MVA training,
@@ -181,8 +185,8 @@ int TMVAClassification_main(TString variable_name, TString type)
    // (it is also possible to use ASCII format as input -> see TMVA Users Guide)
 //	TString fname_signal ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_VBFHToBB_M-125_13TeV_powheg_v14"+type+".root";
 //	TString fname_bg ="/afs/cern.ch/work/n/nchernya/Hbb/main_tmva/main_tmva_tree_BTagCSV_v14"+type+".root";
-	TString fname_signal ="main_tmva_tree_VBFHToBB_M-125_13TeV_powheg_v14"+type+".root";
-	TString fname_bg ="main_tmva_tree_BTagCSV_v14"+type+".root";
+	TString fname_signal ="main_tmva_tree_VBFHToBB_M-125_13TeV_powheg-ext_v21"+type+".root";
+	TString fname_bg ="main_tmva_tree_BTagCSV_v21"+type+".root";
 
 
 
@@ -216,6 +220,7 @@ int TMVAClassification_main(TString variable_name, TString type)
    // You can add an arbitrary number of signal or background trees
    factory->AddSignalTree    ( signal,     signalWeight  );
    factory->AddBackgroundTree( bg, bgWeight );
+	factory->SetSignalWeightExpression("weight");
    TCut mycuts = ""; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
    TCut mycutb = ""; // for example: TCut mycutb = "abs(var1)<0.5";
    
@@ -253,9 +258,9 @@ int TMVAClassification_main(TString variable_name, TString type)
 
    if (Use["BDTG"]) //
       factory->BookMethod( TMVA::Types::kBDT, "BDTG",
-		   "!H:!V:NTrees=120:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=3:NegWeightTreatment=IgnoreNegWeightsInTraining" );
-
-   // For an example of the category classifier usage, see: TMVAClassificationCategory
+		   "!H:!V:NTrees=200:MinNodeSize=5%:BoostType=Grad:Shrinkage=0.10:UseBaggedBoost:BaggedSampleFraction=0.5:nCuts=20:MaxDepth=3:NegWeightTreatment=IgnoreNegWeightsInTraining" );
+   
+	// For an example of the category classifier usage, see: TMVAClassificationCategory
 
    // --------------------------------------------------------------------------------------------------
 

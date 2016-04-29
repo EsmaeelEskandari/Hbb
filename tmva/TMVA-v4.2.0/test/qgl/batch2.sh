@@ -26,6 +26,7 @@ root=.root
 
 echo $TMPDIR/$2${dataset_type[ $3 ]}$root 
 
+cp $TMPDIR/$2${dataset_type[ $3 ]}$root /shome/nchernya/Hbb/
 xrdcp $TMPDIR/$2${dataset_type[ $3 ]}$root root://t3se01.psi.ch//store/user/nchernya/Hbb/v14/qgd/
 rm  $TMPDIR/$2${dataset_type[ $3 ]}$root 
 
