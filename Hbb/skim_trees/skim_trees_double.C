@@ -45,7 +45,7 @@ void skim_trees_double::Loop(TString filename, TString input_filename)
 		TLorentzVector Qjet2;
 		TLorentzVector qq;
 	
-		if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v, Bjet1, Bjet2, Qjet1, Qjet2, qq, looser_cuts_coef) !=0) continue;
+		if (preselection_double(nJet, Jet_pt,Jet_eta, Jet_phi, Jet_mass, Jet_btagCSV, Jet_id, btag_max1_number, btag_max2_number, pt_max1_number, pt_max2_number, /*HLT_BIT_HLT_QuadPFJet_DoubleBTagCSV_VBF_Mqq200_v*/1., Bjet1, Bjet2, Qjet1, Qjet2, qq, looser_cuts_coef) !=0) continue;
 
 		tree->Fill();		
 

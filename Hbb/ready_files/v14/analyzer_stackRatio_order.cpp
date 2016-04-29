@@ -103,6 +103,8 @@ for (int i=0;i<nfiles;i++){
 //	file_names[i].Append("_v14_exclusive_pu_triggerWeight_single");
 //	file_names[i].Append("_v14_exclusive_blike_pu");
 	file_names[i].Append("_v14_qgl");
+//	if (i!=0) file_names[i].Append("_v14_qgl");
+//	else file_names[i].Append("_v14_qgl2");
 //	file_names[i].Append("_v14_exclusive_pu_triggerWeight_single_vtype23");
 	file_names[i].Append(".root");
 }
@@ -188,8 +190,9 @@ out_efficiency.open(trigger[set_type]+dir_name+"efficiency.txt");
 //Float_t MC_data[2] = {1./0.708,1./.9};////////////TO BE CHANGED
 //Float_t MC_data[2] = {1./0.704,1./.899};////////////for trigger logic
 //Float_t MC_data[2] = {1./0.703,1./.964};////////////for blike single btag logic
-Float_t MC_data[2] = {1./0.74,1./.95};////////////for blike single btag logic and with PU weight
-//Float_t MC_data[2] = {1./0.74,1./2.81};////////////for blike single btag logic and with PU weight for triggers
+//Float_t MC_data[2] = {1./0.74,1./.95};////////////for blike single btag logic and with PU weight
+//Float_t MC_data[2] = {1./0.718,1./.95};////////////for blike single btag logic and with PU weight
+Float_t MC_data[2] = {1./0.741,.95};////////////for blike single btag logic and with PU weight for triggers
 Float_t lumi_qcd=lumi/MC_data[set_type];
 do{
 	
@@ -469,8 +472,8 @@ out_discrimination.close();
     	pad2->cd();
 
 		TH1F *frame2 = new TH1F("frame2","",1,xmin,xmax);
-		frame2->SetMinimum(-.5);
-      frame2->SetMaximum(.5);
+		frame2->SetMinimum(-1);
+      frame2->SetMaximum(1);
       frame2->GetYaxis()->SetTitleOffset(0.4);
       frame2->GetXaxis()->SetTitleOffset(1.3);
       frame2->SetStats(0);

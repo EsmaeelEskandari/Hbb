@@ -78,12 +78,12 @@ int set_type = atoi(argv[1]); //0 - double, 1 - single
 int region_type=atoi(argv[2]); // 0 - analysis, 1 - control region , top
  
 const int nfiles  = 18;
-TString leg_names[nfiles] = {"Data",/*"powheg, m(H) = 130 GeV","amc@NLO, m(H) = 125 GeV",*/"VBF, m(H) = 125 GeV","GF, m(H) = 125 GeV","t#bar{t}H, H#rightarrow b#bar{b}","t#bar{t}H, non b#bar{b}","Z(ll) + jets","W(l#nu) + jets","Single t (tW)","Z + jets","t#bar{t}","QCD, H_{T}>100 GeV","QCD, H_{T}>200 GeV","QCD, H_{T}>300 GeV","QCD, H_{T}>500 GeV","QCD, H_{T}>700 GeV","QCD, H_{T}>1000 GeV","QCD, H_{T}>1500 GeV","QCD, H_{T}>2000 GeV"};
+TString leg_names[nfiles] = {"Data","VBF, m(H) = 125 GeV","GF, m(H) = 125 GeV","t#bar{t}H, H#rightarrow b#bar{b}","t#bar{t}H, non b#bar{b}","Z(ll) + jets","W(l#nu) + jets","Single t (tW)","Z + jets","t#bar{t}","QCD, H_{T}>100 GeV","QCD, H_{T}>200 GeV","QCD, H_{T}>300 GeV","QCD, H_{T}>500 GeV","QCD, H_{T}>700 GeV","QCD, H_{T}>1000 GeV","QCD, H_{T}>1500 GeV","QCD, H_{T}>2000 GeV"};
 if (set_type==0)leg_names[0] = "Data (DoubleB)";
 if (set_type==1)leg_names[0] = "Data (SingleB)";
 
 
-TString file_names[nfiles] = { "BTagCSV_golden",/*"VBFHToBB_M-130_13TeV_powheg",*/"VBFHToBB_M-125_13TeV_powheg","GF","ttHtobb","ttHtoNbb","DYtoLL","WJetsToLNu","ST_tW","DYtoQQ","TTbar","QCD_HT2000toInf","QCD_HT1500to2000","QCD_HT1000to1500","QCD_HT100to200","QCD_HT700to1000","QCD_HT200to300","QCD_HT500to700","QCD_HT300to500"}; 
+TString file_names[nfiles] = { "BTagCSV_golden","VBFHToBB_M-125_13TeV_powheg","GF","ttHtobb","ttHtoNbb","DYtoLL","WJetsToLNu","ST_tW","DYtoQQ","TTbar","QCD_HT2000toInf","QCD_HT1500to2000","QCD_HT1000to1500","QCD_HT100to200","QCD_HT700to1000","QCD_HT200to300","QCD_HT500to700","QCD_HT300to500"}; 
 int bg_begin;
 int qcd_begin=10;
 if (region_type==0) bg_begin=7;
@@ -112,9 +112,7 @@ for (int i=0;i<nfiles;i++){
 	file_names[i].Prepend("skimmed_tree");
 	file_names[i].Prepend("../../output_hist/v14/golden/");
 	file_names[i].Append("_v14_final_74cmssw");
-//	file_names[i].Append("_v14_bdt");
-//	if (i!=0) file_names[i].Append("_v14_qgl");
-//	else file_names[i].Append("_v14_qgl2");
+//	file_names[i].Append("_v14_bdt");  //without trigger correction
 	file_names[i].Append(".root");
 }
 TString trigger[2] = {"RatioDoubleBtag_blike_", "RatioSingleBtag_blike_"};
@@ -128,15 +126,20 @@ Float_t lumi = 2190;
 	
 
 
-TLegend *leg = new TLegend(0.77,0.45,0.92,0.9);
+TLegend *leg = new TLegend(0.77,0.45,0.92,0.9); //without writing about SF
 leg->SetFillColor(0);
 leg->SetBorderSize(0);
 leg->SetTextFont(42);
 leg->SetTextSize(0.025);
+TLegend *leg2 = new TLegend(0.77,0.35,0.92,0.4); //with  writing about SF
+leg2->SetFillColor(0);
+leg2->SetBorderSize(0);
+leg2->SetTextFont(42);
+leg2->SetTextSize(0.025);
 
-const int nhistos = 73; //40//52
-TString hist_names[nhistos]={"hJet1_pt","hJet2_pt","hJet3_pt","hJet4_pt","hJet1_eta","hJet2_eta","hJet3_eta","hJet4_eta","hJet1_phi","hJet2_phi","hJet3_phi","hJet4_phi","hMqq", "hEtaQQ", "hPhiBB","hMbb","hbtag","hbtag2","hcosOqqbb","hEtaQB1", "hEtaQB2", "hPhiQB1", "hPhiQB2","hx1","hx2","hVB1_mass","hVB2_mass","hEtot","hPxtot","hPytot","hPztot","hJet5_pt","hPtqqbb","hEtaqqbb","hPhiqqbb","hJet1_pt_bin","hJet2_pt_bin","hJet3_pt_bin","hJet4_pt_bin", "hMqq_bin","hEtaSoftJets", "hPtSoftJets","hMassSoftJets","hHTsoft","hSoft_n2","hSoft_n5","hSoft_n10","hqgl","hqgl2", "hPtSoftJets2","hPtSoftJets3","hPVs", "hJet1q_pt", "hJet1q_eta", "hJet1q_ptd", "hJet1q_axis2", "hJet1q_mult", "hJet2q_pt", "hJet2q_eta", "hJet2q_ptd", "hJet2q_axis2", "hJet2q_mult","hMbb_regVBF","hMbb_regVBF_fsr","hblike1","hblike2", "hmet", "hqgl1_VBF", "hqgl2_VBF", "hbdt", "hPhiQQ", "hMbb_regVBF_fsr_high", "hMbb_regVBF_fsr_high_cat"};
-int UNITS[nhistos]={1,1,1,1 ,0,0,0,0 ,0,0,0,0, 1 ,0,0 ,1, 0,0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1 ,0,0, 1,1,1,1,1, 0, 1,1,1 ,0,0,0,0,0, 1,1, 0, 1,0,0,0,0, 1,0,0,0,0, 1,1 ,0,0, 1, 0,0,0,0,1,1};
+const int nhistos = 74; //40//52
+TString hist_names[nhistos]={"hJet1_pt","hJet2_pt","hJet3_pt","hJet4_pt","hJet1_eta","hJet2_eta","hJet3_eta","hJet4_eta","hJet1_phi","hJet2_phi","hJet3_phi","hJet4_phi","hMqq", "hEtaQQ", "hPhiBB","hMbb","hbtag","hbtag2","hcosOqqbb","hEtaQB1", "hEtaQB2", "hPhiQB1", "hPhiQB2","hx1","hx2","hVB1_mass","hVB2_mass","hEtot","hPxtot","hPytot","hPztot","hJet5_pt","hPtqqbb","hEtaqqbb","hPhiqqbb","hJet1_pt_bin","hJet2_pt_bin","hJet3_pt_bin","hJet4_pt_bin", "hMqq_bin","hEtaSoftJets", "hPtSoftJets","hMassSoftJets","hHTsoft","hSoft_n2","hSoft_n5","hSoft_n10","hqgl","hqgl2", "hPtSoftJets2","hPtSoftJets3","hPVs", "hJet1q_pt", "hJet1q_eta", "hJet1q_ptd", "hJet1q_axis2", "hJet1q_mult", "hJet2q_pt", "hJet2q_eta", "hJet2q_ptd", "hJet2q_axis2", "hJet2q_mult","hMbb_regVBF","hMbb_regVBF_fsr","hblike1","hblike2", "hmet", "hqgl1_VBF", "hqgl2_VBF", "hbdt", "hPhiQQ", "hMbb_regVBF_fsr_high", "hMbb_regVBF_fsr_high_cat","hselLeptons_relIso03"};
+int UNITS[nhistos]={1,1,1,1 ,0,0,0,0 ,0,0,0,0, 1 ,0,0 ,1, 0,0,0,0,0,0,0,0,0, 1,1,1,1,1,1,1,1 ,0,0, 1,1,1,1,1, 0, 1,1,1 ,0,0,0,0,0, 1,1, 0, 1,0,0,0,0, 1,0,0,0,0, 1,1 ,0,0, 1, 0,0,0,0 ,1,1, 0};
 std::array<int,100> LOGY_array = {71,72,51,52,53,54,55,56,57,58,59,60,61};
 
 TString hist_names_sum[nhistos]={};
@@ -195,19 +198,20 @@ ofstream out_discrimination;
 out_efficiency.open(trigger[set_type]+dir_name+"efficiency.txt"); 
 
 //Float_t MC_data[2] = {1.,1.};////////////for efficiency 
-//Float_t MC_data[2] = {1./0.7581,1./0.906};////////////for blike single btag logic and with PU for golden
+//Float_t MC_data[2] = {1./0.7581,1./0.906};////////////for blike single btag logic and with PU for golden FINAL WITHOUT TRIGGER CORRECTION
 //Float_t MC_data[2] = {1./1.5,1./1.56};////////////trigger correction using 4 jets, mqq(double) and csv1,csv2(double)
 //Float_t MC_data[2] = {1./1.07,1./1.52};////////////trigger correction using 4 jets (not 3,4 for single), mqq(double) and csv1
 //Float_t MC_data[2] = {1./1.07,1./1.17};////////////trigger correction using 4 jets (not 3 for single), mqq(double) and csv1(double)
 //Float_t MC_data[2] = {1./1.43,1./1.68};////////////trigger correction using 4 jets (not 3 for single), mqq(double) and csv1(double) and normalization with 3rd jet in double and 1st in single
-Float_t MC_data[2] = {1./1.06,1./1.46};////////////for efficiency
+Float_t MC_data[2] = {1./1.06,1./1.46};//////////// FINAL after trigger correction
 if (region_type!=0) {
 	MC_data[0]=1.; 
 	MC_data[1]=1.; 
 }
 Float_t lumi_qcd=lumi/MC_data[set_type];
 do{
-   TFile *file_initial = new TFile(file_names[files]);
+	TFile *file_initial;
+  	file_initial = new TFile(file_names[files]);
 	TH1F *histos[100];
 	for (int hist=0;hist<nhistos;++hist){
 		if ((hist==71)||(hist==72)) ((TH1F*)file_initial->Get(hist_names[hist]))->Rebin(2);
@@ -232,25 +236,25 @@ do{
 			signal_histos2[hist]=(TH1F*)signal_histos[hist]->Clone("signalHist2");
 		}
 		if (files==2) {
+			gf_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone(hist_names_sum[hist]+"tthnb");
+			gf_histos[hist]->Scale(lumi);
+			gf_histos[hist]->Sumw2(kFALSE);
+			gf_histos[hist]->SetLineColor(LINECOLOR[files]);
+			gf_histos[hist]->SetLineStyle(LINESTYLE[files]);
+		}
+		if (files==3) {
 			tthbb_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone(hist_names_sum[hist]+"tthb");
 			tthbb_histos[hist]->Scale(lumi);
 			tthbb_histos[hist]->Sumw2(kFALSE);
 			tthbb_histos[hist]->SetLineColor(LINECOLOR[files]);
 			tthbb_histos[hist]->SetLineStyle(LINESTYLE[files]);
 		}
-		if (files==3) {
+		if (files==4) {
 			tthnbb_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone(hist_names_sum[hist]+"tthnb");
 			tthnbb_histos[hist]->Scale(lumi);
 			tthnbb_histos[hist]->Sumw2(kFALSE);
 			tthnbb_histos[hist]->SetLineColor(LINECOLOR[files]);
 			tthnbb_histos[hist]->SetLineStyle(LINESTYLE[files]);
-		}
-		if (files==4) {
-			gf_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone(hist_names_sum[hist]+"tthnb");
-			gf_histos[hist]->Scale(lumi);
-			gf_histos[hist]->Sumw2(kFALSE);
-			gf_histos[hist]->SetLineColor(LINECOLOR[files]);
-			gf_histos[hist]->SetLineStyle(LINESTYLE[files]);
 		}
 		histos[hist]->SetLineColor(LINECOLOR[files]);
 		histos[hist]->SetLineStyle(LINESTYLE[files]);
@@ -312,7 +316,8 @@ for (int hist=0;hist<nhistos;hist++){
 }
 
 
-//Float_t TSF[2] = {0.452433,0.525697};
+//Float_t TSF[2] = {0.452433,0.525697}; old v13
+//Float_t TSF[2] = {0.737,0.69}; //v14 (cmssw74)
 Float_t TSF[2] = {1.,1.};
 Float_t kfactors[2] = {0.,0.};
 kfactors[set_type] = 1./(MC_data[set_type] * TSF[set_type]);
@@ -334,6 +339,8 @@ if (region_type!=0) {
 	leg->AddEntry(histos_for_legened[order_legend[qcd_begin]],"QCD","F");
 }
 leg->AddEntry(hBkgUncUp[0],"MC stat. unc.","F");
+leg2->AddEntry(hBkgUncUp[0],"without dynamical","");
+leg2->AddEntry(hBkgUncUp[0],"trigger SF","");
 
 
 
@@ -449,6 +456,7 @@ for (int i=0;i<nhistos;i++){
 		hBkgVis[i]->Draw("same E2");
 
 		leg->Draw("same");
+	//	leg2->Draw("same");
   		gPad->RedrawAxis();
 	
   		TPad* pad2 = new TPad("pad2", "pad2", 0., 0., 1., 1.);
@@ -468,15 +476,13 @@ for (int i=0;i<nhistos;i++){
 		frame2->SetTitleFont(42,"y");
       frame2->SetTitleSize(0.13, "XYZ");
 		frame2->GetYaxis()->SetNdivisions(505);
-    	frame2->GetXaxis()->SetLabelSize(.0);	
-  		frame2->GetYaxis()->SetNdivisions(505);
  		frame2->GetYaxis()->SetTickLength(0.06);
   		frame2->GetYaxis()->SetTitleSize(0.04);
   		frame2->GetYaxis()->SetTitleOffset(1.5);
-  		frame2->GetXaxis()->SetTitleSize(0.05);
  		frame2->GetYaxis()->SetLabelSize(0.03);
-  		frame2->GetXaxis()->SetLabelSize(0.04);
   		frame2->GetYaxis()->CenterTitle(kTRUE);
+  		frame2->GetXaxis()->SetTitleSize(0.05);
+  		frame2->GetXaxis()->SetLabelSize(0.04);
 		frame2->SetXTitle(signal_histos[i]->GetXaxis()->GetTitle());
 		frame2->SetYTitle("Data / MC - 1");
 		frame2->Draw();	
