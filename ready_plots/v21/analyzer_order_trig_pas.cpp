@@ -265,6 +265,11 @@ do{
 		if (files==13) histos[hist]->Scale(lumi_top[region_type]);
 		
 
+		if (files==bg_begin) 	sum_histos[hist] = (TH1F*)histos[hist]->Clone(sum_histos_names[hist]);
+		if (files>bg_begin)	sum_histos[hist]->Add(histos[hist]); 
+
+
+
 		if (files>0) histos[hist]->Sumw2(kFALSE);
 		if (hist==4) cout<<files<<"   "<<histos[4]->Integral() <<endl;
 
@@ -318,7 +323,7 @@ do{
 	//	if (files==bg_begin) 	sum_histos[hist] = (TH1F*)histos[hist]->Clone(sum_histos_names[hist]);
 	//	if (files>bg_begin)	sum_histos[hist]->Add(histos[hist]); 
 	//
-		if (files==nfiles-1)	sum_histos[hist] = (TH1F*)stacks[hist]->GetStack()->Last()->Clone("sum_histos"); 
+	//	if (files==nfiles-1)	sum_histos[hist] = (TH1F*)stacks[hist]->GetStack()->Last()->Clone("sum_histos"); 
 	//
 		if (hist==0) histos_for_legened[files] = (TH1F*)histos[0]->Clone("newd");
 		if (files==bg_begin)	discr_histos[hist] = (TH1F*)file_initial->Get(hist_names[hist])->Clone("discr");
@@ -461,6 +466,12 @@ tex_k->SetTextAlign(20);
 tex_k->SetTextFont(42);
 tex_k->SetTextSize(0.03);
 tex_k->SetLineWidth(2);
+
+float axis2_array1[500];
+float axis2_array2[500];
+int ar1N;
+int ar2N;
+
 for (int i=0;i<nhistos;i++){
 //	for (int i=0;i<4;i++){
 		//temp_str.Form("%2.2f",Discr(discr_histos[i],signal_histos2[i]));
@@ -490,8 +501,8 @@ for (int i=0;i<nhistos;i++){
   		if ((region_type==0) && (LOGY==true)) gPad->SetLogy();
 		
 		
-		Double_t xmin = signal_histos[i]->GetBinCenter(0);
-		Double_t xmax = signal_histos[i]->GetBinCenter(signal_histos[i]->GetNbinsX())+signal_histos[i]->GetBinWidth(signal_histos[i]->GetNbinsX());
+		Double_t xmin = signal_histos[i]->GetBinCenter(1)-signal_histos[i]->GetBinWidth(1)/2.;
+		Double_t xmax = signal_histos[i]->GetBinCenter(signal_histos[i]->GetNbinsX())+signal_histos[i]->GetBinWidth(signal_histos[i]->GetNbinsX())/2.;
 		if ((region_type!=0 ) && (i==66)) {xmin=0.;xmax=400;}
 		if ((region_type!=0 ) && (i==87)) {xmin=-1.;xmax=1.;}
 		if (hist_names[i].CompareTo("hPVs")==0) xmax=30;
@@ -504,14 +515,15 @@ for (int i=0;i<nhistos;i++){
       frame->GetXaxis()->SetTitleOffset(0.91);
       frame->SetStats(0);
 		frame->GetYaxis()->SetNdivisions(505);
+		if (hist_names[i].CompareTo("hSoft_n5")==0)  frame->GetXaxis()->SetNdivisions(18,-2);
 	 	frame->GetXaxis()->SetLabelSize(0.0);
 		char name[1000];
 		if (UNITS[i]==0) {
 			if (data_histos[i]->GetBinWidth(1)>1) sprintf(name,"Events / %1.0f",data_histos[i]->GetBinWidth(1));
-			else sprintf(name,"Events / %1.2f",data_histos[i]->GetBinWidth(1));
-		} else {
-      	sprintf(name,"Events / %1.0f %s",data_histos[i]->GetBinWidth(1),"GeV");
-		}
+			else 
+				if (data_histos[i]->GetBinWidth(1)<0.01)  sprintf(name,"Events / %1.3f",data_histos[i]->GetBinWidth(1));
+					else sprintf(name,"Events / %1.2f",data_histos[i]->GetBinWidth(1));
+		} else 	sprintf(name,"Events / %1.0f",data_histos[i]->GetBinWidth(1),"GeV");
 		frame->GetYaxis()->SetTitle(name);
 
       frame->Draw();
@@ -540,6 +552,10 @@ for (int i=0;i<nhistos;i++){
 ///////////////////////////////////////////////////
 		data_histos[i]->Draw("Psame");
 		hBkgVis[i]->Draw("same E2");
+		if (hist_names[i].CompareTo("hMbb_regVBF_fsr")==0) 
+			cout<<" Mbb  "<<data_histos[i]->GetBinContent(data_histos[i]->GetXaxis()->GetNbins()+1)<<"   , mc  "<<hBkgVis[i]->GetBinContent(hBkgVis[i]->GetXaxis()->GetNbins()+1) <<endl;
+
+		
 
 		leg->Draw("same");
 	//	leg2->Draw("same");
@@ -562,6 +578,8 @@ for (int i=0;i<nhistos;i++){
 		frame2->SetTitleFont(42,"y");
       frame2->SetTitleSize(0.13, "XYZ");
 		frame2->GetYaxis()->SetNdivisions(505);
+		if (hist_names[i].CompareTo("hSoft_n5")==0)  frame2->GetXaxis()->SetNdivisions(18,-2);
+		if (hist_names[i].CompareTo("hSoft_n5")==0)  frame2->GetXaxis()->CenterLabels(kTRUE);
  		frame2->GetYaxis()->SetTickLength(0.06);
   		frame2->GetYaxis()->SetTitleSize(0.04);
   		frame2->GetYaxis()->SetTitleOffset(1.5);
@@ -583,13 +601,36 @@ for (int i=0;i<nhistos;i++){
 		data_histos2[i]->Add(sum_histos[i],-1);
 		data_histos2[i]->Divide(sum_histos[i]);
 		data_histos2[i]->Draw("PEsame");
+		if (hist_names[i].CompareTo("hJet1q_axis2")==0) {
+			ar1N=data_histos2[i]->GetXaxis()->GetNbins();
+			for (int k=1;k<data_histos2[i]->GetXaxis()->GetNbins();k++)
+					axis2_array1[k-1] = 1+data_histos2[i]->GetBinContent(k);
+		}
+		if (hist_names[i].CompareTo("hJet2q_axis2")==0) {
+			ar2N=data_histos2[i]->GetXaxis()->GetNbins();
+			for (int k=1;k<data_histos2[i]->GetXaxis()->GetNbins();k++)
+					axis2_array2[k-1] = 1+ data_histos2[i]->GetBinContent(k);
+		}
 		hBkgUncUp[i]->Draw("HIST same");
 		hBkgUncLo[i]->Draw("HIST same");
 		pad2->RedrawAxis();
 		c1->Print(output_names[i]);
 		c1->Delete();
 	}
+		cout<<endl;
+		cout<<endl;
+		cout<<endl;
+		cout<<endl;
+		cout<<endl;
 
+		for (int k=1;k<ar1N;k++)
+				cout<<axis2_array1[k] <<" , ";
+		cout<<endl;
+		for (int k=1;k<ar2N;k++)
+				cout<<axis2_array2[k]<<" , ";
+		cout<<endl;
+		cout<<endl;
+		cout<<endl;
 
 
 return 0;
